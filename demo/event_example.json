@@ -1,0 +1,8 @@
+{
+  "event_id": "event_001",
+  "event_content": "某公共场所发生安全事件，引发公众讨论。",
+  "event_labels": {
+    "topic": "社会事件",
+    "event_valence": "negative"
+  }
+}

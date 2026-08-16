@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_2105807580",
+  "source_user_id": "2105807580",
+  "identity": {
+    "gender": "m",
+    "location": "安徽",
+    "verified": true,
+    "followers_count": 6013000
+  },
+  "action_preference": {
+    "original_preference": 0.287037,
+    "repost_preference": 0.712963
+  },
+  "topic_preference": {
+    "社会事件": 0.142857,
+    "新闻时事": 0.258929,
+    "娱乐": 0.223214,
+    "其他": 0.375
+  },
+  "information_orientation": {
+    "fact_rate": 0.261261,
+    "opinion_rate": 0.630631,
+    "questioning_rate": 0.108108
+  },
+  "emotion_expression": {
+    "positive_rate": 0.45045,
+    "neutral_rate": 0.27027,
+    "negative_rate": 0.279279
+  },
+  "data_info": {
+    "total_posts": 108,
+    "topic_sample_count": 108,
+    "expression_sample_count": 108,
+    "faction_sample_count": 108
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.345133,
+    "表态判断派": 0.221239,
+    "情绪激进派": 0.070796,
+    "矛盾激化派": 0.017699,
+    "吃瓜派": 0.345133
+  }
+}

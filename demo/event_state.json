@@ -1,0 +1,9 @@
+
+{
+  "event_id": "event_001",
+  "step": 1,
+  "official_statement": "相关部门已成立调查组，正在核查具体情况。",
+  "official_statement_status": "incomplete",
+  "group_conflict": false,
+  "seriousness": "high"
+}

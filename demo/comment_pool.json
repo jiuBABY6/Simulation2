@@ -1,0 +1,487 @@
+{
+  "event_id": "event_001",
+  "generation_method": "local_template_fallback",
+  "requested_size": 60,
+  "candidates": [
+    {
+      "comment_id": "comment_001",
+      "text": "关于某公共场所发生安全事件，引发公众讨论。，建议尽快公开核查依据和后续处理进展。",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_002",
+      "text": "这件事的关键还是事实链条，期待看到完整、可核验的信息。",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_003",
+      "text": "如果后续信息透明、处置及时，公众对社会事件的信任有机会恢复。",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_004",
+      "text": "这事确实让人不舒服，希望相关方面认真对待。",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_005",
+      "text": "目前先看后续通报，再决定怎么判断吧。",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_006",
+      "text": "希望最后能有一个让大家信服的结果。",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_007",
+      "text": "看到某公共场所发生安全事件，引发公众讨论。真的很生气，不能就这样算了。",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_008",
+      "text": "信息越看越乱，心里多少有点焦虑。",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_009",
+      "text": "希望别再互相指责了，大家都先冷静下来。",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_010",
+      "text": "为什么每次都要把责任推给某一类人？就不能正面回应吗？",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_011",
+      "text": "又开始给人贴标签了，真正的问题反而没人讨论。",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_012",
+      "text": "别拿地域和身份制造对立，先把事实说清楚。",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_013",
+      "text": "先吃瓜，等一个后续。",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_014",
+      "text": "信息量有点大，搬个小板凳看后续。",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_015",
+      "text": "希望最后能平稳解决，散了散了。",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_016",
+      "text": "关于某公共场所发生安全事件，引发公众讨论。，建议尽快公开核查依据和后续处理进展。（第16条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_017",
+      "text": "这件事的关键还是事实链条，期待看到完整、可核验的信息。（第17条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_018",
+      "text": "如果后续信息透明、处置及时，公众对社会事件的信任有机会恢复。（第18条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_019",
+      "text": "这事确实让人不舒服，希望相关方面认真对待。（第19条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_020",
+      "text": "目前先看后续通报，再决定怎么判断吧。（第20条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_021",
+      "text": "希望最后能有一个让大家信服的结果。（第21条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_022",
+      "text": "看到某公共场所发生安全事件，引发公众讨论。真的很生气，不能就这样算了。（第22条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_023",
+      "text": "信息越看越乱，心里多少有点焦虑。（第23条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_024",
+      "text": "希望别再互相指责了，大家都先冷静下来。（第24条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_025",
+      "text": "为什么每次都要把责任推给某一类人？就不能正面回应吗？（第25条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_026",
+      "text": "又开始给人贴标签了，真正的问题反而没人讨论。（第26条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_027",
+      "text": "别拿地域和身份制造对立，先把事实说清楚。（第27条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_028",
+      "text": "先吃瓜，等一个后续。（第28条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_029",
+      "text": "信息量有点大，搬个小板凳看后续。（第29条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_030",
+      "text": "希望最后能平稳解决，散了散了。（第30条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_031",
+      "text": "关于某公共场所发生安全事件，引发公众讨论。，建议尽快公开核查依据和后续处理进展。（第31条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_032",
+      "text": "这件事的关键还是事实链条，期待看到完整、可核验的信息。（第32条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_033",
+      "text": "如果后续信息透明、处置及时，公众对社会事件的信任有机会恢复。（第33条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_034",
+      "text": "这事确实让人不舒服，希望相关方面认真对待。（第34条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_035",
+      "text": "目前先看后续通报，再决定怎么判断吧。（第35条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_036",
+      "text": "希望最后能有一个让大家信服的结果。（第36条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_037",
+      "text": "看到某公共场所发生安全事件，引发公众讨论。真的很生气，不能就这样算了。（第37条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_038",
+      "text": "信息越看越乱，心里多少有点焦虑。（第38条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_039",
+      "text": "希望别再互相指责了，大家都先冷静下来。（第39条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_040",
+      "text": "为什么每次都要把责任推给某一类人？就不能正面回应吗？（第40条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_041",
+      "text": "又开始给人贴标签了，真正的问题反而没人讨论。（第41条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_042",
+      "text": "别拿地域和身份制造对立，先把事实说清楚。（第42条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_043",
+      "text": "先吃瓜，等一个后续。（第43条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_044",
+      "text": "信息量有点大，搬个小板凳看后续。（第44条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_045",
+      "text": "希望最后能平稳解决，散了散了。（第45条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_046",
+      "text": "关于某公共场所发生安全事件，引发公众讨论。，建议尽快公开核查依据和后续处理进展。（第46条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_047",
+      "text": "这件事的关键还是事实链条，期待看到完整、可核验的信息。（第47条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_048",
+      "text": "如果后续信息透明、处置及时，公众对社会事件的信任有机会恢复。（第48条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "观点输出派",
+      "orientation": "fact"
+    },
+    {
+      "comment_id": "comment_049",
+      "text": "这事确实让人不舒服，希望相关方面认真对待。（第49条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_050",
+      "text": "目前先看后续通报，再决定怎么判断吧。（第50条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_051",
+      "text": "希望最后能有一个让大家信服的结果。（第51条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "表态判断派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_052",
+      "text": "看到某公共场所发生安全事件，引发公众讨论。真的很生气，不能就这样算了。（第52条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_053",
+      "text": "信息越看越乱，心里多少有点焦虑。（第53条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_054",
+      "text": "希望别再互相指责了，大家都先冷静下来。（第54条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "情绪激进派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_055",
+      "text": "为什么每次都要把责任推给某一类人？就不能正面回应吗？（第55条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_056",
+      "text": "又开始给人贴标签了，真正的问题反而没人讨论。（第56条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_057",
+      "text": "别拿地域和身份制造对立，先把事实说清楚。（第57条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "矛盾激化派",
+      "orientation": "questioning"
+    },
+    {
+      "comment_id": "comment_058",
+      "text": "先吃瓜，等一个后续。（第58条）",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_059",
+      "text": "信息量有点大，搬个小板凳看后续。（第59条）",
+      "topic": "社会事件",
+      "emotion": "neutral",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    },
+    {
+      "comment_id": "comment_060",
+      "text": "希望最后能平稳解决，散了散了。（第60条）",
+      "topic": "社会事件",
+      "emotion": "positive",
+      "faction": "吃瓜派",
+      "orientation": "opinion"
+    }
+  ]
+}

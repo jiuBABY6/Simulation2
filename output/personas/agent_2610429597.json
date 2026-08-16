@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_2610429597",
+  "source_user_id": "2610429597",
+  "identity": {
+    "gender": "m",
+    "location": "北京 东城区",
+    "verified": true,
+    "followers_count": 3173000
+  },
+  "action_preference": {
+    "original_preference": 0.0,
+    "repost_preference": 0.0
+  },
+  "topic_preference": {
+    "社会事件": 0.25,
+    "新闻时事": 0.25,
+    "娱乐": 0.25,
+    "其他": 0.25
+  },
+  "information_orientation": {
+    "fact_rate": 0.333333,
+    "opinion_rate": 0.333333,
+    "questioning_rate": 0.333333
+  },
+  "emotion_expression": {
+    "positive_rate": 0.333333,
+    "neutral_rate": 0.333333,
+    "negative_rate": 0.333333
+  },
+  "data_info": {
+    "total_posts": 0,
+    "topic_sample_count": 0,
+    "expression_sample_count": 0,
+    "faction_sample_count": 0
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.2,
+    "表态判断派": 0.2,
+    "情绪激进派": 0.2,
+    "矛盾激化派": 0.2,
+    "吃瓜派": 0.2
+  }
+}

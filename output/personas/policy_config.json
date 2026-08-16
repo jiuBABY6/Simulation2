@@ -1,0 +1,117 @@
+{
+  "version": "policy_v0.1",
+  "reference_population_size": 16,
+  "band_definition": {
+    "low": "value < p25",
+    "medium": "p25 <= value < p75",
+    "high": "value >= p75"
+  },
+  "topic_quantiles": {
+    "社会事件": {
+      "p25": 0.12987,
+      "p50": 0.28576749999999995,
+      "p75": 0.39586325
+    },
+    "新闻时事": {
+      "p25": 0.158486,
+      "p50": 0.23578100000000002,
+      "p75": 0.32913425
+    },
+    "娱乐": {
+      "p25": 0.051951,
+      "p50": 0.137896,
+      "p75": 0.26129025
+    },
+    "其他": {
+      "p25": 0.10809225,
+      "p50": 0.1410865,
+      "p75": 0.26834575
+    }
+  },
+  "orientation_quantiles": {
+    "fact_rate": {
+      "p25": 0.3320775,
+      "p50": 0.5047615,
+      "p75": 0.8403755
+    },
+    "opinion_rate": {
+      "p25": 0.10633224999999999,
+      "p50": 0.3666665,
+      "p75": 0.6259675
+    },
+    "questioning_rate": {
+      "p25": 0.0319255,
+      "p50": 0.061351,
+      "p75": 0.10975925
+    }
+  },
+  "emotion_quantiles": {
+    "positive_rate": {
+      "p25": 0.197807,
+      "p50": 0.282235,
+      "p75": 0.433484
+    },
+    "neutral_rate": {
+      "p25": 0.268722,
+      "p50": 0.328122,
+      "p75": 0.398127
+    },
+    "negative_rate": {
+      "p25": 0.278242,
+      "p50": 0.337438,
+      "p75": 0.424927
+    }
+  },
+  "action_preference_rule": {
+    "strong_preference_gap": 0.9963555000000001
+  },
+  "candidate_rules": {
+    "emotion": {
+      "positive": [
+        "neutral",
+        "positive"
+      ],
+      "neutral": [
+        "neutral"
+      ],
+      "negative": [
+        "neutral",
+        "negative"
+      ]
+    },
+    "official_statement": {
+      "none": {
+        "default": [
+          "wait"
+        ]
+      },
+      "clear": {
+        "fact_high": [
+          "accept",
+          "wait"
+        ],
+        "default": [
+          "wait"
+        ]
+      },
+      "incomplete": {
+        "questioning_high_or_medium": [
+          "wait",
+          "question"
+        ],
+        "default": [
+          "wait"
+        ]
+      },
+      "conflict": {
+        "questioning_high": [
+          "question"
+        ],
+        "default": [
+          "wait",
+          "question"
+        ]
+      }
+    }
+  }
+}

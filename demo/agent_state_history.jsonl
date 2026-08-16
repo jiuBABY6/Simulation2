@@ -1,0 +1,17 @@
+{
+    "event_id":"event_001",
+    "step":0,
+    "agent_id":"agent_1442246695",
+    "state":
+    {
+        "current_emotion":null,
+        "official_attitude":null,
+        "will_comment":false,
+        "last_action":"none",
+        "last_comment_faction":null,
+        "last_comment_id":null
+    }
+}
+
+
+

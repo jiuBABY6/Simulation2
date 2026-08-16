@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_7788589999",
+  "source_user_id": "7788589999",
+  "identity": {
+    "gender": "m",
+    "location": "陕西",
+    "verified": true,
+    "followers_count": 155000
+  },
+  "action_preference": {
+    "original_preference": 0.997863,
+    "repost_preference": 0.002137
+  },
+  "topic_preference": {
+    "社会事件": 0.815678,
+    "新闻时事": 0.105932,
+    "娱乐": 0.052966,
+    "其他": 0.025424
+  },
+  "information_orientation": {
+    "fact_rate": 0.985138,
+    "opinion_rate": 0.012739,
+    "questioning_rate": 0.002123
+  },
+  "emotion_expression": {
+    "positive_rate": 0.095541,
+    "neutral_rate": 0.259023,
+    "negative_rate": 0.645435
+  },
+  "data_info": {
+    "total_posts": 468,
+    "topic_sample_count": 468,
+    "expression_sample_count": 468,
+    "faction_sample_count": 468
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.849894,
+    "表态判断派": 0.006342,
+    "情绪激进派": 0.002114,
+    "矛盾激化派": 0.002114,
+    "吃瓜派": 0.139535
+  }
+}

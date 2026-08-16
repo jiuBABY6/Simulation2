@@ -1,0 +1,23 @@
+{
+  "event_id": "event_001",
+  "step": 1,
+  "agent_id": "agent_1259110474",
+  "decision_method": "local_rule",
+  "topic_match_score": 0.0625,
+  "current_emotion": "neutral",
+  "emotion_scores": {
+    "neutral": 0.186667,
+    "negative": 0.070834
+  },
+  "official_attitude": "wait",
+  "official_attitude_scores": {
+    "wait": 0.466667,
+    "question": 0.266667
+  },
+  "will_comment": false,
+  "comment_intention_score": 0.27375,
+  "comment_faction": null,
+  "faction_scores": {},
+  "selected_comment": null,
+  "candidate_comment_scores": []
+}
