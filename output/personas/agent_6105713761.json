@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_6105713761",
+  "source_user_id": "6105713761",
+  "identity": {
+    "gender": "f",
+    "location": "四川 成都",
+    "verified": true,
+    "followers_count": 22741000
+  },
+  "action_preference": {
+    "original_preference": 0.999349,
+    "repost_preference": 0.000651
+  },
+  "topic_preference": {
+    "社会事件": 0.279348,
+    "新闻时事": 0.370904,
+    "娱乐": 0.222104,
+    "其他": 0.127644
+  },
+  "information_orientation": {
+    "fact_rate": 0.808148,
+    "opinion_rate": 0.092314,
+    "questioning_rate": 0.099538
+  },
+  "emotion_expression": {
+    "positive_rate": 0.265218,
+    "neutral_rate": 0.423496,
+    "negative_rate": 0.311286
+  },
+  "data_info": {
+    "total_posts": 16905,
+    "topic_sample_count": 16871,
+    "expression_sample_count": 16885,
+    "faction_sample_count": 16815
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.610642,
+    "表态判断派": 0.007015,
+    "情绪激进派": 0.000595,
+    "矛盾激化派": 5.9e-05,
+    "吃瓜派": 0.381688
+  }
+}

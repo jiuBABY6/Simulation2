@@ -1,0 +1,43 @@
+{
+  "event_id": "event_history_example_001",
+  "total_steps": 4,
+  "step_periods": [
+    {
+      "step": 1,
+      "period": "阶段一",
+      "phase": "事件发生"
+    },
+    {
+      "step": 2,
+      "period": "阶段二",
+      "phase": "首次官方信息"
+    },
+    {
+      "step": 3,
+      "period": "阶段三",
+      "phase": "持续讨论"
+    },
+    {
+      "step": 4,
+      "period": "阶段四",
+      "phase": "最终官方信息"
+    }
+  ],
+  "official_updates": [
+    {
+      "step": 2,
+      "published_at": "2026-01-02",
+      "official_statement": "首次官方信息摘要。",
+      "official_statement_status": "incomplete",
+      "source_url": ""
+    },
+    {
+      "step": 4,
+      "published_at": "2026-01-04",
+      "official_statement": "最终官方信息摘要。",
+      "official_statement_status": "clear",
+      "source_url": ""
+    }
+  ]
+}
+

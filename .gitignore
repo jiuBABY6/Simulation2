@@ -1,0 +1,15 @@
+﻿__pycache__/
+*.py[cod]
+
+.env
+.env.*
+
+demo/experiments/
+demo/state/*
+!demo/state/.gitkeep
+demo/comment_pool.json
+
+visualization/data/real_trend.json
+
+output/personas/classification_progress.jsonl
+output/personas/faction_classification_progress.json

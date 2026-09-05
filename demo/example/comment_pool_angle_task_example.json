@@ -1,0 +1,89 @@
+{
+  "event_id": "event_wenjie_001",
+  "generation_method": "angle_task_profile_conditioned_generation",
+  "profile_source": "demo/config/comment_profiles.json",
+  "requested_comment_count": 2,
+  "angle_plan": {
+    "event_id": "event_wenjie_001",
+    "generation_method": "llm_event_angle_plan",
+    "angles": [
+      {
+        "angle_id": "product_design",
+        "angle_name": "产品设计",
+        "focus": "讨论儿童车复刻问界M9的产品设计。",
+        "evidence_text": "外观1:1复刻问界M9",
+        "source_type": "event"
+      },
+      {
+        "angle_id": "price_information",
+        "angle_name": "价格信息",
+        "focus": "讨论网传价格与最终售价尚未发布之间的信息差异。",
+        "evidence_text": "目前官方尚未正式发布最终售价",
+        "source_type": "event"
+      }
+    ]
+  },
+  "faction_coverage": {
+    "minimum_per_faction": 0,
+    "counts": {
+      "观点输出派": 1,
+      "表态判断派": 1,
+      "情绪激进派": 0,
+      "矛盾激化派": 0,
+      "吃瓜派": 0
+    },
+    "complete": false
+  },
+  "profile_faction_combinations": [
+    {
+      "profile_id": 2,
+      "profile_label": "理性客观的分析师",
+      "faction": "观点输出派",
+      "count": 1
+    },
+    {
+      "profile_id": 8,
+      "profile_label": "吃瓜不嫌事大的围观者",
+      "faction": "表态判断派",
+      "count": 1
+    }
+  ],
+  "comments": [
+    {
+      "comment_id": "comment_001",
+      "task_id": "initial_001",
+      "angle_id": "product_design",
+      "angle_name": "产品设计",
+      "angle_focus": "讨论儿童车复刻问界M9的产品设计。",
+      "expression_mode": "fact_check",
+      "expression_instruction": "关注事实、证据或信息是否充分。",
+      "text": "把旗舰车型外观做成儿童车很吸睛，但更应该说明产品设计是否适合儿童使用。",
+      "profile_id": 2,
+      "profile_label": "理性客观的分析师",
+      "topic": "新闻时事",
+      "emotion": "neutral",
+      "faction": "观点输出派",
+      "orientation": "opinion",
+      "stance": "neutral",
+      "introduced_step": 1,
+      "generation_trigger": "initial_event"
+    },
+    {
+      "comment_id": "comment_002",
+      "task_id": "initial_002",
+      "angle_id": "price_information",
+      "angle_name": "价格信息",
+      "angle_focus": "讨论网传价格与最终售价尚未发布之间的信息差异。",
+      "text": "最终售价还没有正式公布，现在围绕参考价争论得太早了，先等官方消息吧。",
+      "profile_id": 8,
+      "profile_label": "吃瓜不嫌事大的围观者",
+      "topic": "新闻时事",
+      "emotion": "neutral",
+      "faction": "表态判断派",
+      "orientation": "fact",
+      "stance": "neutral",
+      "introduced_step": 1,
+      "generation_trigger": "initial_event"
+    }
+  ]
+}

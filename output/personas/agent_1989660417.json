@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_1989660417",
+  "source_user_id": "1989660417",
+  "identity": {
+    "gender": "m",
+    "location": "北京 朝阳区",
+    "verified": true,
+    "followers_count": 24906000
+  },
+  "action_preference": {
+    "original_preference": 0.988357,
+    "repost_preference": 0.011643
+  },
+  "topic_preference": {
+    "社会事件": 0.217503,
+    "新闻时事": 0.58816,
+    "娱乐": 0.048906,
+    "其他": 0.145431
+  },
+  "information_orientation": {
+    "fact_rate": 0.337629,
+    "opinion_rate": 0.637887,
+    "questioning_rate": 0.024485
+  },
+  "emotion_expression": {
+    "positive_rate": 0.235825,
+    "neutral_rate": 0.332474,
+    "negative_rate": 0.431701
+  },
+  "data_info": {
+    "total_posts": 773,
+    "topic_sample_count": 773,
+    "expression_sample_count": 773,
+    "faction_sample_count": 773
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.784062,
+    "表态判断派": 0.066838,
+    "情绪激进派": 0.028278,
+    "矛盾激化派": 0.001285,
+    "吃瓜派": 0.119537
+  }
+}

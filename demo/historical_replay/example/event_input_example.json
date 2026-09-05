@@ -1,0 +1,9 @@
+{
+  "event_id": "event_history_example_001",
+  "event_content": "只填写历史事件第一阶段已经公开的事实，不提前加入后续调查结果。",
+  "event_labels": {
+    "topic": "公共事件",
+    "event_valence": "negative"
+  }
+}
+
