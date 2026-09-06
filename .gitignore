@@ -1,0 +1,13 @@
+# Python运行缓存
+__pycache__/
+*.py[cod]
+
+# 本机环境和密钥文件
+.env
+.env.*
+
+# 编辑器和操作系统临时文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

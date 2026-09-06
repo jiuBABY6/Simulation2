@@ -1,0 +1,114 @@
+{
+  "strategy": "fact_report",
+  "strategy_name": "事实通报",
+  "entry_strategy": "combined_policy",
+  "status": "success",
+  "official_responses": [
+    {
+      "step": 2,
+      "strategy_id": "fact_report",
+      "strategy_name": "事实通报",
+      "official_statement": "问界儿童车尚未正式发布最终售价，网传15800元为销售端预订参考信息，产品配置、正式售价及交付安排请以后续官方发布为准。",
+      "official_statement_status": "incomplete"
+    }
+  ],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "worsening"
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "worsening"
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "worsening"
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "worsening"
+      }
+    },
+    {
+      "step": 8,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 9,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 10,
+      "policy_metrics": {
+        "negative_rate": 0.9,
+        "question_rate": 0.9,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.9,
+    "question_rate": 0.9,
+    "accept_rate": 0.0,
+    "global_trend": "stable"
+  },
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260824_195348_526612\\fact_report\\state"
+}

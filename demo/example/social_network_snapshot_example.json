@@ -1,0 +1,30 @@
+{
+  "network_version": 1,
+  "network_seed": 2026,
+  "neighbors_per_agent": 1,
+  "propagation_decay_factor": 0.7,
+  "visibility": {
+    "neighbor_comment_count": 4,
+    "public_comment_count": 11
+  },
+  "nodes": [
+    {
+      "agent_id": "agent_001",
+      "influence_weight": 2.2
+    },
+    {
+      "agent_id": "agent_002",
+      "influence_weight": 1.4
+    }
+  ],
+  "edges": [
+    {
+      "source_agent_id": "agent_001",
+      "target_agent_id": "agent_002"
+    },
+    {
+      "source_agent_id": "agent_002",
+      "target_agent_id": "agent_001"
+    }
+  ]
+}

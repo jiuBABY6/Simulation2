@@ -1,0 +1,32 @@
+{
+  "event_id": "event_wenjie_001",
+  "entry_strategy": "combined_policy",
+  "stagnation_rounds": 2,
+  "negative_rate_improvement_tolerance": 0.05,
+  "content_strategies": [
+    {
+      "strategy_id": "fact_report",
+      "strategy_name": "事实通报",
+      "official_statement": "现正式公布问界儿童车建议零售价为15800元，价格包含整车、电池、充电器和基础安全组件。车辆采用儿童电动车配置，配备安全带、家长遥控和紧急制动功能，预计8月31日起按预订顺序交付；详细配置、使用限制、质保和售后规则已同步在官方产品页面公布。此前销售人员透露的15800元预订参考价与本次正式售价一致。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "empathy",
+      "strategy_name": "共情安抚",
+      "official_statement": "我们关注到问界儿童车价格信息引发的讨论，也理解公众对产品定价和配置的关切。目前尚未正式发布最终售价，相关信息请以后续官方发布为准。",
+      "official_statement_status": "incomplete"
+    },
+    {
+      "strategy_id": "rumor_clarification",
+      "strategy_name": "辟谣澄清",
+      "official_statement": "网传15800元并非问界儿童车正式售价，而是销售人员透露的预订参考价。产品配置、正式售价及交付安排请以后续官方发布为准。",
+      "official_statement_status": "incomplete"
+    },
+    {
+      "strategy_id": "handling_progress",
+      "strategy_name": "处置进展",
+      "official_statement": "问界儿童车目前尚未正式发布最终售价，车辆预计8月底交付，正式售价、产品配置及交付安排将在后续官方信息中公布。",
+      "official_statement_status": "incomplete"
+    }
+  ]
+}

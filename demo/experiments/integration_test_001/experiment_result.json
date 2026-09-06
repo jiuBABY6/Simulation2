@@ -1,0 +1,116 @@
+{
+  "experiment_id": "integration_test_001",
+  "strategy_count": 4,
+  "strategy_results": [
+    {
+      "strategy": "no_response",
+      "status": "success",
+      "official_responses": [],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.333333,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      },
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\integration_test_001\\no_response\\state"
+    },
+    {
+      "strategy": "negative_threshold",
+      "status": "success",
+      "official_responses": [],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.333333,
+            "question_rate": 0.0,
+            "accept_rate": 0.0,
+            "global_trend": "stable"
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.333333,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      },
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\integration_test_001\\negative_threshold\\state"
+    },
+    {
+      "strategy": "global_worsening",
+      "status": "failed",
+      "error": "场景时间步运行失败：Traceback (most recent call last):\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 240, in <module>\n    main()\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 230, in main\n    result = run_one_simulation_step(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 107, in run_one_simulation_step\n    incremental_record = run_incremental_generation(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\incremental_comment_generator.py\", line 328, in run_incremental_generation\n    comments = generate_incremental_comments(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\incremental_comment_generator.py\", line 257, in generate_incremental_comments\n    batch_comments = generate_valid_comment_batch(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\comment_pool_generator.py\", line 215, in generate_valid_comment_batch\n    raise RuntimeError(\nRuntimeError: �����������Ժ���Ȼʧ�ܣ���Ҫ 5 ����ʵ�ʵõ� 4 ��"
+    },
+    {
+      "strategy": "combined_policy",
+      "status": "failed",
+      "error": "场景时间步运行失败：Traceback (most recent call last):\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 240, in <module>\n    main()\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 230, in main\n    result = run_one_simulation_step(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\simulation_runner.py\", line 107, in run_one_simulation_step\n    incremental_record = run_incremental_generation(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\incremental_comment_generator.py\", line 328, in run_incremental_generation\n    comments = generate_incremental_comments(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\incremental_comment_generator.py\", line 257, in generate_incremental_comments\n    batch_comments = generate_valid_comment_batch(\n  File \"D:\\Desktop\\���ģ�����д���\\demo\\comment_pool_generator.py\", line 215, in generate_valid_comment_batch\n    raise RuntimeError(\nRuntimeError: �����������Ժ���Ȼʧ�ܣ���Ҫ 5 ����ʵ�ʵõ� 3 ��"
+    }
+  ],
+  "comparison": {
+    "lowest_negative_rate": {
+      "strategy": "no_response",
+      "value": 0.333333
+    },
+    "lowest_question_rate": {
+      "strategy": "no_response",
+      "value": 0.0
+    },
+    "highest_accept_rate": {
+      "strategy": "no_response",
+      "value": 0.0
+    },
+    "final_trends": {
+      "no_response": "stable",
+      "negative_threshold": "stable"
+    }
+  }
+}

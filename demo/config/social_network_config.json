@@ -1,0 +1,8 @@
+{
+  "network_seed": 2026,
+  "neighbors_per_agent": 5,
+  "neighbor_comment_count": 4,
+  "public_comment_count": 11,
+  "verified_bonus": 0.2,
+  "propagation_decay_factor": 0.7
+}

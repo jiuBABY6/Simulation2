@@ -1,0 +1,270 @@
+{
+  "strategy": "no_response",
+  "strategy_name": "不回应",
+  "entry_strategy": "no_response",
+  "status": "success",
+  "official_responses": [],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 2,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 16,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 8,
+        "model_returned_comment_count": 64,
+        "rejection_counts": {
+          "重复文本": 45,
+          "无效 faction": 1
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 3,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 17,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 9,
+        "model_returned_comment_count": 79,
+        "rejection_counts": {
+          "重复文本": 62
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 4,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 11,
+        "history_fallback_count": 9,
+        "emergency_fallback_count": 0,
+        "fallback_count": 9,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 87,
+        "rejection_counts": {
+          "重复文本": 76
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 5,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 17,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 101,
+        "rejection_counts": {
+          "重复文本": 82
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "comment_generation": {
+        "step": 6,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 16,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 9,
+        "model_returned_comment_count": 74,
+        "rejection_counts": {
+          "重复文本": 58
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 7,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 10,
+        "history_fallback_count": 10,
+        "emergency_fallback_count": 0,
+        "fallback_count": 10,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 96,
+        "rejection_counts": {
+          "重复文本": 86
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 8,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 8,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 9,
+        "history_fallback_count": 11,
+        "emergency_fallback_count": 0,
+        "fallback_count": 11,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 89,
+        "rejection_counts": {
+          "重复文本": 80
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 9,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 9,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 12,
+        "history_fallback_count": 8,
+        "emergency_fallback_count": 0,
+        "fallback_count": 8,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 109,
+        "rejection_counts": {
+          "重复文本": 97
+        },
+        "validation_errors": []
+      }
+    },
+    {
+      "step": 10,
+      "policy_metrics": {
+        "negative_rate": 0.5,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 10,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 14,
+        "history_fallback_count": 6,
+        "emergency_fallback_count": 0,
+        "fallback_count": 6,
+        "generation_attempts": 9,
+        "model_returned_comment_count": 98,
+        "rejection_counts": {
+          "重复文本": 83
+        },
+        "validation_errors": []
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.5,
+    "question_rate": null,
+    "accept_rate": null,
+    "official_attitude_applicable_count": 0,
+    "global_trend": "worsening"
+  },
+  "comment_quality": {
+    "quality_status": "degraded",
+    "llm_comment_count": 122,
+    "history_fallback_count": 58,
+    "emergency_fallback_count": 0,
+    "fallback_count": 58,
+    "warning_steps": [
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "shared_baseline_completed_step": 2,
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260826_154959_581074\\no_response\\state"
+}

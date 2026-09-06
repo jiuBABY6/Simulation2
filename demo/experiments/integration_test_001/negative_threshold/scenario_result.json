@@ -1,0 +1,41 @@
+{
+  "strategy": "negative_threshold",
+  "status": "success",
+  "official_responses": [],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.333333,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.333333,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.333333,
+        "question_rate": 0.0,
+        "accept_rate": 0.0,
+        "global_trend": "stable"
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.333333,
+    "question_rate": 0.0,
+    "accept_rate": 0.0,
+    "global_trend": "stable"
+  },
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\integration_test_001\\negative_threshold\\state"
+}

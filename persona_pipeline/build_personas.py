@@ -445,14 +445,12 @@ def build_global_policy_config(personas):
                 "neutral": ["neutral"],
                 "negative": ["neutral", "negative"],
             },
+            # 2026/08/25 第五次联调问题修复，修改功能：统一声明态度候选并显式区分无声明场景。
             "official_statement": {
-                "none": {"default": ["wait"]},
-                "clear": {"fact_high": ["accept", "wait"], "default": ["wait"]},
-                "incomplete": {
-                    "questioning_high_or_medium": ["wait", "question"],
-                    "default": ["wait"],
-                },
-                "conflict": {"questioning_high": ["question"], "default": ["wait", "question"]},
+                "none": {"default": ["not_applicable"]},
+                "clear": {"default": ["accept", "wait", "question"]},
+                "incomplete": {"default": ["accept", "wait", "question"]},
+                "conflict": {"default": ["accept", "wait", "question"]},
             },
         },
     }

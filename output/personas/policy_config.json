@@ -82,32 +82,26 @@
     "official_statement": {
       "none": {
         "default": [
-          "wait"
+          "not_applicable"
         ]
       },
       "clear": {
-        "fact_high": [
-          "accept",
-          "wait"
-        ],
         "default": [
-          "wait"
+          "accept",
+          "wait",
+          "question"
         ]
       },
       "incomplete": {
-        "questioning_high_or_medium": [
+        "default": [
+          "accept",
           "wait",
           "question"
-        ],
-        "default": [
-          "wait"
         ]
       },
       "conflict": {
-        "questioning_high": [
-          "question"
-        ],
         "default": [
+          "accept",
           "wait",
           "question"
         ]

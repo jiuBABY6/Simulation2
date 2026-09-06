@@ -1,0 +1,7 @@
+{
+  "strategy": "rumor_clarification",
+  "strategy_name": "辟谣澄清",
+  "entry_strategy": "combined_policy",
+  "status": "failed",
+  "error": "场景时间步运行失败：Traceback (most recent call last):\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\simulation_runner.py\", line 337, in <module>\n    main()\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\simulation_runner.py\", line 327, in main\n    result = run_one_simulation_step(\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\simulation_runner.py\", line 189, in run_one_simulation_step\n    incremental_record = run_incremental_generation(\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\incremental_comment_generator.py\", line 329, in run_incremental_generation\n    comments = generate_incremental_comments(\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\incremental_comment_generator.py\", line 258, in generate_incremental_comments\n    batch_comments = generate_valid_comment_batch(\n  File \"D:\\Desktop\\社会模拟已有代码\\demo\\comment_generation_service.py\", line 213, in generate_valid_comment_batch\n    raise RuntimeError(f\"评论批次重试后仍然失败：{last_error}\")\nRuntimeError: 评论批次重试后仍然失败：需要 10 条，已累积 9 条，还缺 1 条"
+}

@@ -1,0 +1,3331 @@
+{
+  "experiment_id": "event_wenjie_001_20260905_095735_946449",
+  "event_id": "event_wenjie_001",
+  "entry_strategy": "combined_policy",
+  "status": "completed",
+  "strategy_count": 5,
+  "success_count": 5,
+  "not_run_count": 0,
+  "failed_count": 0,
+  "entry_triggered": true,
+  "entry_reason": "stagnation",
+  "comparison_status": "completed",
+  "strategy_results": [
+    {
+      "strategy": "no_response",
+      "strategy_name": "不回应",
+      "entry_strategy": "no_response",
+      "status": "success",
+      "entry_triggered": true,
+      "entry_reason": "stagnation",
+      "comparison_eligible": true,
+      "official_responses": [],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 2,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.2,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 3,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 5
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 4,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 4,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 5,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 5,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 42,
+            "rejection_counts": {
+              "重复文本": 20,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 6,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 6,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 47,
+            "rejection_counts": {
+              "重复文本": 25,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 7,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 7,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 26,
+            "rejection_counts": {
+              "重复文本": 6
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 8,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 8,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 9,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 9,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 28,
+            "rejection_counts": {
+              "重复文本": 8
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 10,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 10,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 34,
+            "rejection_counts": {
+              "重复文本": 16
+            },
+            "validation_errors": []
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.1,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "effect_metrics": {
+        "analysis_start_step": 7,
+        "final_negative_rate": 0.1,
+        "negative_peak_rate": 0.3,
+        "negative_peak_steps": [
+          1,
+          2
+        ],
+        "negative_area": 1.5,
+        "observed_step_count": 10,
+        "control_net_effect": null,
+        "baseline_step": 6,
+        "baseline_negative_agent_count": 1,
+        "recovered_agent_count": 0,
+        "emotion_recovery_rate": 0.0,
+        "effect_baseline_negative_rate": 0.1,
+        "effect_start_step": null,
+        "effect_end_step": null,
+        "effect_duration": 0,
+        "rebound_agent_count": 0,
+        "rebound_rate": null
+      },
+      "comment_quality": {
+        "quality_status": "normal",
+        "llm_comment_count": 176,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "shared_baseline_completed_step": 6,
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\no_response\\state",
+      "performance": {
+        "executed_step_count": 4,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 45.901,
+          "agent_decision": 12.206,
+          "metrics": 3.795
+        },
+        "llm_requests": {
+          "logical_request_count": 56,
+          "http_attempt_count": 56,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 126.564,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 12,
+              "http_attempt_count": 12,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 68.483
+            },
+            "agent_decision": {
+              "logical_request_count": 40,
+              "http_attempt_count": 40,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 54.354
+            },
+            "global_trend": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 3.727
+            }
+          }
+        },
+        "steps": [
+          {
+            "step": 7,
+            "total_duration_seconds": 13.668,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 9.824,
+              "agent_decision": 2.804,
+              "metrics": 1.02
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 28.974,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.0
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 12.97
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.005
+                }
+              }
+            }
+          },
+          {
+            "step": 8,
+            "total_duration_seconds": 13.955,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 9.682,
+              "agent_decision": 3.221,
+              "metrics": 1.033
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 30.363,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.445
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 13.902
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.016
+                }
+              }
+            }
+          },
+          {
+            "step": 9,
+            "total_duration_seconds": 15.643,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 11.789,
+              "agent_decision": 2.934,
+              "metrics": 0.9
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 32.295,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 17.847
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 13.565
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.882
+                }
+              }
+            }
+          },
+          {
+            "step": 10,
+            "total_duration_seconds": 18.716,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 14.606,
+              "agent_decision": 3.247,
+              "metrics": 0.842
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 34.932,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 20.191
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 13.917
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.824
+                }
+              }
+            }
+          }
+        ],
+        "duration_seconds": 63.965
+      }
+    },
+    {
+      "strategy": "fact_report",
+      "strategy_name": "事实通报",
+      "entry_strategy": "combined_policy",
+      "status": "success",
+      "entry_triggered": true,
+      "entry_reason": "stagnation",
+      "comparison_eligible": true,
+      "official_responses": [
+        {
+          "step": 7,
+          "strategy_id": "fact_report",
+          "strategy_name": "事实通报",
+          "official_statement": "现正式公布问界儿童车建议零售价为15800元，价格包含整车、电池、充电器和基础安全组件。车辆配备安全带、家长遥控和紧急制动功能，预计8月31日起按预订顺序交付；详细配置、使用限制、质保和售后规则已同步在官方产品页面公布。",
+          "official_statement_status": "clear"
+        }
+      ],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 2,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.2,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 3,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 5
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 4,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 4,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 5,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 5,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 42,
+            "rejection_counts": {
+              "重复文本": 20,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 6,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 6,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 47,
+            "rejection_counts": {
+              "重复文本": 25,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 7,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.3,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 7,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "无效 orientation": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 8,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.4,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 8,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 17,
+            "history_fallback_count": 3,
+            "emergency_fallback_count": 0,
+            "fallback_count": 3,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 30,
+            "rejection_counts": {
+              "重复文本": 13
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 9,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.4,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "improving"
+          },
+          "comment_generation": {
+            "step": 9,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "无效 orientation": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 10,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.5,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 10,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 27,
+            "rejection_counts": {
+              "重复文本": 7
+            },
+            "validation_errors": []
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.0,
+        "question_rate": 0.5,
+        "accept_rate": 0.5,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "effect_metrics": {
+        "analysis_start_step": 7,
+        "final_negative_rate": 0.0,
+        "negative_peak_rate": 0.3,
+        "negative_peak_steps": [
+          1,
+          2
+        ],
+        "negative_area": 1.1,
+        "observed_step_count": 10,
+        "control_net_effect": {
+          "final_negative_rate_reduction": 0.1,
+          "peak_negative_rate_reduction": 0.0,
+          "negative_area_reduction": 0.4
+        },
+        "baseline_step": 6,
+        "baseline_negative_agent_count": 1,
+        "recovered_agent_count": 1,
+        "emotion_recovery_rate": 1.0,
+        "effect_baseline_negative_rate": 0.1,
+        "effect_start_step": 7,
+        "effect_end_step": 10,
+        "effect_duration": 4,
+        "rebound_agent_count": 0,
+        "rebound_rate": 0.0
+      },
+      "comment_quality": {
+        "quality_status": "normal",
+        "llm_comment_count": 175,
+        "history_fallback_count": 5,
+        "emergency_fallback_count": 0,
+        "fallback_count": 5,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "shared_baseline_completed_step": 6,
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\fact_report\\state",
+      "performance": {
+        "executed_step_count": 4,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 38.133,
+          "agent_decision": 13.586,
+          "metrics": 4.169
+        },
+        "llm_requests": {
+          "logical_request_count": 56,
+          "http_attempt_count": 56,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 126.371,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 12,
+              "http_attempt_count": 12,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 61.218
+            },
+            "agent_decision": {
+              "logical_request_count": 40,
+              "http_attempt_count": 40,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 61.052
+            },
+            "global_trend": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 4.1
+            }
+          }
+        },
+        "steps": [
+          {
+            "step": 7,
+            "total_duration_seconds": 12.354,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 7.734,
+              "agent_decision": 3.549,
+              "metrics": 1.046
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 31.057,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 13.992
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 16.036
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.029
+                }
+              }
+            }
+          },
+          {
+            "step": 8,
+            "total_duration_seconds": 16.544,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 12.289,
+              "agent_decision": 3.255,
+              "metrics": 0.974
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 33.845,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 17.614
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.274
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.957
+                }
+              }
+            }
+          },
+          {
+            "step": 9,
+            "total_duration_seconds": 12.006,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 8.031,
+              "agent_decision": 3.089,
+              "metrics": 0.86
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 29.776,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 14.276
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 14.657
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.842
+                }
+              }
+            }
+          },
+          {
+            "step": 10,
+            "total_duration_seconds": 15.086,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 10.079,
+              "agent_decision": 3.693,
+              "metrics": 1.289
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 31.693,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.336
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.085
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.272
+                }
+              }
+            }
+          }
+        ],
+        "duration_seconds": 57.935
+      }
+    },
+    {
+      "strategy": "empathy",
+      "strategy_name": "共情安抚",
+      "entry_strategy": "combined_policy",
+      "status": "success",
+      "entry_triggered": true,
+      "entry_reason": "stagnation",
+      "comparison_eligible": true,
+      "official_responses": [
+        {
+          "step": 7,
+          "strategy_id": "empathy",
+          "strategy_name": "共情安抚",
+          "official_statement": "我们理解公众对问界儿童车定价、配置和安全性的关切。现正式公布建议零售价为15800元，价格包含整车、电池、充电器和基础安全组件。车辆配备安全带、家长遥控和紧急制动功能，预计8月31日起按预订顺序交付；详细配置、使用限制、质保和售后规则已同步在官方产品页面公布。",
+          "official_statement_status": "clear"
+        }
+      ],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 2,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.2,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 3,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 5
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 4,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 4,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 5,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 5,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 42,
+            "rejection_counts": {
+              "重复文本": 20,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 6,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 6,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 47,
+            "rejection_counts": {
+              "重复文本": 25,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 7,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.4,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 7,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 22,
+            "rejection_counts": {
+              "无效 stance": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 8,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.4,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 8,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 24,
+            "rejection_counts": {
+              "重复文本": 4
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 9,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 9,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 28,
+            "rejection_counts": {
+              "重复文本": 8
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 10,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.4,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 10,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 19,
+            "history_fallback_count": 1,
+            "emergency_fallback_count": 0,
+            "fallback_count": 1,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 44,
+            "rejection_counts": {
+              "重复文本": 22,
+              "无效 faction": 1,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.0,
+        "question_rate": 0.4,
+        "accept_rate": 0.5,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "effect_metrics": {
+        "analysis_start_step": 7,
+        "final_negative_rate": 0.0,
+        "negative_peak_rate": 0.3,
+        "negative_peak_steps": [
+          1,
+          2
+        ],
+        "negative_area": 1.1,
+        "observed_step_count": 10,
+        "control_net_effect": {
+          "final_negative_rate_reduction": 0.1,
+          "peak_negative_rate_reduction": 0.0,
+          "negative_area_reduction": 0.4
+        },
+        "baseline_step": 6,
+        "baseline_negative_agent_count": 1,
+        "recovered_agent_count": 1,
+        "emotion_recovery_rate": 1.0,
+        "effect_baseline_negative_rate": 0.1,
+        "effect_start_step": 7,
+        "effect_end_step": 10,
+        "effect_duration": 4,
+        "rebound_agent_count": 0,
+        "rebound_rate": 0.0
+      },
+      "comment_quality": {
+        "quality_status": "normal",
+        "llm_comment_count": 177,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 30,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 3,
+        "warning_steps": []
+      },
+      "shared_baseline_completed_step": 6,
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\empathy\\state",
+      "performance": {
+        "executed_step_count": 4,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 47.839,
+          "agent_decision": 13.825,
+          "metrics": 3.675
+        },
+        "llm_requests": {
+          "logical_request_count": 57,
+          "http_attempt_count": 57,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 135.576,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 13,
+              "http_attempt_count": 13,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 70.032
+            },
+            "agent_decision": {
+              "logical_request_count": 40,
+              "http_attempt_count": 40,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 61.981
+            },
+            "global_trend": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 3.561
+            }
+          }
+        },
+        "steps": [
+          {
+            "step": 7,
+            "total_duration_seconds": 12.243,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 8.11,
+              "agent_decision": 3.239,
+              "metrics": 0.87
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 30.161,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 14.152
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.157
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.852
+                }
+              }
+            }
+          },
+          {
+            "step": 8,
+            "total_duration_seconds": 13.975,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 9.644,
+              "agent_decision": 3.35,
+              "metrics": 0.956
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 32.093,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.313
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.84
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.939
+                }
+              }
+            }
+          },
+          {
+            "step": 9,
+            "total_duration_seconds": 15.293,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 10.67,
+              "agent_decision": 3.669,
+              "metrics": 0.927
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 32.504,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.977
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.617
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.909
+                }
+              }
+            }
+          },
+          {
+            "step": 10,
+            "total_duration_seconds": 23.933,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 19.415,
+              "agent_decision": 3.567,
+              "metrics": 0.922
+            },
+            "llm_requests": {
+              "logical_request_count": 15,
+              "http_attempt_count": 15,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 40.818,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 4,
+                  "http_attempt_count": 4,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 24.59
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.367
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.861
+                }
+              }
+            }
+          }
+        ],
+        "duration_seconds": 67.404
+      }
+    },
+    {
+      "strategy": "rumor_clarification",
+      "strategy_name": "辟谣澄清",
+      "entry_strategy": "combined_policy",
+      "status": "success",
+      "entry_triggered": true,
+      "entry_reason": "stagnation",
+      "comparison_eligible": true,
+      "official_responses": [
+        {
+          "step": 7,
+          "strategy_id": "rumor_clarification",
+          "strategy_name": "辟谣澄清",
+          "official_statement": "此前流传的15800元信息在正式发布前仅为销售端预订参考价，并非当时的官方售价。现经正式确认，问界儿童车建议零售价为15800元，价格包含整车、电池、充电器和基础安全组件。车辆配备安全带、家长遥控和紧急制动功能，预计8月31日起按预订顺序交付；详细配置、使用限制、质保和售后规则已同步公布。",
+          "official_statement_status": "clear"
+        }
+      ],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 2,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.2,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 3,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 5
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 4,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 4,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 5,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 5,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 42,
+            "rejection_counts": {
+              "重复文本": 20,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 6,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 6,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 47,
+            "rejection_counts": {
+              "重复文本": 25,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 7,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.1,
+            "accept_rate": 0.9,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 7,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "无效 orientation": 1,
+              "重复文本": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 8,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.1,
+            "accept_rate": 0.9,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 8,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 30,
+            "rejection_counts": {
+              "重复文本": 10
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 9,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.1,
+            "accept_rate": 0.9,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 9,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 33,
+            "rejection_counts": {
+              "重复文本": 13
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 10,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.1,
+            "accept_rate": 0.9,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 10,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 29,
+            "rejection_counts": {
+              "重复文本": 9
+            },
+            "validation_errors": []
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.0,
+        "question_rate": 0.1,
+        "accept_rate": 0.9,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "effect_metrics": {
+        "analysis_start_step": 7,
+        "final_negative_rate": 0.0,
+        "negative_peak_rate": 0.3,
+        "negative_peak_steps": [
+          1,
+          2
+        ],
+        "negative_area": 1.1,
+        "observed_step_count": 10,
+        "control_net_effect": {
+          "final_negative_rate_reduction": 0.1,
+          "peak_negative_rate_reduction": 0.0,
+          "negative_area_reduction": 0.4
+        },
+        "baseline_step": 6,
+        "baseline_negative_agent_count": 1,
+        "recovered_agent_count": 1,
+        "emotion_recovery_rate": 1.0,
+        "effect_baseline_negative_rate": 0.1,
+        "effect_start_step": 7,
+        "effect_end_step": 10,
+        "effect_duration": 4,
+        "rebound_agent_count": 0,
+        "rebound_rate": 0.0
+      },
+      "comment_quality": {
+        "quality_status": "normal",
+        "llm_comment_count": 178,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "shared_baseline_completed_step": 6,
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\rumor_clarification\\state",
+      "performance": {
+        "executed_step_count": 4,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 49.405,
+          "agent_decision": 13.825,
+          "metrics": 4.451
+        },
+        "llm_requests": {
+          "logical_request_count": 56,
+          "http_attempt_count": 56,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 136.536,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 12,
+              "http_attempt_count": 12,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 72.498
+            },
+            "agent_decision": {
+              "logical_request_count": 40,
+              "http_attempt_count": 40,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 59.657
+            },
+            "global_trend": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 4.381
+            }
+          }
+        },
+        "steps": [
+          {
+            "step": 7,
+            "total_duration_seconds": 13.799,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 9.085,
+              "agent_decision": 3.466,
+              "metrics": 1.134
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 32.08,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.545
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.419
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.116
+                }
+              }
+            }
+          },
+          {
+            "step": 8,
+            "total_duration_seconds": 18.928,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 14.155,
+              "agent_decision": 3.399,
+              "metrics": 1.343
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 36.083,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 19.581
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.176
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.326
+                }
+              }
+            }
+          },
+          {
+            "step": 9,
+            "total_duration_seconds": 18.648,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 13.93,
+              "agent_decision": 3.741,
+              "metrics": 0.953
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 35.105,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 19.537
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 14.633
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.935
+                }
+              }
+            }
+          },
+          {
+            "step": 10,
+            "total_duration_seconds": 16.501,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 12.235,
+              "agent_decision": 3.219,
+              "metrics": 1.021
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 33.268,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 17.835
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 14.429
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.004
+                }
+              }
+            }
+          }
+        ],
+        "duration_seconds": 70.507
+      }
+    },
+    {
+      "strategy": "handling_progress",
+      "strategy_name": "处置进展",
+      "entry_strategy": "combined_policy",
+      "status": "success",
+      "entry_triggered": true,
+      "entry_reason": "stagnation",
+      "comparison_eligible": true,
+      "official_responses": [
+        {
+          "step": 7,
+          "strategy_id": "handling_progress",
+          "strategy_name": "处置进展",
+          "official_statement": "问界儿童车的价格确认、产品配置核定和交付准备工作已经完成。建议零售价正式确定为15800元，价格包含整车、电池、充电器和基础安全组件。车辆配备安全带、家长遥控和紧急制动功能，预计8月31日起按预订顺序交付；详细配置、使用限制、质保和售后规则已同步公布。",
+          "official_statement_status": "clear"
+        }
+      ],
+      "rounds": [
+        {
+          "step": 1,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          }
+        },
+        {
+          "step": 2,
+          "policy_metrics": {
+            "negative_rate": 0.3,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 2,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 3
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 3,
+          "policy_metrics": {
+            "negative_rate": 0.2,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 3,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 23,
+            "rejection_counts": {
+              "重复文本": 5
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 4,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 4,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 5,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 5,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 42,
+            "rejection_counts": {
+              "重复文本": 20,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 6,
+          "policy_metrics": {
+            "negative_rate": 0.1,
+            "question_rate": null,
+            "accept_rate": null,
+            "official_attitude_applicable_count": 0,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 6,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 47,
+            "rejection_counts": {
+              "重复文本": 25,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 7,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.5,
+            "accept_rate": 0.4,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 7,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 21,
+            "rejection_counts": {
+              "重复文本": 1
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 8,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.5,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 8,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 27,
+            "rejection_counts": {
+              "重复文本": 7
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 9,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.5,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 9,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 18,
+            "history_fallback_count": 2,
+            "emergency_fallback_count": 0,
+            "fallback_count": 2,
+            "generation_attempts": 3,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 0,
+            "generation_wave_count": 2,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 35,
+            "rejection_counts": {
+              "重复文本": 17
+            },
+            "validation_errors": []
+          }
+        },
+        {
+          "step": 10,
+          "policy_metrics": {
+            "negative_rate": 0.0,
+            "question_rate": 0.5,
+            "accept_rate": 0.5,
+            "official_attitude_applicable_count": 10,
+            "global_trend": "stable"
+          },
+          "comment_generation": {
+            "step": 10,
+            "quality_status": "normal",
+            "comment_count": 20,
+            "llm_comment_count": 20,
+            "history_fallback_count": 0,
+            "emergency_fallback_count": 0,
+            "fallback_count": 0,
+            "generation_attempts": 4,
+            "initial_request_count": 2,
+            "refill_request_count": 1,
+            "rescue_request_count": 1,
+            "generation_wave_count": 3,
+            "quality_target_count": 17,
+            "model_returned_comment_count": 46,
+            "rejection_counts": {
+              "重复文本": 23,
+              "无效 faction": 1,
+              "重复 task_id": 2
+            },
+            "validation_errors": []
+          }
+        }
+      ],
+      "final_metrics": {
+        "negative_rate": 0.0,
+        "question_rate": 0.5,
+        "accept_rate": 0.5,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "effect_metrics": {
+        "analysis_start_step": 7,
+        "final_negative_rate": 0.0,
+        "negative_peak_rate": 0.3,
+        "negative_peak_steps": [
+          1,
+          2
+        ],
+        "negative_area": 1.1,
+        "observed_step_count": 10,
+        "control_net_effect": {
+          "final_negative_rate_reduction": 0.1,
+          "peak_negative_rate_reduction": 0.0,
+          "negative_area_reduction": 0.4
+        },
+        "baseline_step": 6,
+        "baseline_negative_agent_count": 1,
+        "recovered_agent_count": 1,
+        "emotion_recovery_rate": 1.0,
+        "effect_baseline_negative_rate": 0.1,
+        "effect_start_step": 7,
+        "effect_end_step": 10,
+        "effect_duration": 4,
+        "rebound_agent_count": 0,
+        "rebound_rate": 0.0
+      },
+      "comment_quality": {
+        "quality_status": "normal",
+        "llm_comment_count": 176,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 30,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 3,
+        "warning_steps": []
+      },
+      "shared_baseline_completed_step": 6,
+      "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\handling_progress\\state",
+      "performance": {
+        "executed_step_count": 4,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 55.33,
+          "agent_decision": 13.905,
+          "metrics": 3.91
+        },
+        "llm_requests": {
+          "logical_request_count": 57,
+          "http_attempt_count": 57,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 143.793,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 13,
+              "http_attempt_count": 13,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 77.892
+            },
+            "agent_decision": {
+              "logical_request_count": 40,
+              "http_attempt_count": 40,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 62.059
+            },
+            "global_trend": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 3.843
+            }
+          }
+        },
+        "steps": [
+          {
+            "step": 7,
+            "total_duration_seconds": 13.176,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 8.775,
+              "agent_decision": 3.582,
+              "metrics": 0.792
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 31.998,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.442
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.781
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.776
+                }
+              }
+            }
+          },
+          {
+            "step": 8,
+            "total_duration_seconds": 15.829,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 11.197,
+              "agent_decision": 3.494,
+              "metrics": 1.113
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 33.52,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 16.859
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.564
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.097
+                }
+              }
+            }
+          },
+          {
+            "step": 9,
+            "total_duration_seconds": 18.462,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 13.925,
+              "agent_decision": 3.47,
+              "metrics": 1.041
+            },
+            "llm_requests": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 35.3,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 3,
+                  "http_attempt_count": 3,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 19.075
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.201
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 1.023
+                }
+              }
+            }
+          },
+          {
+            "step": 10,
+            "total_duration_seconds": 25.781,
+            "stage_duration_seconds": {
+              "incremental_comment_generation": 21.433,
+              "agent_decision": 3.359,
+              "metrics": 0.964
+            },
+            "llm_requests": {
+              "logical_request_count": 15,
+              "http_attempt_count": 15,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 42.975,
+              "by_type": {
+                "comment_generation": {
+                  "logical_request_count": 4,
+                  "http_attempt_count": 4,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 26.516
+                },
+                "agent_decision": {
+                  "logical_request_count": 10,
+                  "http_attempt_count": 10,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 15.513
+                },
+                "global_trend": {
+                  "logical_request_count": 1,
+                  "http_attempt_count": 1,
+                  "retry_count": 0,
+                  "failed_request_count": 0,
+                  "total_duration_seconds": 0.947
+                }
+              }
+            }
+          }
+        ],
+        "duration_seconds": 75.182
+      }
+    }
+  ],
+  "comparison": {
+    "lowest_negative_rate": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 0.0,
+      "is_tie": true
+    },
+    "lowest_question_rate": {
+      "strategy": "rumor_clarification",
+      "strategy_name": "辟谣澄清",
+      "strategies": [
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        }
+      ],
+      "value": 0.1,
+      "is_tie": false
+    },
+    "highest_accept_rate": {
+      "strategy": "rumor_clarification",
+      "strategy_name": "辟谣澄清",
+      "strategies": [
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        }
+      ],
+      "value": 0.9,
+      "is_tie": false
+    },
+    "lowest_negative_peak_rate": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "no_response",
+          "strategy_name": "不回应"
+        },
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 0.3,
+      "is_tie": true
+    },
+    "lowest_negative_area": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 1.1,
+      "is_tie": true
+    },
+    "highest_emotion_recovery_rate": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 1.0,
+      "is_tie": true
+    },
+    "longest_effect_duration": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 4,
+      "is_tie": true
+    },
+    "lowest_rebound_rate": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 0.0,
+      "is_tie": true
+    },
+    "highest_negative_area_reduction": {
+      "strategy": null,
+      "strategy_name": null,
+      "strategies": [
+        {
+          "strategy": "fact_report",
+          "strategy_name": "事实通报"
+        },
+        {
+          "strategy": "empathy",
+          "strategy_name": "共情安抚"
+        },
+        {
+          "strategy": "rumor_clarification",
+          "strategy_name": "辟谣澄清"
+        },
+        {
+          "strategy": "handling_progress",
+          "strategy_name": "处置进展"
+        }
+      ],
+      "value": 0.4,
+      "is_tie": true
+    },
+    "final_trends": {
+      "no_response": "stable",
+      "fact_report": "stable",
+      "empathy": "stable",
+      "rumor_clarification": "stable",
+      "handling_progress": "stable"
+    },
+    "data_quality": {
+      "no_response": {
+        "quality_status": "normal",
+        "llm_comment_count": 176,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "fact_report": {
+        "quality_status": "normal",
+        "llm_comment_count": 175,
+        "history_fallback_count": 5,
+        "emergency_fallback_count": 0,
+        "fallback_count": 5,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "empathy": {
+        "quality_status": "normal",
+        "llm_comment_count": 177,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 30,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 3,
+        "warning_steps": []
+      },
+      "rumor_clarification": {
+        "quality_status": "normal",
+        "llm_comment_count": 178,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 29,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 2,
+        "warning_steps": []
+      },
+      "handling_progress": {
+        "quality_status": "normal",
+        "llm_comment_count": 176,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 30,
+        "initial_request_count": 18,
+        "refill_request_count": 9,
+        "rescue_request_count": 3,
+        "warning_steps": []
+      }
+    },
+    "quality_warning_strategies": []
+  },
+  "performance": {
+    "experiment_duration_seconds": 425.153,
+    "shared_baseline_duration_seconds": 90.132,
+    "strategy_duration_seconds": {
+      "no_response": 63.965,
+      "fact_report": 57.935,
+      "empathy": 67.404,
+      "rumor_clarification": 70.507,
+      "handling_progress": 75.182
+    },
+    "stage_duration_seconds": {
+      "incremental_comment_generation": 300.567,
+      "agent_decision": 86.084,
+      "metrics": 24.527,
+      "initial_comment_pool": 46.529
+    },
+    "llm_requests": {
+      "logical_request_count": 374,
+      "http_attempt_count": 374,
+      "retry_count": 0,
+      "failed_request_count": 0,
+      "total_duration_seconds": 888.473,
+      "by_type": {
+        "comment_angle": {
+          "logical_request_count": 1,
+          "http_attempt_count": 1,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 2.613
+        },
+        "comment_generation": {
+          "logical_request_count": 88,
+          "http_attempt_count": 88,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 484.281
+        },
+        "agent_decision": {
+          "logical_request_count": 260,
+          "http_attempt_count": 260,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 377.521
+        },
+        "global_trend": {
+          "logical_request_count": 25,
+          "http_attempt_count": 25,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 24.055
+        }
+      }
+    },
+    "initial_comment_pool_duration_seconds": 46.529,
+    "total_duration_seconds": 471.695
+  },
+  "shared_baseline": {
+    "completed_step": 6,
+    "response_step": 7,
+    "entry_triggered": true,
+    "entry_reason": "stagnation",
+    "stagnant_round_count": 2,
+    "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_wenjie_001_20260905_095735_946449\\_shared_baseline\\state",
+    "performance": {
+      "executed_step_count": 6,
+      "stage_duration_seconds": {
+        "incremental_comment_generation": 63.959,
+        "agent_decision": 18.737,
+        "metrics": 4.527
+      },
+      "llm_requests": {
+        "logical_request_count": 82,
+        "http_attempt_count": 82,
+        "retry_count": 0,
+        "failed_request_count": 0,
+        "total_duration_seconds": 173.123,
+        "by_type": {
+          "agent_decision": {
+            "logical_request_count": 60,
+            "http_attempt_count": 60,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 78.418
+          },
+          "comment_generation": {
+            "logical_request_count": 17,
+            "http_attempt_count": 17,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 90.261
+          },
+          "global_trend": {
+            "logical_request_count": 5,
+            "http_attempt_count": 5,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 4.443
+          }
+        }
+      },
+      "steps": [
+        {
+          "step": 1,
+          "total_duration_seconds": 3.081,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 0.0,
+            "agent_decision": 3.061,
+            "metrics": 0.011
+          },
+          "llm_requests": {
+            "logical_request_count": 10,
+            "http_attempt_count": 10,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 13.408,
+            "by_type": {
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 13.408
+              }
+            }
+          }
+        },
+        {
+          "step": 2,
+          "total_duration_seconds": 13.056,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 9.491,
+            "agent_decision": 2.625,
+            "metrics": 0.927
+          },
+          "llm_requests": {
+            "logical_request_count": 14,
+            "http_attempt_count": 14,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 27.552,
+            "by_type": {
+              "comment_generation": {
+                "logical_request_count": 3,
+                "http_attempt_count": 3,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 14.586
+              },
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 12.052
+              },
+              "global_trend": {
+                "logical_request_count": 1,
+                "http_attempt_count": 1,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 0.914
+              }
+            }
+          }
+        },
+        {
+          "step": 3,
+          "total_duration_seconds": 13.213,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 9.562,
+            "agent_decision": 2.776,
+            "metrics": 0.853
+          },
+          "llm_requests": {
+            "logical_request_count": 14,
+            "http_attempt_count": 14,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 28.386,
+            "by_type": {
+              "comment_generation": {
+                "logical_request_count": 3,
+                "http_attempt_count": 3,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 15.043
+              },
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 12.504
+              },
+              "global_trend": {
+                "logical_request_count": 1,
+                "http_attempt_count": 1,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 0.839
+              }
+            }
+          }
+        },
+        {
+          "step": 4,
+          "total_duration_seconds": 11.775,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 7.339,
+            "agent_decision": 3.452,
+            "metrics": 0.969
+          },
+          "llm_requests": {
+            "logical_request_count": 14,
+            "http_attempt_count": 14,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 28.449,
+            "by_type": {
+              "comment_generation": {
+                "logical_request_count": 3,
+                "http_attempt_count": 3,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 13.337
+              },
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 14.158
+              },
+              "global_trend": {
+                "logical_request_count": 1,
+                "http_attempt_count": 1,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 0.954
+              }
+            }
+          }
+        },
+        {
+          "step": 5,
+          "total_duration_seconds": 22.233,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 17.896,
+            "agent_decision": 3.446,
+            "metrics": 0.875
+          },
+          "llm_requests": {
+            "logical_request_count": 15,
+            "http_attempt_count": 15,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 36.519,
+            "by_type": {
+              "comment_generation": {
+                "logical_request_count": 4,
+                "http_attempt_count": 4,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 22.82
+              },
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 12.838
+              },
+              "global_trend": {
+                "logical_request_count": 1,
+                "http_attempt_count": 1,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 0.86
+              }
+            }
+          }
+        },
+        {
+          "step": 6,
+          "total_duration_seconds": 23.957,
+          "stage_duration_seconds": {
+            "incremental_comment_generation": 19.671,
+            "agent_decision": 3.377,
+            "metrics": 0.892
+          },
+          "llm_requests": {
+            "logical_request_count": 15,
+            "http_attempt_count": 15,
+            "retry_count": 0,
+            "failed_request_count": 0,
+            "total_duration_seconds": 38.809,
+            "by_type": {
+              "comment_generation": {
+                "logical_request_count": 4,
+                "http_attempt_count": 4,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 24.475
+              },
+              "agent_decision": {
+                "logical_request_count": 10,
+                "http_attempt_count": 10,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 13.458
+              },
+              "global_trend": {
+                "logical_request_count": 1,
+                "http_attempt_count": 1,
+                "retry_count": 0,
+                "failed_request_count": 0,
+                "total_duration_seconds": 0.876
+              }
+            }
+          }
+        }
+      ],
+      "duration_seconds": 90.132
+    }
+  }
+}

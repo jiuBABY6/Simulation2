@@ -1,0 +1,285 @@
+{
+  "experiment_id": "event_huxinyu_2022_001_20260902_170113_704837",
+  "event_id": "event_huxinyu_2022_001",
+  "mode": "historical_replay",
+  "status": "completed",
+  "step_count": 8,
+  "official_update_count": 3,
+  "official_updates": [
+    {
+      "step": 3,
+      "published_at": "2023-01-07",
+      "official_statement": "江西省、市、县公安机关联合工作专班公布阶段性调查进展：公安机关接警后持续开展调查搜寻，现有调查未发现胡某宇在校内被害、自杀或发生意外的痕迹证据，综合现有信息指向其自行离校；校内监控未被人为删改，网民关注的相关人员未发现异常并已排除犯罪嫌疑。多项网络传言经查不实，搜寻和调查工作仍在继续。",
+      "official_statement_status": "incomplete",
+      "source_url": "本地文件：项目根目录/offical.md"
+    },
+    {
+      "step": 5,
+      "published_at": "2023-01-29",
+      "official_statement": "联合工作专班此前已公布阶段性调查和搜寻进展。本轮新增信息为：1月28日，公安机关接报在河口镇金鸡山区域树林中发现一具缢吊尸体；1月29日经DNA检验确认死者系胡某宇。现场勘查过程中发现一支录音笔并送专业机构鉴定，公安机关已邀请刑事技术专家参与勘验，死因及相关调查、检验工作仍在进行。",
+      "official_statement_status": "incomplete",
+      "source_url": "https://news.bjd.com.cn/2023/01/29/10316865.shtml"
+    },
+    {
+      "step": 7,
+      "published_at": "2023-02-02",
+      "official_statement": "此前已确认发现胡某宇遗体及其随身录音笔。本轮联合工作专班公布最终调查情况：经调查访问、现场勘查、尸体检验和物证检验鉴定，认定胡某宇系自缢死亡，尸体发现地系原始第一现场；现场未发现打斗、拖拽痕迹，尸体检验未发现支持他杀的损伤和常见毒物，录音笔音频经鉴定不存在人为合成、篡改，并表达了轻生意愿。发布会同时回应了遗体发现、搜寻盲区及前期调查工作等公众关切。",
+      "official_statement_status": "clear",
+      "source_url": "https://news.bjd.com.cn/2023/02/02/10321795.shtml"
+    }
+  ],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "period": "2022.10.15-2022.11.22",
+      "phase": "失联事件发酵与初步搜寻",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 2,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 19,
+        "history_fallback_count": 1,
+        "emergency_fallback_count": 0,
+        "fallback_count": 1,
+        "generation_attempts": 6,
+        "model_returned_comment_count": 31,
+        "rejection_counts": {
+          "重复文本": 12
+        },
+        "validation_errors": []
+      },
+      "period": "2022.11.23-2023.01.06",
+      "phase": "持续调查与网络猜测扩散",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": 1.0,
+        "accept_rate": 0.0,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 3,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 18,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 8,
+        "model_returned_comment_count": 59,
+        "rejection_counts": {
+          "重复文本": 41
+        },
+        "validation_errors": []
+      },
+      "period": "2023.01.07-2023.01.11",
+      "phase": "阶段性调查进展通报",
+      "official_statement_timing": {
+        "introduced_step": 3,
+        "is_new": true
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": 1.0,
+        "accept_rate": 0.0,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 4,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 9,
+        "model_returned_comment_count": 54,
+        "rejection_counts": {
+          "重复文本": 34
+        },
+        "validation_errors": []
+      },
+      "period": "2023.01.12-2023.01.28",
+      "phase": "通报后持续搜寻与舆情发酵",
+      "official_statement_timing": {
+        "introduced_step": 3,
+        "is_new": false
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": 1.0,
+        "accept_rate": 0.0,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 5,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 19,
+        "history_fallback_count": 1,
+        "emergency_fallback_count": 0,
+        "fallback_count": 1,
+        "generation_attempts": 6,
+        "model_returned_comment_count": 31,
+        "rejection_counts": {
+          "重复文本": 12
+        },
+        "validation_errors": []
+      },
+      "period": "2023.01.29",
+      "phase": "发现遗体警情通报",
+      "official_statement_timing": {
+        "introduced_step": 5,
+        "is_new": true
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 1.0,
+        "question_rate": 1.0,
+        "accept_rate": 0.0,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "worsening"
+      },
+      "comment_generation": {
+        "step": 6,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 16,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 65,
+        "rejection_counts": {
+          "重复文本": 49
+        },
+        "validation_errors": []
+      },
+      "period": "2023.01.30-2023.02.01",
+      "phase": "调查结论发布前的集中讨论",
+      "official_statement_timing": {
+        "introduced_step": 5,
+        "is_new": false
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": 0.4,
+        "accept_rate": 0.5,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "comment_generation": {
+        "step": 7,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 7,
+        "model_returned_comment_count": 44,
+        "rejection_counts": {
+          "重复文本": 24
+        },
+        "validation_errors": []
+      },
+      "period": "2023.02.02-2023.02.03",
+      "phase": "调查情况新闻发布会",
+      "official_statement_timing": {
+        "introduced_step": 7,
+        "is_new": true
+      }
+    },
+    {
+      "step": 8,
+      "policy_metrics": {
+        "negative_rate": 0.3,
+        "question_rate": 0.2,
+        "accept_rate": 0.7,
+        "official_attitude_applicable_count": 10,
+        "global_trend": "stable"
+      },
+      "comment_generation": {
+        "step": 8,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 18,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 10,
+        "model_returned_comment_count": 50,
+        "rejection_counts": {
+          "重复文本": 31,
+          "无效 faction": 1
+        },
+        "validation_errors": []
+      },
+      "period": "2023.02.04以后",
+      "phase": "最终结论后的持续讨论",
+      "official_statement_timing": {
+        "introduced_step": 7,
+        "is_new": false
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.3,
+    "question_rate": 0.2,
+    "accept_rate": 0.7,
+    "official_attitude_applicable_count": 10,
+    "global_trend": "stable"
+  },
+  "comment_quality": {
+    "quality_status": "degraded",
+    "llm_comment_count": 130,
+    "history_fallback_count": 10,
+    "emergency_fallback_count": 0,
+    "fallback_count": 10,
+    "warning_steps": [
+      6
+    ]
+  },
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_huxinyu_2022_001_20260902_170113_704837\\historical_replay\\state"
+}

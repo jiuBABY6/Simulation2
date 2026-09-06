@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第二十六次联调 · 社交网络传播分析</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">SOCIAL PROPAGATION · INTEGRATION TEST 26</p>
+      <h1>社交网络与评论传播分析</h1>
+      <p class="subtitle">从固定关注关系出发，追踪评论如何被看见、继续表达，并沿网络形成多层传播</p>
+      <p id="experiment-id" class="experiment-id">正在读取实验……</p>
+    </div>
+    <div class="status-box">
+      <span class="status-label">验收结论</span>
+      <strong id="acceptance-status">读取中</strong>
+      <small>原始实验数据只读</small>
+    </div>
+  </header>
+
+  <main>
+    <section id="notice" class="notice hidden"></section>
+
+    <section id="summary-cards" class="summary-cards"></section>
+
+    <section class="panel network-panel">
+      <div class="panel-heading split-heading">
+        <div>
+          <p class="section-tag blue">网络总览</p>
+          <h2>关注关系上的累计信息流</h2>
+          <p class="heading-note">箭头按照评论实际传播方向绘制，与JSON中的“关注方向”相反</p>
+        </div>
+        <div class="controls">
+          <label>
+            <span>实验场景</span>
+            <select id="scenario-select"></select>
+          </label>
+          <label class="step-control">
+            <span>截至第 <strong id="step-value">10</strong> 轮</span>
+            <input id="step-slider" type="range" min="1" max="10" value="10">
+          </label>
+          <button id="play-button" type="button">▶ 播放轮次</button>
+        </div>
+      </div>
+
+      <div class="network-layout">
+        <div>
+          <div id="network-chart" class="network-chart"></div>
+          <div class="legend">
+            <span><i class="node-symbol"></i>节点大小：Agent影响力</span>
+            <span><i class="line-symbol active"></i>已发生邻居曝光</span>
+            <span><i class="line-symbol continued"></i>曝光后继续表达</span>
+            <span><i class="line-symbol inactive"></i>尚未发生传播</span>
+          </div>
+        </div>
+        <aside id="node-details" class="node-details">
+          <p class="side-kicker">节点观察</p>
+          <h3>点击任意Agent</h3>
+          <p>查看影响力、发出曝光、接收曝光和继续表达情况。</p>
+        </aside>
+      </div>
+      <div id="network-stats" class="metric-strip"></div>
+    </section>
+
+    <section class="panel cascade-panel">
+      <div class="panel-heading split-heading cascade-heading">
+        <div>
+          <p class="section-tag orange">单评论追踪</p>
+          <h2>一条评论如何形成传播链</h2>
+          <p class="heading-note">实线代表看见后继续表达，虚线终点代表看见但未继续表达</p>
+        </div>
+        <label class="comment-picker">
+          <span>选择评论</span>
+          <select id="comment-select"></select>
+        </label>
+      </div>
+      <blockquote id="comment-text" class="comment-text">正在加载评论传播数据……</blockquote>
+      <div id="cascade-stats" class="metric-strip compact"></div>
+      <div id="cascade-chart" class="cascade-chart"></div>
+      <div class="legend cascade-legend">
+        <span><i class="cascade-node root"></i>首次表达</span>
+        <span><i class="cascade-node continued"></i>继续表达</span>
+        <span><i class="cascade-node stopped"></i>看见但停止</span>
+        <span>横向位置表示轮次，节点提示显示Agent和传播权重</span>
+      </div>
+    </section>
+
+    <section class="panel comparison-panel">
+      <div class="panel-heading">
+        <p class="section-tag teal">策略对照</p>
+        <h2>同一张社交网络中的传播差异</h2>
+        <p class="heading-note">五个场景共享网络快照，进入各自场景后传播轨迹独立演化</p>
+      </div>
+      <div class="comparison-grid">
+        <div id="strategy-bars" class="strategy-bars"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>场景</th><th>曝光次数</th><th>继续传播</th><th>继续传播率</th><th>最大深度</th><th>平均深度</th><th>数据质量</th>
+              </tr>
+            </thead>
+            <tbody id="strategy-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="insight-grid">
+      <article class="panel insight-panel success">
+        <div class="panel-heading">
+          <p class="section-tag teal">验收发现</p>
+          <h2>第二阶段A形成完整传播数据闭环</h2>
+        </div>
+        <ul id="findings" class="insight-list"></ul>
+      </article>
+      <article class="panel insight-panel caution">
+        <div class="panel-heading">
+          <p class="section-tag orange">解释边界</p>
+          <h2>当前结果不能直接等同现实传播规模</h2>
+        </div>
+        <ul id="limitations" class="insight-list"></ul>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    第二十六次联调专题 · 数据来自只读实验目录 · 页面不调用大模型、不修改仿真结果
+  </footer>
+  <script src="/app.js"></script>
+</body>
+</html>

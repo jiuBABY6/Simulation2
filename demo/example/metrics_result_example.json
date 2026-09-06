@@ -1,0 +1,107 @@
+{
+  "is_example": true,
+  "round_metrics": {
+    "event_id": "example_event",
+    "step": 2,
+    "global_trend": {
+      "trend_direction": "improving",
+      "reason": "与初始评论相比，当前轮负面和质疑表达减少，舆情呈缓和趋势。",
+      "evidence_comment_ids": [
+        "comment_061",
+        "comment_067"
+      ]
+    },
+    "agent_negative_emotion": {
+      "agent_count": 30,
+      "negative_count": 12,
+      "negative_rate": 0.4
+    },
+    "agent_emotion_distribution": {
+      "agent_count": 30,
+      "distribution": {
+        "positive": {
+          "count": 4,
+          "rate": 0.133333
+        },
+        "neutral": {
+          "count": 14,
+          "rate": 0.466667
+        },
+        "negative": {
+          "count": 12,
+          "rate": 0.4
+        }
+      }
+    },
+    "official_attitude_distribution": {
+      "agent_count": 30,
+      "applicable_agent_count": 30,
+      "not_applicable_count": 0,
+      "distribution": {
+        "accept": {
+          "count": 8,
+          "rate": 0.266667
+        },
+        "wait": {
+          "count": 16,
+          "rate": 0.533333
+        },
+        "question": {
+          "count": 6,
+          "rate": 0.2
+        }
+      }
+    },
+    "propagation_metrics": {
+      "exposure_count": 48,
+      "reached_agent_count": 26,
+      "reach_rate": 0.866667,
+      "source_agent_count": 18,
+      "propagated_comment_count": 15,
+      "continued_propagation_count": 9,
+      "continued_agent_count": 9,
+      "continuation_rate": 0.1875,
+      "max_propagation_depth": 2,
+      "average_propagation_depth": 1.25,
+      "total_effective_weight": 63.42
+    }
+  },
+  "effect_metrics": {
+    "analysis_start_step": 2,
+    "final_negative_rate": 0.3,
+    "baseline_step": 1,
+    "baseline_negative_agent_count": 12,
+    "recovered_agent_count": 5,
+    "emotion_recovery_rate": 0.416667,
+    "effect_baseline_negative_rate": 0.4,
+    "effect_start_step": 3,
+    "effect_end_step": 5,
+    "effect_duration": 3,
+    "rebound_agent_count": 2,
+    "rebound_rate": 0.4,
+    "negative_peak_rate": 0.5,
+    "negative_peak_steps": [
+      1
+    ],
+    "negative_area": 3.7,
+    "observed_step_count": 10,
+    "control_net_effect": {
+      "final_negative_rate_reduction": 0.1,
+      "peak_negative_rate_reduction": 0.1,
+      "negative_area_reduction": 0.8
+    }
+  },
+  "propagation_summary": {
+    "exposure_count": 356,
+    "reached_agent_count": 30,
+    "reach_rate": 1.0,
+    "source_agent_count": 25,
+    "propagated_comment_count": 52,
+    "continued_propagation_count": 71,
+    "continued_agent_count": 24,
+    "continuation_rate": 0.199438,
+    "max_propagation_depth": 4,
+    "average_propagation_depth": 1.764045,
+    "total_effective_weight": 381.72
+  }
+}

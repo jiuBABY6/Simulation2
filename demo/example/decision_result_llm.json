@@ -1,0 +1,56 @@
+{
+  "event_id": "event_001",
+  "step": 1,
+  "agent_id": "agent_1442246695",
+  "visible_comment_ids": [
+    "comment_002",
+    "comment_008",
+    "comment_015"
+  ],
+  "neighbor_visible_count": 1,
+  "public_visible_count": 2,
+  "decision_method": "constrained_llm",
+  "status": "preview",
+  "is_example": true,
+  "decision": {
+    "current_emotion": "negative",
+    "official_attitude": "question",
+    "will_comment": true,
+    "comment_faction": "观点输出派",
+    "decision_reason": {
+      "emotion": "事件涉及公共安全问题，因此更容易产生负面情绪。",
+      "official_attitude": "当前官方声明仍然比较简略，需要等待更完整的信息。",
+      "comment": "倾向选择要求公开核查依据的观点表达。"
+    },
+    "selection_source": "personal_visible_comments",
+    "visible_candidate_count": 3,
+    "scored_candidate_count": 3,
+    "selected_comment_id": "comment_001",
+    "selected_comment_score": 0.932831,
+    "expression_id": "expression_example001",
+    "propagation_depth": 0,
+    "parent_expression_ids": [],
+    "root_expression_ids": [
+      "expression_example001"
+    ],
+    "selected_comment": {
+      "comment_id": "comment_001",
+      "text": "关于某公共场所发生安全事件，引发公众讨论。，建议尽快公开核查依据和后续处理进展。",
+      "profile_id": 1,
+      "profile_label": "愤世嫉俗的批判者",
+      "topic": "社会事件",
+      "emotion": "negative",
+      "faction": "观点输出派",
+      "orientation": "fact",
+      "stance": "criticism",
+      "introduced_step": 1,
+      "generation_trigger": "initial_event",
+      "expression_id": "expression_example001",
+      "propagation_depth": 0,
+      "parent_expression_ids": [],
+      "root_expression_ids": [
+        "expression_example001"
+      ]
+    }
+  }
+}
