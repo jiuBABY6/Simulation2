@@ -19,6 +19,24 @@
 
 当前Persona可匹配的主题包括`新闻时事`、`社会事件`和`其他`等已有键值。新事件不得临时创造Persona中不存在的主题标签。
 
+### Web 事件输入
+
+事件默认从`demo/event_example.json`读取。后续 web 页面通过
+`resolve_event_input()`接收事件输入，只传需要覆盖的字段即可，例如：
+
+```json
+{
+  "event_content": "网页填写的事件正文",
+  "event_labels": {
+    "event_valence": "negative"
+  }
+}
+```
+
+`event_labels`使用浅层合并：没有传入的标签保留默认值。只覆盖事件正文时沿用
+默认`event_id`；若传入与默认不同的`event_id`，必须同时传入`event_content`，
+避免新事件编号误配旧正文。
+
 ## 官方策略输入
 
 文件：`demo/official_response_options.json`。
@@ -27,10 +45,35 @@
 
 - `event_id`：必须与事件输入一致；
 - `entry_strategy`：`negative_threshold`、`global_worsening`或`combined_policy`；
-- `content_strategies`：必须完整包含事实通报、共情安抚、辟谣澄清和处置进展；
-- `official_statement_status`：`clear`、`incomplete`或`conflict`。
+- `content_strategies`：必须完整包含事实通报、共情安抚、辟谣澄清、处置进展和
+  `custom`；内置策略的声明不能为空；
+- `official_statement_status`：`clear`、`incomplete`、`conflict`或`none`；
+  `none`仅允许用于公告内容为空的`custom`占位。
+
+`custom`策略是框架的自定义公告入口，默认不随依次触发模式运行。通过
+`run_single_strategy_experiment(..., strategy_id="custom")`显式触发时：
+公告为空且状态为`none`会保存为`not_run`，原因`custom_statement_empty`；
+填入`official_statement`并将状态改为`clear`、`incomplete`或`conflict`后，
+该策略会按同一套规则运行并参与该批次结果记录。
 
 不回应场景由系统自动增加，不写入`content_strategies`。
+
+### Web 公告输入
+
+后续 web 页面通过 `resolve_official_response_options()`接收公告内容。默认值来自
+`official_response_options.json`；输入可以只覆盖需要修改的策略，例如：
+
+```json
+{
+  "custom": {
+    "official_statement": "网页填写内容",
+    "official_statement_status": "clear"
+  }
+}
+```
+
+也可以传入策略列表或完整的`{"content_strategies": [...]}`结构。未知策略编号、
+缺少`strategy_id`、空公告配非`none`状态等情况都会在校验阶段直接报错。
 
 ## 评论记录
 
@@ -68,6 +111,8 @@ comment_faction, selected_comment_id
 ```text
 experiment_id, status, strategy_count, success_count,
 not_run_count, failed_count, entry_triggered, entry_reason,
+strategy_trigger_mode, selected_strategy_id,
+custom_included, custom_triggered,
 comparison_status, strategy_results, comparison,
 performance, performance_summary
 ```

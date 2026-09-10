@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>舆情推演控制台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">舆</span>
+        <div>
+          <h1>舆情推演控制台</h1>
+          <p>Simulation2 · 事件 / 公告 / 策略 / 会话控制</p>
+        </div>
+      </div>
+      <div class="top-status" id="top-status">
+        <span class="live-dot" id="live-dot"></span>
+        <span id="live-text">等待创建会话</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="setup">
+        <section class="panel" id="entry-timing-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">1 · 事件</p>
+              <h2>事件输入</h2>
+            </div>
+            <span class="count" id="event-id-label"></span>
+          </div>
+          <label class="field">
+            <span>事件正文</span>
+            <textarea id="event-content" maxlength="5000"></textarea>
+          </label>
+          <div class="form-row">
+            <label class="field">
+              <span>主题</span>
+              <select id="event-topic"></select>
+            </label>
+            <label class="field">
+              <span>情绪倾向</span>
+              <select id="event-valence">
+                <option value="negative">负面</option>
+                <option value="neutral">中性</option>
+                <option value="positive">正面</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">2 · 公告</p>
+              <h2>公告内容</h2>
+            </div>
+          </div>
+          <div id="announcement-list" class="announcement-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">2.5 · 时机</p>
+              <h2>公告发布时间</h2>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>模式</span>
+              <select id="entry-mode">
+                <option value="dynamic">动态进场</option>
+                <option value="fixed_round">固定轮次</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>固定轮次</span>
+              <select id="entry-round"></select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">2.6 · 追加公告</p>
+              <h2>暂停时添加公告</h2>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>发布轮次</span>
+              <select id="timeline-round"></select>
+            </label>
+            <label class="field">
+              <span>声明状态</span>
+              <select id="timeline-status">
+                <option value="clear">clear</option>
+                <option value="incomplete">incomplete</option>
+                <option value="conflict">conflict</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            <span>公告内容</span>
+            <textarea id="timeline-text" maxlength="5000" placeholder="暂停时填写公告内容"></textarea>
+          </label>
+          <div class="setup-actions">
+            <button class="button primary" id="add-announcement-btn" type="button" disabled>添加到时间线</button>
+          </div>
+          <div id="timeline-list" class="timeline-list"></div>
+        </section>
+
+        <div class="setup-actions">
+          <button class="button ghost" id="preview-btn" type="button">预览输入</button>
+          <button class="button primary" id="create-btn" type="button">创建会话</button>
+        </div>
+      </aside>
+
+      <main class="control">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">会话</p>
+              <h2 id="session-title">尚未创建</h2>
+            </div>
+            <span class="count" id="session-id-label"></span>
+          </div>
+          <div class="summary-strip" id="summary-strip"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">进度</p>
+              <h2>推演进度</h2>
+            </div>
+            <span class="count" id="progress-label">0 / 10</span>
+          </div>
+          <div class="progress-track" id="progress-track"></div>
+          <div class="phase-line" id="phase-line"></div>
+        </section>
+
+        <section class="panel" id="metrics-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">实时</p>
+              <h2>舆情指标</h2>
+            </div>
+            <span class="count" id="metrics-count">无数据</span>
+          </div>
+          <div id="metrics-summary" class="mini-strip"></div>
+          <div id="metrics-legend" class="chart-legend"></div>
+          <div class="chart-wrap">
+            <div id="metrics-chart" class="line-chart"></div>
+            <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+          </div>
+        </section>
+
+        <section class="live-grid">
+          <article class="panel detail-trigger" id="agent-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">实时</p>
+                <h2>Agent 状态</h2>
+              </div>
+              <span class="count" id="agent-count">无数据</span>
+            </div>
+            <div id="agent-summary" class="mini-strip"></div>
+          </article>
+
+          <article class="panel detail-trigger" id="pool-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">实时</p>
+                <h2>舆论池</h2>
+              </div>
+              <span class="count" id="comments-count">无数据</span>
+            </div>
+            <div id="comments-summary" class="mini-strip"></div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">运行</p>
+              <h2>会话控制</h2>
+            </div>
+          </div>
+          <div class="control-row">
+            <button class="button primary" id="start-btn" type="button">启动</button>
+            <button class="button primary" id="run-all-btn" type="button" hidden>运行全部策略</button>
+            <button class="button" id="continue-btn" type="button">继续运行</button>
+            <button class="button" id="pause-btn" type="button">暂停</button>
+            <label class="rollback-control">
+              <span>回滚</span>
+              <select id="rollback-steps">
+                <option value="1">1 步</option>
+                <option value="2">2 步</option>
+                <option value="3">3 步</option>
+              </select>
+              <button class="button" id="rollback-btn" type="button">回滚</button>
+            </label>
+            <button class="button danger" id="restart-btn" type="button">重启新批次</button>
+          </div>
+          <div class="busy" id="busy" hidden></div>
+          <div id="current-strategy" class="current-strategy"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">结果</p>
+              <h2>会话明细</h2>
+            </div>
+          </div>
+          <div class="detail-grid" id="detail-grid"></div>
+          <pre id="detail-raw" class="raw-output"></pre>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="comment-drawer-backdrop" class="drawer-backdrop hidden"></div>
+  <aside id="comment-drawer" class="comment-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow">POOL DETAIL</p>
+        <h2>舆论池详情</h2>
+      </div>
+      <button class="button ghost" id="comment-drawer-close" type="button">关闭</button>
+    </div>
+    <div id="comment-drawer-body" class="drawer-body"></div>
+  </aside>
+
+  <div id="agent-drawer-backdrop" class="drawer-backdrop hidden"></div>
+  <aside id="agent-drawer" class="comment-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow">AGENT DETAIL</p>
+        <h2>Agent 详情</h2>
+      </div>
+      <button class="button ghost" id="agent-drawer-close" type="button">关闭</button>
+    </div>
+    <div id="agent-drawer-body" class="drawer-body"></div>
+  </aside>
+  <script src="/app.js"></script>
+</body>
+</html>

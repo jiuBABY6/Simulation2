@@ -1,7 +1,8 @@
-"""运行并比较四种官方内容策略。
+"""运行并比较内置与自定义官方内容策略。
 
-本模块只负责编排实验。四种内容策略使用相同的动态进场规则和独立状态目录，
-具体评论生成、Agent 决策和指标统计继续由 simulation/runner.py 完成。
+本模块只负责编排实验。内置内容策略和可选的自定义策略使用相同的动态进场
+规则和独立状态目录，具体评论生成、Agent 决策和指标统计继续由
+simulation/runner.py 完成。
 """
 
 import json
@@ -53,17 +54,24 @@ ENTRY_STRATEGIES = (
     "global_worsening",
     "combined_policy",
 )
-# 2026/08/23 内容策略对照，新增功能：明确当前 Demo 必须提供的四种人工内容策略。
-CONTENT_STRATEGY_IDS = (
+# 2026/08/23 内容策略对照，新增功能：明确当前 Demo 必须提供的四种内置人工内容策略。
+BUILTIN_CONTENT_STRATEGY_IDS = (
     "fact_report",
     "empathy",
     "rumor_clarification",
     "handling_progress",
 )
+# 2026/09/08 自定义策略，新增功能：框架内置自定义策略占位，公告内容可暂为空。
+CUSTOM_CONTENT_STRATEGY_ID = "custom"
+CONTENT_STRATEGY_IDS = BUILTIN_CONTENT_STRATEGY_IDS + (
+    CUSTOM_CONTENT_STRATEGY_ID,
+)
+CUSTOM_STATEMENT_PENDING_REASON = "custom_statement_empty"
 OFFICIAL_STATEMENT_STATUSES = (
     "clear",
     "incomplete",
     "conflict",
+    "none",
 )
 # 2026/08/23 内容策略对照，新增功能：保留不发布官方声明的独立实验基线。
 NO_RESPONSE_SCENARIO = {
@@ -72,6 +80,46 @@ NO_RESPONSE_SCENARIO = {
     "official_statement": "",
     "official_statement_status": "none",
 }
+
+
+def resolve_entry_timing(entry_timing_input=None):
+    """解析 web 传入的自定义官方进场时机。
+
+    ``None`` 或 ``{"mode": "dynamic"}`` 表示沿用官方回应文件中的动态进场规则；
+    ``{"mode": "fixed_round", "round": N}`` 表示官方声明从第 N 轮开始生效。
+    """
+    if entry_timing_input is None:
+        return {"mode": "dynamic", "round": None}
+    if not isinstance(entry_timing_input, dict):
+        raise ValueError("entry_timing_input 必须是 JSON 对象。")
+    mode = str(entry_timing_input.get("mode", "")).strip()
+    if mode in {"dynamic", ""}:
+        return {"mode": "dynamic", "round": None}
+    if mode not in {"fixed_round", "custom_round"}:
+        raise ValueError(
+            "entry_timing_input.mode 只支持 dynamic、fixed_round 或 custom_round。"
+        )
+    raw_round = entry_timing_input.get("round")
+    if (
+        isinstance(raw_round, bool)
+        or not isinstance(raw_round, int)
+        or not 2 <= raw_round <= MAX_STEPS
+    ):
+        raise ValueError(
+            f"自定义进场轮次必须是 2 到 {MAX_STEPS} 之间的整数。"
+        )
+    return {"mode": "fixed_round", "round": raw_round}
+
+
+def is_custom_statement_ready(content_strategy):
+    """判断自定义策略是否已经填入可用的公告内容。"""
+    statement = str(
+        content_strategy.get("official_statement", "")
+    ).strip()
+    status = str(
+        content_strategy.get("official_statement_status", "")
+    ).strip()
+    return bool(statement) and status != "none"
 
 
 def parse_simulation_step_result(output):
@@ -249,11 +297,21 @@ def validate_official_response_options(options, event_id):
             raise ValueError(f"发现重复的内容策略编号：{strategy_id}")
         if not strategy_name:
             raise ValueError(f"内容策略 {strategy_id} 缺少 strategy_name。")
-        if not statement:
-            raise ValueError(f"内容策略 {strategy_id} 的官方声明不能为空。")
         if statement_status not in OFFICIAL_STATEMENT_STATUSES:
             raise ValueError(
                 f"内容策略 {strategy_id} 的 official_statement_status 不合法。"
+            )
+        is_custom = strategy_id == CUSTOM_CONTENT_STRATEGY_ID
+        if not statement:
+            if not (is_custom and statement_status == "none"):
+                raise ValueError(
+                    f"内容策略 {strategy_id} 的官方声明不能为空，"
+                    "只有 custom 策略可暂以 none 状态占位。"
+                )
+        elif statement_status == "none":
+            raise ValueError(
+                f"内容策略 {strategy_id} 已有公告内容时，"
+                "official_statement_status 不能为 none。"
             )
 
         strategy_ids.add(strategy_id)
@@ -271,7 +329,7 @@ def validate_official_response_options(options, event_id):
         missing_ids = sorted(expected_ids - strategy_ids)
         extra_ids = sorted(strategy_ids - expected_ids)
         raise ValueError(
-            "内容策略必须完整包含当前四种策略："
+            "内容策略必须完整包含四种内置策略和 custom 策略："
             f"缺少 {missing_ids}，多余 {extra_ids}。"
         )
 
@@ -296,6 +354,97 @@ def load_official_response_options(response_file, event_id):
         load_json(response_path),
         event_id,
     )
+
+
+def _normalize_content_patches(content_input):
+    """将 web 输入转换为 ``{strategy_id: patch}`` 结构。"""
+    if content_input is None:
+        return {}
+    if isinstance(content_input, dict) and isinstance(
+        content_input.get("content_strategies"), list
+    ):
+        content_input = content_input["content_strategies"]
+    if isinstance(content_input, list):
+        patches = {}
+        for index, item in enumerate(content_input, start=1):
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"第 {index} 个公告内容输入必须是 JSON 对象。"
+                )
+            strategy_id = str(item.get("strategy_id", "")).strip()
+            if not strategy_id:
+                raise ValueError(f"第 {index} 个公告内容输入缺少 strategy_id。")
+            patches[strategy_id] = item
+        return patches
+    if isinstance(content_input, dict):
+        patches = {}
+        for strategy_id, item in content_input.items():
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"策略 {strategy_id} 的公告内容输入必须是 JSON 对象。"
+                )
+            patches[str(strategy_id).strip()] = item
+        return patches
+    raise ValueError(
+        "公告内容输入必须是策略列表或 strategy_id 到内容对象的映射。"
+    )
+
+
+def resolve_official_response_options(
+    event_id,
+    default_response_file=OFFICIAL_RESPONSE_FILE,
+    content_input=None,
+):
+    """合并默认 JSON 与 web 页面公告输入。
+
+    未提供 ``content_input`` 时直接使用 ``official_response_options.json``。
+    提供输入时可只传需要覆盖的策略，例如：:
+
+        {
+            "custom": {
+                "official_statement": "网页填写内容",
+                "official_statement_status": "clear"
+            }
+        }
+
+    也支持列表形式或完整 ``{"content_strategies": [...]}`` 结构。
+    """
+    options = load_official_response_options(default_response_file, event_id)
+    patches = _normalize_content_patches(content_input)
+    if not patches:
+        return options
+
+    content_by_id = {
+        item["strategy_id"]: item
+        for item in options["content_strategies"]
+    }
+    for strategy_id, patch in patches.items():
+        if strategy_id not in content_by_id:
+            raise ValueError(f"不支持的公告输入策略：{strategy_id}")
+        default_item = content_by_id[strategy_id]
+        content_by_id[strategy_id] = {
+            "strategy_id": strategy_id,
+            "strategy_name": patch.get(
+                "strategy_name",
+                default_item["strategy_name"],
+            ),
+            "official_statement": patch.get(
+                "official_statement",
+                default_item["official_statement"],
+            ),
+            "official_statement_status": patch.get(
+                "official_statement_status",
+                default_item["official_statement_status"],
+            ),
+        }
+    merged = dict(options)
+    merged["content_strategies"] = [
+        content_by_id[strategy_id]
+        for strategy_id in (
+            item["strategy_id"] for item in options["content_strategies"]
+        )
+    ]
+    return validate_official_response_options(merged, event_id)
 
 
 # 2026/08/25 第五次联调问题修复，修改功能：保留无声明场景的空官方态度指标。
@@ -1093,6 +1242,64 @@ def compare_strategy_results(strategy_results):
     return comparison
 
 
+def select_strategy_scenarios(response_options, selected_strategy_id=None):
+    """选择本次实验要触发的策略场景。
+
+    默认（``selected_strategy_id=None``）按顺序触发不回应和四种内置内容策略；
+    ``custom`` 默认不自动触发。传入具体策略编号时只保留该策略场景，供后续
+    可视化控制页面使用。
+    """
+    content_by_id = {
+        item["strategy_id"]: item
+        for item in response_options.get("content_strategies", [])
+    }
+    if selected_strategy_id is None:
+        scenarios = [(NO_RESPONSE_SCENARIO, "no_response")]
+        scenarios.extend(
+            (item, response_options["entry_strategy"])
+            for item in content_by_id.values()
+            if item["strategy_id"] != CUSTOM_CONTENT_STRATEGY_ID
+        )
+        return scenarios
+    if selected_strategy_id == NO_RESPONSE_SCENARIO["strategy_id"]:
+        return [(NO_RESPONSE_SCENARIO, "no_response")]
+    if selected_strategy_id not in content_by_id:
+        raise ValueError(f"不支持的策略编号：{selected_strategy_id}")
+    return [
+        (
+            content_by_id[selected_strategy_id],
+            response_options["entry_strategy"],
+        )
+    ]
+
+
+def list_triggerable_strategies(response_options):
+    """返回 web 控制页面可单独触发的策略列表。"""
+    strategies = [
+        {
+            "strategy_id": NO_RESPONSE_SCENARIO["strategy_id"],
+            "strategy_name": NO_RESPONSE_SCENARIO["strategy_name"],
+            "custom": False,
+            "ready": True,
+        }
+    ]
+    for item in response_options.get("content_strategies", []):
+        is_custom = item["strategy_id"] == CUSTOM_CONTENT_STRATEGY_ID
+        strategies.append(
+            {
+                "strategy_id": item["strategy_id"],
+                "strategy_name": item["strategy_name"],
+                "custom": is_custom,
+                "ready": (
+                    is_custom_statement_ready(item)
+                    if is_custom
+                    else True
+                ),
+            }
+        )
+    return strategies
+
+
 # 2026/08/23 内容策略对照，修改功能：读取批次声明快照并汇总全部内容策略场景。
 def run_experiment(
     experiment_id,
@@ -1100,8 +1307,14 @@ def run_experiment(
     event_file,
     comment_pool_file,
     official_response_file=OFFICIAL_RESPONSE_FILE,
+    selected_strategy_id=None,
 ):
-    """使用当前批次的独立输入运行官方内容策略对照实验。"""
+    """运行策略对照实验，默认触发内置策略，可指定单策略模式。
+
+    ``selected_strategy_id=None`` 时按顺序运行不回应和四种内置内容策略；
+    ``custom`` 默认不触发。传入 ``selected_strategy_id`` 时只触发该策略，
+    便于后续可视化页面按用户选择控制实验分支。
+    """
     # 2026/09/04 Demo性能基线，新增功能：记录实验编排、共享基线和各策略的墙钟耗时。
     experiment_start_time = time.perf_counter()
     experiment_dir = Path(experiment_dir)
@@ -1126,12 +1339,18 @@ def run_experiment(
     )
     entry_strategy = response_options["entry_strategy"]
 
-    # 2026/08/23 内容策略对照，修改功能：先运行不回应基线，再运行四个官方内容场景。
-    scenarios = [(NO_RESPONSE_SCENARIO, "no_response")]
-    scenarios.extend(
-        (content_strategy, entry_strategy)
-        for content_strategy in response_options["content_strategies"]
+    # 2026/08/23 内容策略对照，修改功能：先运行不回应基线，再运行内容策略场景。
+    scenarios = select_strategy_scenarios(
+        response_options,
+        selected_strategy_id=selected_strategy_id,
     )
+    strategy_trigger_mode = (
+        "single" if selected_strategy_id is not None else "all"
+    )
+    if strategy_trigger_mode == "single":
+        print(f"单策略触发模式：{selected_strategy_id}")
+    else:
+        print("依次触发模式：不回应与内置内容策略；custom 默认不触发。")
 
     # 2026/08/25 第八次联调问题修复，新增功能：只运行一次官方进场前基线供全部场景复制。
     shared_baseline = None
@@ -1172,6 +1391,44 @@ def run_experiment(
     strategy_results = []
     for content_strategy, scenario_entry_strategy in scenarios:
         strategy_id = content_strategy["strategy_id"]
+        if (
+            strategy_id == CUSTOM_CONTENT_STRATEGY_ID
+            and not is_custom_statement_ready(content_strategy)
+        ):
+            print(
+                f"实验场景 {strategy_id} 未运行："
+                "custom 公告内容为空，等待填充后参与对照。"
+            )
+            scenario_dir = experiment_dir / strategy_id
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            result = {
+                "strategy": strategy_id,
+                "strategy_name": content_strategy["strategy_name"],
+                "entry_strategy": scenario_entry_strategy,
+                "status": "not_run",
+                "reason": CUSTOM_STATEMENT_PENDING_REASON,
+                "entry_triggered": bool(
+                    shared_baseline
+                    and shared_baseline.get("entry_triggered")
+                ),
+                "entry_reason": (
+                    shared_baseline.get("entry_reason")
+                    if shared_baseline is not None
+                    else None
+                ),
+                "comparison_eligible": False,
+                "official_responses": [],
+                "rounds": [],
+                "comment_quality": {},
+                "state_dir": None,
+                "performance": {
+                    **summarize_step_performance([]),
+                    "duration_seconds": 0.0,
+                },
+            }
+            save_json(scenario_dir / "scenario_result.json", result)
+            strategy_results.append(result)
+            continue
         print(
             f"正在运行实验场景：{strategy_id} "
             f"({content_strategy['strategy_name']})"
@@ -1230,13 +1487,23 @@ def run_experiment(
     failed_count = sum(
         result.get("status") == "failed" for result in strategy_results
     )
+    pending_custom_count = sum(
+        result.get("status") == "not_run"
+        and result.get("reason") == CUSTOM_STATEMENT_PENDING_REASON
+        for result in strategy_results
+    )
+    entry_not_run_count = not_run_count - pending_custom_count
     entry_triggered = bool(
         shared_baseline and shared_baseline.get("entry_triggered")
     )
     if failed_count:
         experiment_status = "partial_failed" if success_count else "failed"
-    elif not_run_count:
+    elif entry_not_run_count:
         experiment_status = "completed_no_entry"
+    elif pending_custom_count and success_count == (
+        len(strategy_results) - pending_custom_count
+    ):
+        experiment_status = "completed_with_pending"
     elif success_count == len(strategy_results):
         experiment_status = "completed"
     else:
@@ -1268,6 +1535,21 @@ def run_experiment(
         "experiment_id": experiment_id,
         "event_id": event_input["event_id"],
         "entry_strategy": entry_strategy,
+        "strategy_trigger_mode": strategy_trigger_mode,
+        "selected_strategy_id": (
+            selected_strategy_id
+            if strategy_trigger_mode == "single"
+            else None
+        ),
+        "custom_included": any(
+            result.get("strategy") == CUSTOM_CONTENT_STRATEGY_ID
+            for result in strategy_results
+        ),
+        "custom_triggered": any(
+            result.get("strategy") == CUSTOM_CONTENT_STRATEGY_ID
+            and result.get("status") == "success"
+            for result in strategy_results
+        ),
         "status": experiment_status,
         "strategy_count": len(strategy_results),
         "success_count": success_count,
@@ -1300,6 +1582,29 @@ def run_experiment(
     save_json(result_file, experiment_result)
     print(f"实验完成，结果保存在：{result_file}")
     return experiment_result
+
+
+def run_single_strategy_experiment(
+    experiment_id,
+    experiment_dir,
+    event_file,
+    comment_pool_file,
+    strategy_id,
+    official_response_file=OFFICIAL_RESPONSE_FILE,
+):
+    """只触发一个具体策略，供后续可视化控制页面调用。
+
+    支持传入 ``no_response``、四种内置策略或 ``custom``。传 ``custom`` 时，
+    该策略仍只有在已填写公告内容时才会实际运行。
+    """
+    return run_experiment(
+        experiment_id=experiment_id,
+        experiment_dir=experiment_dir,
+        event_file=event_file,
+        comment_pool_file=comment_pool_file,
+        official_response_file=official_response_file,
+        selected_strategy_id=strategy_id,
+    )
 
 
 if __name__ == "__main__":

@@ -8,9 +8,12 @@ import json
 import time
 
 from comments.pool_generator import generate_comment_pool
-from simulation.event_context import validate_event_input
-from experiment_runner import load_official_response_options, run_experiment
-from infrastructure.json_storage import load_json, save_json
+from simulation.event_context import resolve_event_input
+from experiment_runner import (
+    resolve_official_response_options,
+    run_experiment,
+)
+from infrastructure.json_storage import save_json
 from infrastructure.llm_service import (
     get_llm_performance_stats,
     merge_llm_performance_stats,
@@ -43,15 +46,23 @@ def prepare_comment_pool(event_input, comment_pool_file):
 
 
 # 2026/08/22 系统重置与状态初始化，修改功能：每次启动都创建独立模拟批次并使用独立输入文件。
-def run_complete_simulation():
+def run_complete_simulation(
+    web_event_input=None,
+    official_content_input=None,
+    selected_strategy_id=None,
+):
     """准备运行数据，并执行完整的官方回应策略对照实验。"""
     # 2026/09/04 Demo性能基线，新增功能：记录从统一入口启动到最终结果汇总的完整耗时。
     complete_run_start_time = time.perf_counter()
-    event_input = validate_event_input(load_json(EVENT_FILE))
-    # 2026/08/23 内容策略对照，新增功能：启动前读取并校验人工维护的官方内容策略。
-    official_response_options = load_official_response_options(
-        OFFICIAL_RESPONSE_FILE,
-        event_input["event_id"],
+    event_input = resolve_event_input(
+        default_event_file=EVENT_FILE,
+        event_input=web_event_input,
+    )
+    # 2026/08/23 内容策略对照，新增功能：默认读取 JSON，可被 web 公告输入覆盖。
+    official_response_options = resolve_official_response_options(
+        event_id=event_input["event_id"],
+        default_response_file=OFFICIAL_RESPONSE_FILE,
+        content_input=official_content_input,
     )
     # 2026/08/23 内容策略对照，修改功能：为本批次保存独立的官方内容策略快照。
     batch_context = prepare_simulation_batch(
@@ -73,6 +84,7 @@ def run_complete_simulation():
         event_file=batch_context["event_file"],
         comment_pool_file=batch_context["comment_pool_file"],
         official_response_file=batch_context["official_response_file"],
+        selected_strategy_id=selected_strategy_id,
     )
     performance = experiment_result.setdefault("performance", {})
     performance["initial_comment_pool_duration_seconds"] = round(
@@ -132,6 +144,19 @@ def run_complete_simulation():
     elif experiment_result.get("comparison_status") == "not_evaluable":
         # 2026/08/27 第十二次联调修复，新增功能：控制台明确区分仿真完成与内容策略对照未执行。
         print("仿真运行结束，官方未进场，内容策略对照未执行。")
+    elif experiment_result.get("not_run_count"):
+        pending_custom = any(
+            result.get("status") == "not_run"
+            and result.get("reason") == "custom_statement_empty"
+            for result in experiment_result.get("strategy_results", [])
+        )
+        if pending_custom:
+            print(
+                "仿真运行结束，custom 公告为空，"
+                "自定义策略暂未参与策略对照。"
+            )
+        else:
+            print("仿真运行结束，但存在未运行的实验策略。")
     else:
         print("全部仿真任务已经完成。")
     print(json.dumps(summary, ensure_ascii=False, indent=2))

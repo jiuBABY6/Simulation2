@@ -125,7 +125,10 @@ def validate_global_trend(result, valid_comment_ids):
         raise ValueError("evidence_comment_ids 只能包含字符串编号。")
     invalid_ids = [item for item in evidence_ids if item not in valid_comment_ids]
     if invalid_ids:
-        raise ValueError("全局趋势分析引用了不存在的评论编号。")
+        # 模型偶尔会编造证据编号；保留有效证据，避免单条幻觉中断整轮仿真。
+        evidence_ids = [
+            item for item in evidence_ids if item in valid_comment_ids
+        ]
 
     unique_evidence_ids = list(dict.fromkeys(evidence_ids))[
         :GLOBAL_TREND_EVIDENCE_LIMIT

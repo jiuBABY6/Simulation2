@@ -137,3 +137,34 @@ def validate_event_input(event_input):
     if not event_input.get("event_content"):
         raise ValueError("事件必须包含 event_content。")
     return event_input
+
+
+def resolve_event_input(default_event_file=EVENT_FILE, event_input=None):
+    """合并默认事件 JSON 与 web 页面事件输入。
+
+    未提供 ``event_input`` 时直接使用 ``event_example.json``。web 输入按字典
+    覆盖默认事件字段；``event_labels`` 为浅层合并，可只传需要修改的标签。
+    """
+    defaults = validate_event_input(load_json(default_event_file))
+    if event_input is None:
+        return defaults
+    if not isinstance(event_input, dict):
+        raise ValueError("事件输入必须是 JSON 对象。")
+
+    provided_event_id = str(event_input.get("event_id", "") or "").strip()
+    if provided_event_id and provided_event_id != defaults.get("event_id"):
+        if not str(event_input.get("event_content", "") or "").strip():
+            raise ValueError(
+                "提供新的 event_id 时必须同时提供 event_content。"
+            )
+
+    merged = dict(defaults)
+    for key, value in event_input.items():
+        if key == "event_labels":
+            labels = dict(defaults.get("event_labels", {}) or {})
+            if isinstance(value, dict):
+                labels.update(value)
+            merged[key] = labels
+        else:
+            merged[key] = value
+    return validate_event_input(merged)
