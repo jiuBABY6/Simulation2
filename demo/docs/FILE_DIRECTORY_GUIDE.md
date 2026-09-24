@@ -23,7 +23,7 @@
 | `comment/` | 历史原型 | 保留早期评论池、评分和分析原型 | 当前 Demo 不再依赖该目录，不作为正式入口 |
 | `persona_pipeline/` | 辅助工具 | 从原始社交数据构建 Persona、情绪阈值和派系偏好 | 画像重新生成时使用 |
 | `output/` | 当前核心数据 | 保存 Persona 构建结果和全局策略配置 | 当前 Agent 决策会读取 `output/personas` |
-| `visualization/` | 辅助工具 | 提供历史趋势对照及第二十六次联调社交网络传播专题网页 | 只读仿真结果，不参与仿真计算 |
+| `visualization/` | 辅助工具 | 提供历史趋势与社交网络专题页面，以及 V1/V2 两套 Vue 单页仿真控制台 | 控制台通过 Web API 控制会话，不直接修改仿真核心规则 |
 | `agentsociety2/` | 外部参考 | AgentSociety 相关框架代码 | 当前 `demo/main.py` 不以它作为运行入口 |
 | `oasis-master/` | 外部参考 | OASIS 社交媒体仿真框架和示例 | 用于设计参考，修改前应先确认是否准备正式集成 |
 | `TrendSim/` | 外部参考 | 另一套舆情趋势模拟原型 | 与当前 Demo 相互独立 |
@@ -40,9 +40,13 @@
 | --- | --- | --- |
 | `main.py` | 当前核心 | 五策略实验总入口；准备初始评论池并调用实验调度器。正常运行命令为 `python demo\main.py` |
 | `project_config.py` | 当前核心 | 集中定义项目路径、模型参数、Agent 数量、并发数、评论数量、重试次数、质量阈值和可见评论数量等配置 |
-| `experiment_runner.py` | 当前核心 | 五策略实验总调度器；运行共享进场前基线、判断官方动态进场、分流各策略、汇总质量与性能并比较策略结果 |
+| `experiment_runner.py` | 当前核心 | 五策略实验总调度器；运行共享进场前基线、判断官方动态进场、分流各策略、汇总质量与性能并比较策略结果；提供公告输入解析和单策略触发函数供控制页面调用 |
+| `web_api.py` | 当前核心 | web 输入与会话控制 API 的统一门面，集中导出事件、公告、策略与暂停/继续/回滚/重启函数 |
+| `web_control.py` | 当前核心 | 单策略逐步控制层；维护 `web_control.json`、公告时间线和回滚检查点，复用现有单轮仿真入口 |
+| `web_server.py` | 辅助工具 | V1 的纯标准库本地 HTTP 服务，托管 `visualization/web`，默认端口 `8770` |
+| `web_server2.py` | 辅助工具 | V2 的独立纯标准库 HTTP 服务，托管 `visualization/web2`，默认端口 `8771` |
 | `event_example.json` | 当前核心输入 | 当前五策略实验的事件材料，包括 `event_id`、事件描述、标签和初始状态等 |
-| `official_response_options.json` | 当前核心输入 | 配置“不回应、事实通报、共情安抚、辟谣澄清、处置进展”等实验场景及官方声明内容、状态与进场规则 |
+| `official_response_options.json` | 当前核心输入 | 配置“不回应、事实通报、共情安抚、辟谣澄清、处置进展、自定义”等实验场景及官方声明内容、状态与进场规则 |
 | `comment_pool.json` | 运行产物 | 当前调试或最近一次准备得到的初始评论池；正式批次会复制独立快照 |
 
 注意：`event_example.json` 与 `official_response_options.json` 中的 `event_id` 必须一致。`project_config.py` 涉及模型访问配置，敏感凭据应通过安全配置方式管理，不应在文档、日志或提交记录中暴露。
@@ -82,7 +86,7 @@
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
 | `__init__.py` | 包文件 | 标记仿真运行领域包并说明模块边界 |
-| `event_context.py` | 当前核心 | 读取事件及当前状态，构建官方声明时间语义，并验证事件输入 |
+| `event_context.py` | 当前核心 | 读取事件及当前状态，构建官方声明时间语义，并验证事件输入；提供默认 JSON 与 web 输入合并函数 |
 | `event_state_updater.py` | 当前核心 | 追加、读取和校验事件状态历史，获取某事件的最新状态 |
 | `state_manager.py` | 当前核心 | 创建、复制、校验和重置仿真状态目录，防止不同实验场景相互污染 |
 | `batch_manager.py` | 当前核心 | 生成实验批次 ID，创建批次目录并保存事件、官方策略和初始评论池快照 |
@@ -154,7 +158,8 @@ demo/experiments/<experiment_id>/
 ├─ fact_report/
 ├─ empathy/
 ├─ rumor_clarification/
-└─ handling_progress/
+├─ handling_progress/
+└─ custom/            # 由单策略模式显式触发且公告已填写时生成
 ```
 
 | 文件或目录 | 主要功能 |
@@ -164,7 +169,7 @@ demo/experiments/<experiment_id>/
 | `comment_pool.json` | 五个场景共同使用的初始评论池快照 |
 | `social_network_snapshot.json` | 五个场景共同只读的固定社交网络与影响力权重快照 |
 | `experiment_result.json` | 批次总结果，包括完成状态、进场原因、策略比较、数据质量和性能统计 |
-| `_shared_baseline/state/` | 官方进场前的共享基线状态，保证五个场景从同一舆情条件分流 |
+| `_shared_baseline/state/` | 官方进场前的共享基线状态，保证各策略场景从同一舆情条件分流 |
 | `<scenario>/scenario_result.json` | 单个策略场景的轮次结果、最终指标、质量与性能摘要 |
 | `<scenario>/state/event_state_history.json` | 该场景每轮事件和官方声明状态 |
 | `<scenario>/state/agent_state_history.jsonl` | 该场景各 Agent 的状态历史 |
@@ -220,6 +225,8 @@ demo/experiments/<experiment_id>/
 | `LLM_SERVICE.md` | 系统各处 LLM 调用点、用途和调用边界 |
 | `HISTORICAL_REPLAY.md` | 历史趋势复现模式的配置和运行说明 |
 | `VISUALIZATION.md` | 历史复现与人工真实趋势网页展示说明 |
+| `WEB_API.md` | 事件/公告/策略 web 输入与逐步会话控制 API 说明 |
+| `CHANGE_SUMMARY.md` | 本轮框架、Web API、前端和错误修复的完整变更总结 |
 | `INTEGRATION_TEST_HISTORY.md` | 历次正式联调的日期、输入、结果、失败原因和修复记录 |
 | `detail.md` | 长期开发记录，保存方案演变、阶段成果、历史计划和扩展方向 |
 
@@ -285,7 +292,7 @@ demo/experiments/<experiment_id>/
 
 `agent_<user_id>.json` 的具体文件名对应不同 Agent，但文件职责相同。正式修改画像生成规则时应修改 `persona_pipeline`，不建议批量手工改写生成结果。
 
-## 七、`visualization`：结果展示网页
+## 七、`visualization`：历史趋势、社交网络专题与仿真控制台
 
 ### 7.1 历史趋势展示
 
@@ -299,6 +306,17 @@ demo/experiments/<experiment_id>/
 | `comparison_service.py` | 辅助工具 | 对齐模拟趋势与人工真实趋势，计算方向一致性、平均绝对差和峰值轮次差等展示指标 |
 | `__init__.py` | 包文件 | 将目录标记为 Python 包 |
 | `data/real_trend.json` | 处理产物 | 从真实数据表生成的标准化趋势数据，网页直接读取 |
+| `web/` | V1 交互页面 | Vue 3 单页控制台，包含事件/公告/策略输入、会话控制、Agent 网络、舆情折线图和评论分布 |
+| `web/app.js` | V1 前端逻辑 | 复用统一 Web API，处理输入校验、会话控制、轮询运行和可视化交互 |
+| `web/index.html` | V1 页面入口 | 挂载 Vue 应用并加载本地 Vue 运行库 |
+| `web/styles.css` | V1 页面样式 | 控制 V1 控制台布局、抽屉、网络图、图表和响应式显示 |
+| `web/vue.global.prod.js` | 本地依赖 | V1 使用的 Vue 3 运行库，无需 npm 构建 |
+| `web2/` | V2 交互页面 | 独立单屏控制台；左侧状态、中间输入、右侧时机，Agent 网络位于主界面 |
+| `web2/app.js` | V2 前端逻辑 | 复用 V1 业务方法，增加单屏状态、图表和自适应追加公告输入逻辑 |
+| `web2/template.js` | V2 页面模板 | 定义左中右三部分布局、Agent 网络、指标图表和二级详情弹层 |
+| `web2/index.html` | V2 页面入口 | 挂载 V2 Vue 应用并加载本地依赖与模板 |
+| `web2/styles.css` | V2 页面样式 | 控制单屏布局、两端信息密度、网络和图表视觉 |
+| `web2/vue.global.prod.js` | 本地依赖 | V2 使用的 Vue 3 运行库，无需 npm 构建 |
 | `static/index.html` | 前端页面 | 定义可视化页面结构和展示容器 |
 | `static/app.js` | 前端逻辑 | 调用本地接口并绘制趋势、指标卡、轮次表格和对比结果 |
 | `static/styles.css` | 前端样式 | 控制页面配色、布局、响应式显示和组件样式 |
@@ -387,7 +405,7 @@ demo/experiments/<experiment_id>/
 | 修改动态进场或策略比较 | `demo/experiment_runner.py` |
 | 修改舆情指标 | `demo/evaluation/metrics.py`、`demo/experiment_runner.py` |
 | 运行历史趋势复现 | `demo/docs/HISTORICAL_REPLAY.md`、`demo/historical_replay/main.py` |
-| 修改网页展示 | `demo/docs/VISUALIZATION.md`、`visualization/` |
+| 修改 V1/V2 仿真控制台 | `demo/docs/WEB_API.md`、`demo/web_server.py`、`demo/web_server2.py`、`visualization/web/`、`visualization/web2/` |
 | 重建 Persona | `persona_pipeline/`、`output/personas/` |
 | 查看历史决策和修复背景 | `demo/docs/detail.md`、`demo/docs/INTEGRATION_TEST_HISTORY.md` |
 

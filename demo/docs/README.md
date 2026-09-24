@@ -20,6 +20,8 @@
 | [`LLM_SERVICE.md`](./LLM_SERVICE.md) | 记录系统调用LLM的位置和调用边界 |
 | [`HISTORICAL_REPLAY.md`](./HISTORICAL_REPLAY.md) | 历史趋势复现模式说明 |
 | [`VISUALIZATION.md`](./VISUALIZATION.md) | 历史复现与真实趋势可视化说明 |
+| [`WEB_API.md`](./WEB_API.md) | 事件/公告/策略 web 输入与逐步会话控制 API |
+| [`CHANGE_SUMMARY.md`](./CHANGE_SUMMARY.md) | 本轮框架、API、前端和错误修复的完整变更总结 |
 | [`INTEGRATION_TEST_HISTORY.md`](./INTEGRATION_TEST_HISTORY.md) | 每次正式联调的完整证据 |
 | [`detail.md`](./detail.md) | 长期开发过程、方案演变和历史规划 |
 
@@ -72,11 +74,20 @@ $env:DEEPSEEK_API_KEY = "填写本机使用的API Key"
 需要检查：
 
 - `demo/event_example.json`：当前事件材料；
-- `demo/official_response_options.json`：四种回应内容以及不回应对照场景；
+- `demo/official_response_options.json`：四种内置回应内容、可留空的
+  `custom`策略以及不回应对照场景；
 - `demo/config/comment_profiles.json`：评论生成使用的人物类型模板。
 - `demo/config/social_network_config.json`：固定网络、邻居传播数量、公共评论补充和逐层衰减配置。
 
 `event_example.json` 与 `official_response_options.json` 的 `event_id` 必须完全一致。官方回应文件中的 `official_statement_status` 应与声明信息完整程度一致。
+
+公告内容默认读取 `official_response_options.json`。后续 web 页面可通过
+`resolve_official_response_options()`只覆盖需要修改策略的 `official_statement`
+和 `official_statement_status`，其余策略仍沿用该默认文件。
+
+事件正文默认读取 `demo/event_example.json`，后续 web 页面可通过
+`resolve_event_input()`只覆盖 `event_content` 或事件标签；提供新事件时需同时
+给出新的 `event_id` 与 `event_content`。
 
 ### 4. 准备历史复现输入
 
@@ -91,7 +102,7 @@ $env:DEEPSEEK_API_KEY = "填写本机使用的API Key"
 
 ## 运行五策略实验
 
-五策略实验会生成一份固定社交网络和共享的进场前基线，依据负面阈值、全局恶化或连续停滞判断官方进场时机，然后从相同网络与状态分流并比较不回应、事实通报、共情安抚、辟谣澄清和处置进展。
+策略对照实验会生成固定社交网络和共享的进场前基线，依据负面阈值、全局恶化或连续停滞判断官方进场时机，然后从相同网络与状态分流并比较不回应、事实通报、共情安抚、辟谣澄清和处置进展；`custom` 默认不自动触发，可通过单策略入口显式运行。
 
 在项目根目录执行：
 
@@ -168,6 +179,28 @@ python visualization\social_network_report\app.py
 ```
 
 浏览器默认打开 `http://127.0.0.1:8766`。该命令不会重新运行仿真，也不会调用 DeepSeek 或修改实验结果。
+
+## 启动仿真控制台
+
+V1 控制台使用端口 `8770`：
+
+```powershell
+& .\.venv\Scripts\python.exe demo\web_server.py --port 8770
+```
+
+访问 `http://127.0.0.1:8770`，使用 `visualization/web` 页面。
+
+V2 是独立的单屏控制台，默认使用端口 `8771`：
+
+```powershell
+& .\.venv\Scripts\python.exe demo\web_server2.py --port 8771
+```
+
+访问 `http://127.0.0.1:8771`，使用 `visualization/web2` 页面。V2 的左侧展示
+Agent 网络、舆情指标和评论分布图表，中间为事件与公告策略输入，右侧为官方
+发布时机和追加公告。两套服务可同时运行。
+
+完整接口和会话控制语义见 [`WEB_API.md`](./WEB_API.md)。
 
 ## 最短运行顺序
 

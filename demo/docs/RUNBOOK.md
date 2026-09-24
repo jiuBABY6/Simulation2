@@ -40,9 +40,10 @@ demo/experiments/<event_id>_<timestamp>/
 | 状态 | 含义 |
 | --- | --- |
 | `completed` | 应运行的策略均成功完成 |
+| `completed_with_pending` | 应运行策略全部完成，空公告的`custom`策略等待填写 |
 | `partial_failed` | 部分策略失败 |
 | `failed` | 所有策略失败或关键流程失败 |
-| `not_run` | 动态进场条件始终未触发，回应策略未实际运行 |
+| `not_run` | 动态进场条件始终未触发，或空公告`custom`策略未参与对照 |
 | `normal` | 评论兜底未触发质量告警 |
 | `degraded` | 实验完成，但部分轮次历史兜底较多 |
 | `emergency` | 使用了本地应急评论，结果需谨慎解释 |
@@ -55,6 +56,13 @@ demo/experiments/<event_id>_<timestamp>/
 | `global_worsening` | LLM全局趋势判断为恶化 |
 | `stagnation` | 舆情连续多轮没有明显改善 |
 
+## 未运行原因
+
+| 值 | 含义 |
+| --- | --- |
+| `official_response_not_triggered` | 共享基线结束仍未触发官方进场 |
+| `custom_statement_empty` | `custom`策略的公告内容为空，等待填写后重新运行 |
+
 ## 最小交接检查
 
 新成员首次接手时应依次完成：
@@ -64,3 +72,33 @@ demo/experiments/<event_id>_<timestamp>/
 3. 使用小规模参数完成一次运行；
 4. 确认生成新实验目录且没有覆盖旧批次；
 5. 确认结果中包含策略状态、数据质量、传播摘要和性能摘要。
+
+## Web 输入与会话 API
+
+V1 本地启动：
+
+```powershell
+& .\.venv\Scripts\python.exe demo\web_server.py
+```
+
+默认服务地址为 `http://127.0.0.1:8770`。事件、公告内容、策略选择和
+暂停/继续/回滚/重启接口说明见 [`WEB_API.md`](./WEB_API.md)。
+
+同一服务会托管 `visualization/web` 下的控制台页面，浏览器访问
+`http://127.0.0.1:8770` 即可使用事件、公告与策略输入并控制会话。
+
+V2 单屏控制台使用独立入口和静态目录：
+
+```powershell
+& .\.venv\Scripts\python.exe demo\web_server2.py --port 8771
+```
+
+浏览器访问 `http://127.0.0.1:8771`。V2 托管 `visualization/web2`，左侧显示
+Agent 网络、舆情指标和评论分布图表，中间输入事件与公告，右侧设置官方发布
+时机和追加公告。V1 和 V2 可以同时启动，互不覆盖。
+
+会话控制补充规则：
+
+- 不回应策略不运行进场前基线，启动后直接从第 1 轮进入控制场景；
+- 重启新批次成功后会更新页面中的会话编号和 URL 哈希；
+- 重启只创建新批次，不覆盖旧实验目录。

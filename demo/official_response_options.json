@@ -27,6 +27,12 @@
       "strategy_name": "处置进展",
       "official_statement": "目前，公安机关已经完成接报警核查、涉事人员询问、现场监控调取和网络视频证据固定等工作，受害人伤情检查及案件责任认定工作正在进行。后续将根据调查结果依法处理有关人员，并及时向社会公布案件处理情况。",
       "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "custom",
+      "strategy_name": "自定义",
+      "official_statement": "",
+      "official_statement_status": "none"
     }
   ]
 }
