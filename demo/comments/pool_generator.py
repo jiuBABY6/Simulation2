@@ -7,6 +7,8 @@
 """
 
 import argparse
+from copy import deepcopy
+import json
 
 # 2026/08/22 增量评论累积对齐：初始评论生成器改为复用独立的评论生成服务。
 from comments.generation_service import (
@@ -20,6 +22,7 @@ from comments.generation_service import (
     summarize_profile_faction_combinations,
 )
 from comments.angle_planner import (
+    apply_required_emotion_targets,
     build_initial_angle_tasks,
     format_comment_tasks,
     generate_event_angle_plan,
@@ -41,6 +44,7 @@ def build_generation_prompt(
     profiles,
     batch_size,
     comment_tasks=None,
+    initial_opinion=None,
 ):
     """构造要求大模型按人物类型生成结构化评论的提示词。"""
     event_content = event_input.get("event_content", "")
@@ -53,6 +57,13 @@ def build_generation_prompt(
     task_text = ""
     task_output_field = ""
     if comment_tasks is not None:
+        # 2026/10/8，新增功能：历史校准任务显式要求评论文本语义与人工情绪配额一致。
+        required_emotion_rule = (
+            "如果任务包含 required_emotion，评论文本必须真实体现该情绪，"
+            "返回的 emotion 也必须与 required_emotion 完全一致。"
+            if any(task.get("required_emotion") for task in comment_tasks)
+            else ""
+        )
         task_text = f"""
 【本批次角度任务】
 {format_comment_tasks(comment_tasks)}
@@ -60,8 +71,23 @@ def build_generation_prompt(
 每个 task_id 必须恰好生成一条评论。评论必须围绕该任务的 angle_name 和 focus，
 并遵循 expression_instruction 指定的表达方式，
 人物类型和评论派系由你根据角度语义合理选择。
+{required_emotion_rule}
 """.strip()
         task_output_field = '      "task_id": "initial_001",\n'
+
+    # 2026/10/9，修改功能：历史初始条件只注入情绪配额，不再注入人工舆情摘要。
+    historical_context_text = ""
+    coverage_rule = "尽量平均覆盖不同人物类型，也要覆盖五种评论派系、三种情绪和三种信息取向。"
+    if initial_opinion is not None:
+        historical_context_text = """
+【第一轮人工舆论初始条件】
+本批次只使用人工统计的第一轮情绪配额。评论内容仍必须完全依据事件正文，
+不得引入真实评论摘要，也不得把第一轮配额理解为后续轮次预测目标。
+""".strip()
+        coverage_rule = (
+            "尽量平均覆盖不同人物类型、五种评论派系和三种信息取向；"
+            "情绪必须严格服从各任务的 required_emotion，不再自行平均分配三种情绪。"
+        )
 
     return f"""
 你是社会舆情模拟系统的评论池生成器。请根据事件内容，模拟不同人物类型可能发布的微博评论。
@@ -72,6 +98,8 @@ def build_generation_prompt(
 【事件标签】
 {event_labels}
 
+{historical_context_text}
+
 【可使用的人物类型】
 {profile_text}
 
@@ -79,7 +107,7 @@ def build_generation_prompt(
 
 【生成要求】
 1. 本次生成 {batch_size} 条评论，每条评论必须来自上面某一个人物类型。
-2. 尽量平均覆盖不同人物类型，也要覆盖五种评论派系、三种情绪和三种信息取向。
+2. {coverage_rule}
 3. 评论必须围绕当前事件，不得编造事件中没有提供的具体事实、姓名、数字或时间。
 4. 评论使用自然的中文微博表达，长度控制在 15 至 100 个汉字。
 5. profile_id 必须从给定人物类型中选择；不要自行创建人物类型。
@@ -139,6 +167,7 @@ def build_faction_fill_prompt(
     target_faction,
     comment_count,
     comment_tasks=None,
+    initial_opinion=None,
 ):
     """在普通生成提示词后追加优先级更高的派系补充要求。"""
     if target_faction not in FACTIONS:
@@ -149,6 +178,7 @@ def build_faction_fill_prompt(
         profiles,
         comment_count,
         comment_tasks,
+        initial_opinion,
     )
     return f"""
 {base_prompt}
@@ -210,6 +240,7 @@ def ensure_faction_coverage(
     comments,
     used_texts,
     minimum_count=COMMENT_POOL_MIN_FACTION_COUNT,
+    initial_opinion=None,
 ):
     """补齐未达最低数量的派系，返回总数量不变的新评论列表。"""
     deficits = calculate_faction_deficits(comments, minimum_count)
@@ -247,6 +278,8 @@ def ensure_faction_coverage(
                 "expression_instruction": comment.get(
                     "expression_instruction"
                 ),
+                # 2026/10/8，修改功能：派系补齐必须保留原任务的人工情绪配额。
+                "required_emotion": comment.get("required_emotion"),
             }
             for comment in replacement_comments
             if all(
@@ -262,6 +295,7 @@ def ensure_faction_coverage(
             faction,
             missing_count,
             replacement_tasks,
+            initial_opinion,
         )
         fill_comments.extend(
             generate_valid_comment_batch(
@@ -292,6 +326,7 @@ def generate_comment_pool(
     # 2026/09/05 评论人物类型配置归档，修改功能：默认读取 Demo 配置目录中的评论人物类型。
     profile_file=COMMENT_PROFILE_FILE,
     comment_count=COMMENT_POOL_SIZE,
+    initial_opinion=None,
 ):
     """根据一个事件和人物类型生成完整的初始评论池。"""
     if not isinstance(event_input, dict):
@@ -302,6 +337,14 @@ def generate_comment_pool(
         raise ValueError("事件必须包含 event_content。")
     if not isinstance(comment_count, int) or comment_count <= 0:
         raise ValueError("comment_count 必须是正整数。")
+    # 2026/10/8，新增功能：可选人工配额只允许匹配当前事件和本次初始池规模。
+    if initial_opinion is not None:
+        if not isinstance(initial_opinion, dict):
+            raise ValueError("initial_opinion 必须是JSON对象或 None。")
+        if initial_opinion.get("event_id") != event_input["event_id"]:
+            raise ValueError("人工初始条件与事件输入的 event_id 不一致。")
+        if initial_opinion.get("comment_count") != comment_count:
+            raise ValueError("人工初始条件的 comment_count 与请求数量不一致。")
     # 2026/08/23 评论派系覆盖对齐，修改功能：生成前拒绝无法满足五派最低数量的评论池规模。
     required_count = len(FACTIONS) * COMMENT_POOL_MIN_FACTION_COUNT
     if comment_count < required_count:
@@ -314,6 +357,11 @@ def generate_comment_pool(
     # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：每个事件只生成一次可供全部场景复用的角度计划。
     angle_plan = generate_event_angle_plan(event_input)
     comment_tasks = build_initial_angle_tasks(angle_plan, comment_count)
+    if initial_opinion is not None:
+        comment_tasks = apply_required_emotion_targets(
+            comment_tasks,
+            initial_opinion.get("emotion_targets"),
+        )
     used_texts = set()
     comments = []
     batch_count = (comment_count + COMMENT_BATCH_SIZE - 1) // COMMENT_BATCH_SIZE
@@ -329,6 +377,7 @@ def generate_comment_pool(
             profiles,
             batch_size,
             batch_tasks,
+            initial_opinion,
         )
         # 2026/08/22 增量评论累积对齐：通过共享服务保留有效评论，并补齐当前批次。
         batch_comments = generate_valid_comment_batch(
@@ -347,7 +396,23 @@ def generate_comment_pool(
         profiles=profiles,
         comments=comments,
         used_texts=used_texts,
+        initial_opinion=initial_opinion,
     )
+
+    # 2026/10/8，新增功能：历史校准批次在编号前硬校验实际情绪数量，禁止静默偏离人工初始条件。
+    actual_emotion_counts = {
+        emotion: sum(comment.get("emotion") == emotion for comment in comments)
+        for emotion in EMOTIONS
+    }
+    if (
+        initial_opinion is not None
+        and actual_emotion_counts != initial_opinion["emotion_targets"]
+    ):
+        raise RuntimeError(
+            "历史初始评论情绪配额未满足："
+            f"期望 {initial_opinion['emotion_targets']}，"
+            f"实际 {actual_emotion_counts}"
+        )
 
     current_step = event_input.get("current_state", {}).get("step", 1)
     if not isinstance(current_step, int):
@@ -372,6 +437,11 @@ def generate_comment_pool(
                 "profile_label": comment["profile_label"],
                 "topic": comment["topic"],
                 "emotion": comment["emotion"],
+                **(
+                    {"required_emotion": comment["required_emotion"]}
+                    if comment.get("required_emotion") is not None
+                    else {}
+                ),
                 "faction": comment["faction"],
                 "orientation": comment["orientation"],
                 "stance": comment["stance"],
@@ -381,7 +451,7 @@ def generate_comment_pool(
         )
 
     # 2026/08/23 评论派系覆盖对齐，新增功能：在初始评论池结果中保存五派覆盖摘要。
-    return {
+    result = {
         "event_id": event_input["event_id"],
         "generation_method": "angle_task_profile_conditioned_generation",
         # 2026/09/05 评论人物类型配置归档，修改功能：在评论池中记录迁移后的配置来源。
@@ -398,6 +468,20 @@ def generate_comment_pool(
         ),
         "comments": result_comments,
     }
+    if initial_opinion is not None:
+        # 2026/10/8，新增功能：评论池保存校准来源、目标和实际数量，供结果与前端审计。
+        result["initialization"] = {
+            "mode": initial_opinion["mode"],
+            "calibrated_step": 1,
+            "evaluation_role": initial_opinion["evaluation_role"],
+            "target_emotion_counts": deepcopy(
+                initial_opinion["emotion_targets"]
+            ),
+            "actual_emotion_counts": actual_emotion_counts,
+            "source": deepcopy(initial_opinion.get("source", {})),
+            "source_snapshot": "initial_opinion.json",
+        }
+    return result
 
 
 def main():

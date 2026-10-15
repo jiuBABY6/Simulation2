@@ -1,0 +1,126 @@
+{
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "data_type": "manual_group_trend_reference",
+  "stage_count": 3,
+  "source": {
+    "file": "北国先[1].xlsx",
+    "sheet": "Sheet1",
+    "range": "A3:H5",
+    "header_row": 2
+  },
+  "scope": "人工整理材料中的群体舆情阶段变化",
+  "methodology": [
+    "动态读取表头之后所有同时包含时间段和社会情绪的非空阶段行。",
+    "“关键节点”作为阶段名称，“当前”作为采样方法说明保存。",
+    "保留材料中明确写出的约值和区间，不把人工判断视为精确抽样统计。",
+    "区间仅为绘图生成中点，同时保留下限、上限和原始表达。",
+    "“近乎为零”仅按展示值 0 处理，不代表统计意义上的绝对为零。",
+    "各情绪比例不强制归一化，避免改写原材料中的人工估计。"
+  ],
+  "limitations": [
+    "数据只能反映群体层面的阶段性变化，不能用于验证单个 Agent 的判断。",
+    "数据来自人工整理和有限历史材料，不是完整平台样本或严格抽样结果。",
+    "当前只对照可共同定义的情绪趋势，不把真实材料推导为接受率或质疑率。"
+  ],
+  "periods": [
+    {
+      "step": 1,
+      "period": "2026年09月20日17时事件发生~2026年09月20日21：38通告前",
+      "phase": "通告前",
+      "sampling_method": "取2026年09月20日17时事件发生~2026年09月21日06时的事故视频下评论来模拟该时间线",
+      "sentiment": {
+        "negative": {
+          "lower": 0.35,
+          "upper": 0.35,
+          "estimate": 0.35,
+          "method": "stated_approximation",
+          "source_expression": "负面 (Negative)35%"
+        },
+        "neutral": {
+          "lower": 0.4,
+          "upper": 0.4,
+          "estimate": 0.4,
+          "method": "stated_approximation",
+          "source_expression": "中性 (Neutral)40%"
+        },
+        "positive": {
+          "lower": 0.25,
+          "upper": 0.25,
+          "estimate": 0.25,
+          "method": "stated_approximation",
+          "source_expression": "正面 (Positive)25%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "中性 (Neutral)40% 以好奇、询问事实、理性探讨赔偿为主，情绪波动小。 负面 (Negative)35% 包含对安全的担忧、对司机的指责、对法律后果的严肃看待。 正面 (Positive)25% 以玩梗、讽刺、黑色幽默为主，属于网络特有的消解严肃性的情绪。",
+      "public_opinion_summary": "当前舆论呈现显著的“娱乐化解构”特征。虽有个别对公共安全及赔偿的担忧，但主流情绪并非愤怒，而是以黑色幽默和玩梗为主。网友热衷于调侃“购物车”、“0元购”、商场业绩暴增及沃尔沃品牌特性，将严重事故转化为网络段子。同时，公众对保险赔付、司机身份及车辆技术（如主动刹车失效）保持高度好奇与理性质疑。整体氛围偏向吃瓜看戏，严肃的道德谴责被消解，反映出网民面对突发社会新……",
+      "source_row": 3
+    },
+    {
+      "step": 2,
+      "period": "2026年09月20日21：38通告后~2026年09月21日09：38",
+      "phase": "通告后12小时内",
+      "sampling_method": "取通告12小时内的评论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.5,
+          "upper": 0.5,
+          "estimate": 0.5,
+          "method": "stated_approximation",
+          "source_expression": "负面：约 50%"
+        },
+        "neutral": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "中性/吃瓜情绪：约 30%"
+        },
+        "positive": {
+          "lower": 0.2,
+          "upper": 0.2,
+          "estimate": 0.2,
+          "method": "stated_approximation",
+          "source_expression": "正面/庆幸情绪：约 20%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面：约 50% 主要构成：对“操作不当”结论的不信任、对司机的严厉谴责、对车辆安全功能的质疑、性别嘲讽。这是最活跃的情绪板块，因为涉及公共安全信任危机和对责任人的愤怒。 中性/吃瓜情绪：约 30% 主要构成：好奇司机身份、讨论保险赔付、感叹事件传播速度、单纯围观。这部分用户更多是信息消费者，情绪波动较小。 正面/庆幸情绪：约 20% 主要构成：庆幸伤者无大……",
+      "public_opinion_summary": "当前舆论主要聚焦四点：一是质疑“操作不当”定性，网民猜测误踩油门、车辆故障或故意行为，呼吁刑侦介入；二是关注沃尔沃AEB自动刹车为何未触发，质疑车辆安全性能；三是强烈要求严惩司机，呼吁吊销驾照并追责驾校；四是肯定警方通报迅速，有效遏制了谣言传播。此外，部分网友调侃商场意外获流量，也有理性声音建议加强自动挡防呆设计与新手心理评估，整体情绪从震惊转向对公共安全机……",
+      "source_row": 4
+    },
+    {
+      "step": 3,
+      "period": "2026年09月21日09：38~",
+      "phase": "通告后12小时以后",
+      "sampling_method": "取通告12小时以后的评论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.55,
+          "upper": 0.55,
+          "estimate": 0.55,
+          "method": "stated_approximation",
+          "source_expression": "负面 (55%"
+        },
+        "neutral": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "中性 (30%"
+        },
+        "positive": {
+          "lower": 0.15,
+          "upper": 0.15,
+          "estimate": 0.15,
+          "method": "stated_approximation",
+          "source_expression": "正面 (15%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面 (55%) 这部分情绪占据了主导地位，主要包含对司机行为的愤怒、对公共安全的担忧以及对官方通报或处理结果的质疑。 对司机及驾驶行为的严厉谴责 对性别议题的争议与偏见 对官方通报及透明度的不信任 对公共安全环境的焦虑 中性 (30%) 这部分情绪主要表现为围观、调侃、好奇或对事实的单纯讨论，没有强烈的爱憎倾向。 “吃瓜”与调侃 调侃式评论玩梗 事实询问与……",
+      "public_opinion_summary": "舆论呈现质疑与调侃并存的态势。公众焦点集中在司机性别、是否误踩油门及沃尔沃主动刹车为何失效上。尽管官方通报排除酒驾毒驾，但网友对“操作不当”的解释存疑，猜测涉及情绪失控或故意行为。同时，事故意外成为沃尔沃车身质量的“反向广告”，引发对车辆安全性的讨论。部分声音呼吁严惩“马路杀手”，终身禁驾，并对自媒体传播速度及信息透明度表示关注，整体情绪以震惊、讽刺及对公共……",
+      "source_row": 5
+    }
+  ]
+}

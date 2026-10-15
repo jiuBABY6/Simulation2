@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_1862226395",
+  "source_user_id": "1862226395",
+  "identity": {
+    "gender": "m",
+    "location": "广东 中山",
+    "verified": false,
+    "followers_count": 263
+  },
+  "action_preference": {
+    "original_preference": 0.625,
+    "repost_preference": 0.375
+  },
+  "topic_preference": {
+    "社会事件": 0.25,
+    "新闻时事": 0.166667,
+    "娱乐": 0.25,
+    "其他": 0.333333
+  },
+  "information_orientation": {
+    "fact_rate": 0.363636,
+    "opinion_rate": 0.545455,
+    "questioning_rate": 0.090909
+  },
+  "emotion_expression": {
+    "positive_rate": 0.090909,
+    "neutral_rate": 0.363636,
+    "negative_rate": 0.545455
+  },
+  "data_info": {
+    "total_posts": 8,
+    "topic_sample_count": 8,
+    "expression_sample_count": 8,
+    "faction_sample_count": 8
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.307692,
+    "表态判断派": 0.230769,
+    "情绪激进派": 0.076923,
+    "矛盾激化派": 0.076923,
+    "吃瓜派": 0.307692
+  }
+}

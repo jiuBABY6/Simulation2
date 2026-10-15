@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_5262469035",
+  "source_user_id": "5262469035",
+  "identity": {
+    "gender": "f",
+    "location": "黑龙江 大庆",
+    "verified": true,
+    "followers_count": 829
+  },
+  "action_preference": {
+    "original_preference": 0.995434,
+    "repost_preference": 0.004566
+  },
+  "topic_preference": {
+    "社会事件": 0.295455,
+    "新闻时事": 0.132955,
+    "娱乐": 0.205682,
+    "其他": 0.365909
+  },
+  "information_orientation": {
+    "fact_rate": 0.423208,
+    "opinion_rate": 0.531286,
+    "questioning_rate": 0.045506
+  },
+  "emotion_expression": {
+    "positive_rate": 0.362912,
+    "neutral_rate": 0.326507,
+    "negative_rate": 0.31058
+  },
+  "data_info": {
+    "total_posts": 876,
+    "topic_sample_count": 876,
+    "expression_sample_count": 876,
+    "faction_sample_count": 836
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.422117,
+    "表态判断派": 0.039239,
+    "情绪激进派": 0.08918,
+    "矛盾激化派": 0.002378,
+    "吃瓜派": 0.447087
+  }
+}

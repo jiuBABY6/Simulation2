@@ -1,0 +1,13 @@
+{
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "event_content": "2026年10月6日中午，河北保定一购物广场附近路口，一辆带有“学员服务车”标识的白色车辆多次发生碰撞。网传视频显示，该车辆在道路上倒车、前进和转向，先后撞击其他车辆、道路护栏及路边石墩，最后停止。事件传播初期，驾驶人员身份、事故原因、人员伤亡情况和责任认定尚无权威结论。",
+  "event_labels": {
+    "topic": "社会事件",
+    "event_valence": "negative"
+  },
+  "simulation_options": {
+    "emotion_choice_mode": "evidence_based_all",
+    "incremental_comment_count": 50,
+    "active_opinion_window": 2
+  }
+}

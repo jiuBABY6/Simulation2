@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "step": 1,
+  "mode": "historical_calibration",
+  "comment_count": 60,
+  "emotion_targets": {
+    "negative": 21,
+    "neutral": 24,
+    "positive": 15
+  },
+  "observed_distribution": {
+    "negative": {
+      "estimate": 0.35,
+      "source_expression": "约35%"
+    },
+    "neutral": {
+      "estimate": 0.4,
+      "source_expression": "约40%"
+    },
+    "positive": {
+      "estimate": 0.25,
+      "source_expression": "约25%"
+    }
+  },
+  "source": {
+    "type": "manual_group_trend_reference",
+    "file": "real_trend_source.xlsx",
+    "sheet": "Sheet1",
+    "source_row": 3
+  },
+  "evaluation_role": "initial_condition"
+}

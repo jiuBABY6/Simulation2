@@ -1,0 +1,13 @@
+{
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "event_content": "2026年9月20日17时许，河北省保定市北国先天下广场发生车辆冲入商场入口事件，相关现场视频随后在网络传播。通报发布前，事故原因、人员伤情、驾驶人状态及责任认定尚无权威结论。",
+  "event_labels": {
+    "topic": "社会事件",
+    "event_valence": "negative"
+  },
+  "simulation_options": {
+    "emotion_choice_mode": "evidence_based_all",
+    "incremental_comment_count": 50,
+    "active_opinion_window": 2
+  }
+}

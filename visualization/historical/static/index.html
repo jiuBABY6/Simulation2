@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>历史舆情趋势复现</title>
+  <link rel="stylesheet" href="/historical/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">HISTORICAL REPLAY · READ ONLY</p>
+      <h1>历史舆情趋势复现</h1>
+      <p class="subtitle">将多 Agent 模拟轨迹与人工整理的真实群体趋势放在同一时间轴上进行探索性对照</p>
+    </div>
+    <div class="header-actions">
+      <nav class="page-nav">
+        <a href="/">切换模式</a>
+        <a id="network-link" href="/network/">社交网络与评论追踪</a>
+        <span id="network-unavailable" class="page-nav-note hidden">该旧批次没有网络追踪数据</span>
+      </nav>
+      <label class="experiment-picker">
+        <span>实验批次</span>
+        <select id="experiment-select"></select>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section id="notice" class="notice hidden"></section>
+
+    <section class="cards" id="summary-cards"></section>
+
+    <section class="panel featured">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag">核心对照</p>
+          <h2 id="comparison-title">活跃舆情负面率与真实群体趋势参考</h2>
+        </div>
+        <label class="metric-basis-picker">
+          <span>评论统计口径</span>
+          <select id="metric-basis-select">
+            <option value="agent_expression">Agent实际表达（主口径）</option>
+            <option value="active_opinion">活跃舆情（最近两轮）</option>
+            <option value="current_round">当前轮增量</option>
+            <option value="cumulative">模拟评论池累计</option>
+          </select>
+        </label>
+        <div class="legend">
+          <span><i class="dot simulation"></i><span id="comparison-legend-label">活跃舆情</span></span>
+          <span><i class="dot real"></i>人工群体参考</span>
+          <span><i class="dot agent"></i>Agent负面情绪</span>
+          <span><i class="marker"></i>官方信息投入</span>
+        </div>
+      </div>
+      <div id="comparison-chart" class="chart"></div>
+      <div id="comparison-metrics" class="metric-strip"></div>
+      <p id="comparison-caution" class="caution">该对照用于观察阶段走势是否接近，不代表模型准确率。真实数据为人工整理的群体级近似判断，不用于验证单个 Agent。</p>
+    </section>
+
+    <section class="two-column">
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-tag teal">模拟内部状态</p>
+            <h2>Agent 情绪分布</h2>
+          </div>
+        </div>
+        <div id="emotion-chart" class="chart compact"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-tag teal">舆情环境</p>
+            <h2 id="comment-emotion-title">活跃舆情情绪分布</h2>
+          </div>
+        </div>
+        <div id="comment-emotion-chart" class="chart compact"></div>
+        <!-- 2026/10/8，修改功能：说明人工初始化批次的第一轮属于已知历史条件。 -->
+        <p class="chart-note">当前轮用于观察新增声音，累计用于观察历史存量，活跃舆情默认统计最近两轮。第1轮若标记“历史初始条件”，该点不计入MAE和峰值指标。</p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag orange">声明投入后</p>
+          <h2>Agent 官方态度</h2>
+        </div>
+      </div>
+      <div id="attitude-chart" class="chart compact"></div>
+      <div id="attitude-diagnostics" class="metric-strip"></div>
+      <p class="chart-note">官方信息尚未投入的轮次显示为空缺，不按 0 计算。</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag">阶段证据</p>
+          <h2>阶段趋势明细</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>轮次</th><th>时间段（模拟 / 参考）</th><th>阶段</th><th>官方节点</th>
+              <th>Agent负面率</th><th id="comment-rate-heading">活跃舆情负面率</th><th>真实群体参考</th><th>绝对差</th><th>趋势</th>
+            </tr>
+          </thead>
+          <tbody id="phase-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag teal">外部事实输入</p>
+          <h2>各阶段公众语境</h2>
+        </div>
+      </div>
+      <div id="context-timeline" class="context-timeline"></div>
+      <p class="chart-note">这里展示当轮可见的已核实信息和同期公众议题；第2轮以后真实评论文本和真实情绪比例不进入模拟。</p>
+    </section>
+
+    <section class="two-column bottom-grid">
+      <article class="panel">
+        <div class="panel-heading">
+          <div><p class="section-tag teal">数据质量</p><h2>评论生成质量</h2></div>
+        </div>
+        <div id="quality-content"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-heading">
+          <div><p class="section-tag orange">使用边界</p><h2>真实数据说明</h2></div>
+        </div>
+        <div id="limitations"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>本页只读访问历史复现实验目录 · 数据处理与展示代码位于 visualization</footer>
+  <script src="/historical/app.js"></script>
+</body>
+</html>

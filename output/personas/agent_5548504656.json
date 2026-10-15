@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_5548504656",
+  "source_user_id": "5548504656",
+  "identity": {
+    "gender": "f",
+    "location": "广西",
+    "verified": false,
+    "followers_count": 230
+  },
+  "action_preference": {
+    "original_preference": 0.00813,
+    "repost_preference": 0.99187
+  },
+  "topic_preference": {
+    "社会事件": 0.264,
+    "新闻时事": 0.056,
+    "娱乐": 0.272,
+    "其他": 0.408
+  },
+  "information_orientation": {
+    "fact_rate": 0.124498,
+    "opinion_rate": 0.751004,
+    "questioning_rate": 0.124498
+  },
+  "emotion_expression": {
+    "positive_rate": 0.445783,
+    "neutral_rate": 0.100402,
+    "negative_rate": 0.453815
+  },
+  "data_info": {
+    "total_posts": 246,
+    "topic_sample_count": 246,
+    "expression_sample_count": 246,
+    "faction_sample_count": 246
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.191235,
+    "表态判断派": 0.123506,
+    "情绪激进派": 0.207171,
+    "矛盾激化派": 0.035857,
+    "吃瓜派": 0.442231
+  }
+}

@@ -29,6 +29,7 @@ from comments.angle_planner import (
 )
 from comments.repository import load_comment_pool
 from simulation.event_context import load_event_context
+from simulation.options import uses_evidence_based_emotions
 from simulation.event_state_updater import load_event_state_history
 from infrastructure.json_storage import append_jsonl, read_jsonl
 from project_config import (
@@ -70,6 +71,19 @@ EMERGENCY_COMMENT_TEMPLATES = (
     "不同观点都可以保留，先等待事件出现进一步的明确进展。",
     "公众关心的问题仍需要清楚说明，继续观察后续回应。",
 )
+EMERGENCY_COMMENT_TEMPLATES_BY_EMOTION = {
+    "neutral": EMERGENCY_COMMENT_TEMPLATES,
+    "negative": (
+        "事件造成的伤害和仍待说明的问题令人担忧，需要继续关注后续调查。",
+        "现有信息仍留有重要疑问，这种不确定性让人难以真正安心。",
+        "即使部分事实已经明确，事件后果和相关责任仍值得严肃对待。",
+    ),
+    "positive": (
+        "看到搜寻、互助或信息公开有所推进，希望后续问题得到妥善处理。",
+        "相关行动带来了一些建设性进展，希望信息继续公开、问题得到解决。",
+        "愿意肯定目前已有的帮助和改进行动，也希望后续工作持续推进。",
+    ),
+}
 EMERGENCY_COMMENT_PREFIXES = (
     "",
     "我觉得，",
@@ -81,8 +95,6 @@ EMERGENCY_COMMENT_PREFIXES = (
 RECENT_AVOID_TEXT_COUNT = 30
 # 2026/08/26 第十一次联调问题修复，新增功能：补充较早历史评论的有限避重样本。
 OLDER_AVOID_TEXT_COUNT = 20
-
-
 # 2026/08/24 增量评论兜底机制，修改功能：校验并兼容历史记录中的兜底数量字段。
 # 2026/08/24 增量评论稳定补齐，修改功能：允许完整兜底并校验新增的数据质量字段。
 def validate_incremental_record(record):
@@ -131,6 +143,20 @@ def validate_incremental_record(record):
         for comment in emergency_fallback_comments
     ):
         raise ValueError("本地应急评论缺少 fallback_reason。")
+
+    # 2026/10/9：历史复现的情绪保真兜底必须留下可校验的目标情绪。
+    # 只有启用了该机制的兜底评论才包含此字段；旧实验记录不受影响。
+    emotion_preserving_fallbacks = [
+        comment
+        for comment in fallback_comments
+        if comment.get("fallback_required_emotion") is not None
+    ]
+    if any(
+        comment.get("fallback_required_emotion") not in EMOTIONS
+        or comment.get("emotion") != comment.get("fallback_required_emotion")
+        for comment in emotion_preserving_fallbacks
+    ):
+        raise ValueError("情绪保真兜底评论的目标情绪与实际情绪不一致。")
 
     history_fallback_count = record.get(
         "history_fallback_count",
@@ -219,6 +245,16 @@ def validate_incremental_record(record):
         raise ValueError("增量评论记录的 angle_counts 必须是 JSON 对象。")
     if not isinstance(record.get("profile_faction_combinations", []), list):
         raise ValueError("增量评论记录的人物类型与派系统计必须是数组。")
+    emotion_coverage = record.get("emotion_coverage")
+    if emotion_coverage is not None:
+        if not isinstance(emotion_coverage, dict):
+            raise ValueError("emotion_coverage 必须是 JSON 对象。")
+        if emotion_coverage.get("status") not in {
+            "not_required",
+            "complete",
+            "incomplete",
+        }:
+            raise ValueError("emotion_coverage.status 不合法。")
 
 
 def load_incremental_history(history_file=INCREMENTAL_COMMENT_FILE):
@@ -407,8 +443,9 @@ def select_fallback_comments(
     event_id,
     current_step,
     random_seed=COMMENT_VISIBILITY_SEED,
+    required_emotions=None,
 ):
-    """按最近轮次优先的顺序抽取可追踪的历史评论。"""
+    """按最近轮次优先抽取历史评论，可选优先保持缺失任务的情绪。"""
     if missing_count <= 0:
         return []
 
@@ -463,29 +500,62 @@ def select_fallback_comments(
     random_generator = random.Random(
         f"{random_seed}:{event_id}:{current_step}"
     )
-    selected_comments = []
+    ordered_candidates = []
     for step in sorted(candidates_by_step, reverse=True):
         step_candidates = sorted(
             candidates_by_step[step],
             key=lambda item: str(item["comment_id"]),
         )
         random_generator.shuffle(step_candidates)
-        take_count = min(
-            missing_count - len(selected_comments),
-            len(step_candidates),
+        ordered_candidates.extend(step_candidates)
+
+    normalized_requirements = (
+        [
+            emotion if emotion in EMOTIONS else None
+            for emotion in required_emotions[:missing_count]
+        ]
+        if isinstance(required_emotions, list)
+        else [None] * missing_count
+    )
+    normalized_requirements.extend(
+        [None] * (missing_count - len(normalized_requirements))
+    )
+    # 2026/10/9，历史复现低风险加固：先满足带情绪要求的缺失任务，
+    # 再为普通缺口选择任意合格历史评论，避免中性兜底占掉负面/正面候选。
+    ordered_requirements = [
+        emotion for emotion in normalized_requirements if emotion is not None
+    ] + [
+        None for emotion in normalized_requirements if emotion is None
+    ]
+    selected_comments = []
+    available_candidates = list(ordered_candidates)
+    for required_emotion in ordered_requirements:
+        candidate_index = next(
+            (
+                index
+                for index, item in enumerate(available_candidates)
+                if required_emotion is None
+                or item.get("emotion") == required_emotion
+            ),
+            None,
         )
-        selected_comments.extend(step_candidates[:take_count])
+        if candidate_index is None:
+            continue
+        source_comment = available_candidates.pop(candidate_index)
+        selected_comments.append((source_comment, required_emotion))
         if len(selected_comments) == missing_count:
             break
 
     fallback_comments = []
-    for source_comment in selected_comments:
+    for source_comment, required_emotion in selected_comments:
         fallback_comment = {
             field: source_comment[field] for field in FALLBACK_COMMENT_FIELDS
         }
         fallback_comment["text"] = str(fallback_comment["text"]).strip()
         fallback_comment["source_type"] = "repost_fallback"
         fallback_comment["source_comment_id"] = source_comment["comment_id"]
+        if required_emotion is not None:
+            fallback_comment["fallback_required_emotion"] = required_emotion
         fallback_comments.append(fallback_comment)
     return fallback_comments
 
@@ -497,8 +567,9 @@ def build_emergency_fallback_comments(
     existing_comments,
     generated_comments,
     missing_count,
+    required_emotions=None,
 ):
-    """使用确定性中性模板补足剩余数量，避免依赖模型再次请求。"""
+    """使用确定性模板补足数量；条件化回放保持缺失任务的情绪。"""
     if missing_count <= 0:
         return []
     if not profiles:
@@ -512,13 +583,25 @@ def build_emergency_fallback_comments(
     topic = event_context.get("event_labels", {}).get("topic", "其他")
     factions = ("吃瓜派", "观点输出派", "表态判断派")
     comments = []
+    normalized_requirements = (
+        [
+            emotion if emotion in EMOTIONS else None
+            for emotion in required_emotions[:missing_count]
+        ]
+        if isinstance(required_emotions, list)
+        else []
+    )
+    normalized_requirements.extend(
+        [None] * (missing_count - len(normalized_requirements))
+    )
 
     for index in range(missing_count):
-        template = EMERGENCY_COMMENT_TEMPLATES[
-            index % len(EMERGENCY_COMMENT_TEMPLATES)
-        ]
+        required_emotion = normalized_requirements[index]
+        emotion = required_emotion or "neutral"
+        templates = EMERGENCY_COMMENT_TEMPLATES_BY_EMOTION[emotion]
+        template = templates[index % len(templates)]
         prefix_index = (
-            index // len(EMERGENCY_COMMENT_TEMPLATES)
+            index // len(templates)
         ) % len(EMERGENCY_COMMENT_PREFIXES)
         text = f"{EMERGENCY_COMMENT_PREFIXES[prefix_index]}{template}"
         while text in used_texts:
@@ -526,20 +609,24 @@ def build_emergency_fallback_comments(
         used_texts.add(text)
 
         profile = profiles[index % len(profiles)]
-        comments.append(
-            {
-                "text": text,
-                "profile_id": profile["profile_id"],
-                "profile_label": profile["profile_label"],
-                "topic": topic,
-                "emotion": "neutral",
-                "faction": factions[index % len(factions)],
-                "orientation": "opinion",
-                "stance": "neutral",
-                "source_type": "local_emergency_fallback",
-                "fallback_reason": "insufficient_valid_comments",
-            }
-        )
+        comment = {
+            "text": text,
+            "profile_id": profile["profile_id"],
+            "profile_label": profile["profile_label"],
+            "topic": topic,
+            "emotion": emotion,
+            "faction": factions[index % len(factions)],
+            "orientation": "opinion",
+            "stance": {
+                "negative": "questioning",
+                "positive": "support",
+            }.get(emotion, "neutral"),
+            "source_type": "local_emergency_fallback",
+            "fallback_reason": "insufficient_valid_comments",
+        }
+        if required_emotion is not None:
+            comment["fallback_required_emotion"] = required_emotion
+        comments.append(comment)
     return comments
 
 
@@ -551,8 +638,9 @@ def complete_incremental_comments(
     generated_comments,
     selected_comment_ids,
     target_count,
+    comment_tasks=None,
 ):
-    """先使用严格历史候选，再以本地中性评论补足全部剩余缺口。"""
+    """先使用严格历史候选，再用本地模板补足全部剩余缺口。"""
     missing_count = target_count - len(generated_comments)
     if missing_count <= 0:
         return list(generated_comments[:target_count])
@@ -564,6 +652,7 @@ def complete_incremental_comments(
         missing_count=missing_count,
         event_id=event_context["event_id"],
         current_step=event_context["current_state"]["step"],
+        required_emotions=None,
     )
     completed_comments = [*generated_comments, *history_fallbacks]
     emergency_count = target_count - len(completed_comments)
@@ -575,6 +664,7 @@ def complete_incremental_comments(
                 existing_comments=existing_comments,
                 generated_comments=completed_comments,
                 missing_count=emergency_count,
+                required_emotions=None,
             )
         )
     return completed_comments
@@ -687,6 +777,25 @@ def build_incremental_prompt(
             for profile in profiles
         )
     current_state = event_context["current_state"]
+    public_context = current_state.get("public_context")
+    public_context_text = ""
+    if isinstance(public_context, dict):
+        public_context_text = f"""
+【本轮条件化历史语境】
+{json.dumps(public_context, ensure_ascii=False, indent=2)}
+
+该语境只描述本阶段当时已经出现的公众议题。可以据此生成差异化表达，
+但不得引入后续阶段的信息或把语境文字复制成评论。
+""".strip()
+    objective_context = current_state.get("objective_event_context")
+    objective_context_text = ""
+    if isinstance(objective_context, dict):
+        objective_context_text = f"""
+【本轮客观事件】
+{json.dumps(objective_context, ensure_ascii=False, indent=2)}
+
+这里只包含不依赖真实舆情统计即可成立的外部事实。不得假定或复述后续真实公众反应。
+""".strip()
     # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，修改功能：增量评论逐项完成程序分配的活跃角度任务。
     task_text = ""
     task_output_field = ""
@@ -705,7 +814,8 @@ def build_incremental_prompt(
 
 {task_rule}评论必须围绕对应的 angle_name 和 focus，并遵循
 expression_instruction 指定的表达方式。人物类型和评论派系由你结合角度、
-官方声明和上一轮讨论合理选择。
+官方声明和上一轮讨论合理选择。任务包含 required_emotion 时必须使用该情绪；
+包含 evidence_ids 时必须围绕对应的本轮语境证据表达，不能编造新的事实。
 """.strip()
         task_output_field = '      "task_id": "step_2_001",\n'
 
@@ -716,7 +826,7 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 {json.dumps(previous_comments, ensure_ascii=False, indent=2)}
 
 这些评论只用于理解讨论方向，不得逐字复用，也不得只修改少量词语后输出。
-同一条实际评论只展示一次，selection_count 表示上一轮选择该评论的 Agent 数量。
+同一条实际评论只展示一次。selection_count表示上一轮选择该评论的Agent数量。
 
 【上一轮全部增量评论分布】
 {json.dumps(previous_incremental_summary or {}, ensure_ascii=False, indent=2)}
@@ -743,6 +853,10 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 【本轮生成原因】
 {generation_trigger}
 
+{objective_context_text}
+
+{public_context_text}
+
 {discussion_text}
 
 【近期不得重复的评论文本】
@@ -756,7 +870,7 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 【生成要求】
 1. 生成 {comment_count} 条新的中文微博评论。
 2. 评论应体现对当前官方声明或上一轮讨论的继续反应，不得复制上面的近期文本，也不要只替换少量词语进行复述。
-3. 同一批次尽量从价格、配置、信息可信度、处理态度和公众感受等不同角度表达，避免重复同一个论点。
+3. 同一批次尽量从事实进展、信息可信度、处理态度、社会影响和公众感受等不同角度表达，避免重复同一个论点。
 4. 尽量覆盖不同人物类型、五种评论派系、三种情绪和三种信息取向。
 5. 不得编造事件中没有提供的姓名、数字、时间和调查结论。
 6. 每条评论长度控制在 15 至 100 个汉字。
@@ -766,6 +880,8 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 10. orientation 只能是：{ORIENTATIONS}
 11. stance 只能是：{STANCES}
 12. 提供角度任务时，task_id 必须来自本批次角度任务，不得自行创建；是否允许同一任务提供备选表达以本批次任务说明为准。
+13. negative 事件中的 positive 只能表示对搜寻、互助、事实澄清、公开回应或社会改进的希望、宽慰或认可，不能表示赞同伤害或悲剧后果。
+14. 正面任务必须依据任务中的 positive_evidence 表达；没有正面证据时不得为了凑齐三类情绪而编造正面内容。
 
 【输出格式】
 只能返回一个 JSON 对象，不要返回 Markdown 或额外解释：
@@ -824,6 +940,47 @@ def summarize_angle_task_counts(comments):
         if angle_id:
             counts[angle_id] = counts.get(angle_id, 0) + 1
     return dict(sorted(counts.items()))
+
+
+# 2026/10/9，新增功能：情绪覆盖与兜底质量分开诊断，避免“生成成功”掩盖正面任务缺失。
+def summarize_emotion_coverage(comments, comment_tasks):
+    """统计最小情绪覆盖任务是否由有效模型评论完成。"""
+
+    normalized_tasks = comment_tasks or []
+    required_by_task = {
+        task["task_id"]: task["required_emotion"]
+        for task in normalized_tasks
+        if task.get("required_emotion")
+    }
+    actual_counts = {
+        emotion: sum(
+            1 for comment in comments if comment.get("emotion") == emotion
+        )
+        for emotion in EMOTIONS
+    }
+    required_counts = {
+        emotion: sum(value == emotion for value in required_by_task.values())
+        for emotion in EMOTIONS
+    }
+    completed_task_ids = {
+        comment.get("task_id")
+        for comment in comments
+        if comment.get("task_id") in required_by_task
+        and comment.get("emotion") == required_by_task[comment.get("task_id")]
+    }
+    missing_task_ids = sorted(set(required_by_task) - completed_task_ids)
+    if not required_by_task:
+        status = "not_required"
+    else:
+        status = "complete" if not missing_task_ids else "incomplete"
+    return {
+        "status": status,
+        "required_counts": required_counts,
+        "actual_counts": actual_counts,
+        "required_task_count": len(required_by_task),
+        "completed_required_task_count": len(completed_task_ids),
+        "missing_task_ids": missing_task_ids,
+    }
 
 
 # 2026/09/04 增量评论生成架构优化，新增功能：单次执行一个增量评论批次，供首轮并行生成复用。
@@ -1012,6 +1169,10 @@ def generate_incremental_comments(
             angle_plan,
             event_context["current_state"],
             comment_count,
+            # 2026/10/9，修改功能：条件化回放根据本轮证据为三类情绪
+            # 保留最低任务覆盖，防止增量评论池也发生单一情绪坍缩。
+            evidence_based=uses_evidence_based_emotions(event_context),
+            previous_comments=previous_comments,
         )
         if angle_plan is not None
         else None
@@ -1188,6 +1349,11 @@ def generate_incremental_comments(
         generated_comments=generated_comments,
         selected_comment_ids=selected_comment_ids,
         target_count=comment_count,
+        comment_tasks=comment_tasks,
+    )
+    emotion_coverage = summarize_emotion_coverage(
+        generated_comments,
+        comment_tasks,
     )
     if generation_stats is not None:
         generation_stats.clear()
@@ -1199,6 +1365,7 @@ def generate_incremental_comments(
         generation_stats["completed_angle_task_count"] = sum(
             bool(comment.get("task_id")) for comment in generated_comments
         )
+        generation_stats["emotion_coverage"] = emotion_coverage
 
     next_number = get_next_comment_number(existing_comments)
     result = []
@@ -1366,6 +1533,10 @@ def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
         "angle_counts": summarize_angle_task_counts(comments),
         "profile_faction_combinations": summarize_profile_faction_combinations(
             comments
+        ),
+        "emotion_coverage": generation_stats.get(
+            "emotion_coverage",
+            {"status": "not_required"},
         ),
         "comments": comments,
     }

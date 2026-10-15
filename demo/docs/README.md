@@ -12,6 +12,7 @@
 6. [`SIMULATION_INTERFACE_SPEC.md`](./SIMULATION_INTERFACE_SPEC.md)：核心模块接口与禁止事项。
 7. [`TASK_BREAKDOWN.md`](./TASK_BREAKDOWN.md)：可以分配给不同成员的任务包。
 8. [`TEAM_COLLABORATION.md`](./TEAM_COLLABORATION.md)：协作、验收和变更规则。
+9. [`GIT_WORKFLOW.md`](./GIT_WORKFLOW.md)：更新已有代码、创建姓名分支、提交、推送和Pull Request流程。
 
 ## 专题文档
 
@@ -19,7 +20,11 @@
 | --- | --- |
 | [`LLM_SERVICE.md`](./LLM_SERVICE.md) | 记录系统调用LLM的位置和调用边界 |
 | [`HISTORICAL_REPLAY.md`](./HISTORICAL_REPLAY.md) | 历史趋势复现模式说明 |
-| [`VISUALIZATION.md`](./VISUALIZATION.md) | 历史复现与真实趋势可视化说明 |
+| [`VISUALIZATION.md`](./VISUALIZATION.md) | 五策略、历史复现、真实趋势和传播追踪的统一可视化说明 |
+| [`GIT_WORKFLOW.md`](./GIT_WORKFLOW.md) | 团队Git姓名分支、旧代码更新、提交、推送和代码合并操作说明 |
+| [`dev/README.md`](./dev/README.md) | 新建实验、查询历史实验及三端开发任务入口 |
+| [`dev/SHARED_INTERFACE_CONTRACT.md`](./dev/SHARED_INTERFACE_CONTRACT.md) | 数据库、后端和JavaScript前端共同遵循的`v1.1-product`接口契约 |
+| [`dev/INTEGRATION_CHECKLIST.md`](./dev/INTEGRATION_CHECKLIST.md) | 三端在本地完成新实验与历史结果联调、通过后再推送的清单 |
 | [`INTEGRATION_TEST_HISTORY.md`](./INTEGRATION_TEST_HISTORY.md) | 每次正式联调的完整证据 |
 | [`detail.md`](./detail.md) | 长期开发过程、方案演变和历史规划 |
 
@@ -67,6 +72,8 @@ $env:DEEPSEEK_API_KEY = "填写本机使用的API Key"
 
 五策略实验和历史复现都会只读这些基础 Persona，不会覆盖原文件。
 
+如需从MongoDB重新生成Persona，请先阅读`persona_pipeline/README.md`，并按“基础Persona → 评论派系偏好 → 情绪分位点”的顺序执行三个脚本。
+
 ### 3. 准备五策略实验输入
 
 需要检查：
@@ -80,14 +87,18 @@ $env:DEEPSEEK_API_KEY = "填写本机使用的API Key"
 
 ### 4. 准备历史复现输入
 
-需要检查：
+每个事件独立保存在 `demo/historical_replay/events/<event_id>/`，需要检查：
 
-- `demo/historical_replay/event_input.json`：事件初始阶段公开信息；
-- `demo/historical_replay/official_response_timeline.json`：官方信息投入轮次；
-- `demo/historical_replay/example.xlsx`：人工整理的真实群体趋势；
-- `demo/historical_replay/official.md`：配置时间线时参考的原始材料，程序不会自动读取。
+- `event_manifest.json`：事件名称、原始Excel名称和哈希；
+- `event_input.json`：事件初始阶段公开信息；
+- `initial_opinion.json`：必需的第一轮人工情绪比例，只影响历史回放；
+- `public_context_timeline.json`：必需的逐轮同期公众语境，不得包含情绪比例或目标分布；
+- `official_response_timeline.json`：官方信息投入轮次；
+- `real_trend_source.xlsx`：人工整理的真实群体趋势，仅供可视化转换。
 
 历史复现的事件文件与时间线文件必须使用相同的 `event_id`。后续调查结论只能写入对应轮次的 `official_updates`，不能提前放入初始事件描述。
+
+历史趋势复现第1轮按人工整数情绪配额构造初始公共评论环境；第2轮以后投入同期公众语境和真实官方通告，但不读取真实评论文本或逐轮真实情绪比例。已核实事实统一广播，公众讨论和建设性证据按Agent个体曝光。规则层使用`persona_decision_v3 / personalized_hysteresis_v3 / emotion_transition_v1 / official_attitude_v3`：第一轮情绪由LLM初始化，后续情绪转移和官方态度由Persona门槛、当前证据和上一轮状态裁决；过程评价无新过程证据时跨轮保持；发言评分不奖励特定情绪。LLM解释既定状态、判断发言意愿并生成原创表达。当前不使用连续情绪值、跨轮响应记忆、群体比例限制或群体坍缩熔断；五策略实验仍不读取历史事件目录，并保留原有LLM态度和候选评论选择机制。
 
 ## 运行五策略实验
 
@@ -110,13 +121,13 @@ demo/experiments/<event_id>_<timestamp>/
 
 ## 运行历史趋势复现
 
-历史复现按照 `official_response_timeline.json` 指定的轮次依次投入官方信息，只运行一条历史路线，不执行动态进场，也不进行五策略对照。
+历史趋势复现按照真实时间线逐轮投入当时已知的公众语境和官方信息，只运行一条历史路线，不执行动态进场，也不进行五策略对照。Agent 内部情绪、官方态度与公共表达分别判断，发言时生成原创评论；它用于解释“在这些历史条件和个体曝光下 Agent 如何响应”，不属于自主历史预测。
 
 在项目根目录执行：
 
 ```powershell
 conda activate persona_sim
-python demo\historical_replay\main.py
+python demo\historical_replay\main.py --event-id <event_id>
 ```
 
 运行结果同样保存到新建的 `demo/experiments/<experiment_id>/`，主要查看：
@@ -130,16 +141,16 @@ historical_replay/state/propagation_history.jsonl
 
 ## 启动可视化
 
-可视化模块只读 `demo/experiments` 中已经完成的历史复现实验，不会修改实验数据，也不会调用 DeepSeek。
+可视化模块只读 `demo/experiments` 中已经完成的五策略实验和历史复现实验，不会修改实验数据，也不会调用 DeepSeek。
 
-首次使用或 `example.xlsx` 更新后，先把人工整理的数据转换为展示用 JSON：
+首次使用或某事件的真实趋势Excel更新后，按事件编号转换：
 
 ```powershell
 conda activate persona_sim
-python visualization\real_data_processor.py
+python visualization\historical\real_data_processor.py --event-id <event_id>
 ```
 
-处理结果保存在 `visualization/data/real_trend.json`。然后启动网页：
+处理结果保存在 `visualization/data/real_trends/<event_id>.json`。不同事件的数据不会互相覆盖，然后启动网页：
 
 ```powershell
 python visualization\app.py
@@ -157,17 +168,11 @@ http://127.0.0.1:8765
 python visualization\app.py --no-browser
 ```
 
-服务启动后，在网页中选择已经完成的历史复现实验进行展示。按 `Ctrl+C` 停止服务。
+服务启动后，首页可以选择“五策略推演”或“历史数据复现”。按 `Ctrl+C` 停止服务。
 
-### 查看第二十六次联调社交网络传播专题
+### 查看社交网络与评论传播
 
-该专题页面固定只读第二十六次联调结果，展示固定关注网络、逐轮信息流、Agent影响力、单条评论传播链和五策略传播指标：
-
-```powershell
-python visualization\social_network_report\app.py
-```
-
-浏览器默认打开 `http://127.0.0.1:8766`。该命令不会重新运行仿真，也不会调用 DeepSeek 或修改实验结果。
+统一入口采用“历史复现、五策略、共享网络”三层结构。五策略和历史复现分别拥有业务总览，共用固定关注网络、逐轮信息流、Agent影响力和单条评论传播链。共享网络通过页面中的入口打开，不再维护端口8766的独立兼容服务。
 
 ## 最短运行顺序
 
@@ -176,9 +181,9 @@ python visualization\social_network_report\app.py
 ```powershell
 conda activate persona_sim
 python demo\main.py
-python demo\historical_replay\main.py
-python visualization\real_data_processor.py
+python demo\historical_replay\main.py --event-id <event_id>
+python visualization\historical\real_data_processor.py --event-id <event_id>
 python visualization\app.py
 ```
 
-五策略实验和历史复现都会产生大量 LLM 请求，应分别等待上一条命令执行完成。可视化只需已有历史复现结果；如果只查看旧结果，无需重新运行五策略实验。
+五策略实验和历史复现都会产生大量 LLM 请求，应分别等待上一条命令执行完成。可视化只需已有实验结果；查看旧结果时无需重新运行任何模拟。

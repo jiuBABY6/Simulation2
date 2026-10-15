@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_1874361623",
+  "source_user_id": "1874361623",
+  "identity": {
+    "gender": "m",
+    "location": "辽宁",
+    "verified": true,
+    "followers_count": 2622000
+  },
+  "action_preference": {
+    "original_preference": 0.975426,
+    "repost_preference": 0.024574
+  },
+  "topic_preference": {
+    "社会事件": 0.603076,
+    "新闻时事": 0.177029,
+    "娱乐": 0.119764,
+    "其他": 0.100131
+  },
+  "information_orientation": {
+    "fact_rate": 0.114239,
+    "opinion_rate": 0.717512,
+    "questioning_rate": 0.168249
+  },
+  "emotion_expression": {
+    "positive_rate": 0.122422,
+    "neutral_rate": 0.359083,
+    "negative_rate": 0.518494
+  },
+  "data_info": {
+    "total_posts": 3052,
+    "topic_sample_count": 3052,
+    "expression_sample_count": 3052,
+    "faction_sample_count": 3042
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.5681,
+    "表态判断派": 0.163768,
+    "情绪激进派": 0.093206,
+    "矛盾激化派": 0.013784,
+    "吃瓜派": 0.161142
+  }
+}

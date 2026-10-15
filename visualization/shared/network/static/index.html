@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>共享社交网络与评论传播分析</title>
+  <link rel="stylesheet" href="/network/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-copy">
+      <p id="mode-eyebrow" class="eyebrow">SOCIAL PROPAGATION · READ ONLY</p>
+      <h1>社交网络与评论传播分析</h1>
+      <p class="subtitle">从固定关注关系出发，追踪评论如何被看见、继续表达，并沿网络形成多层传播</p>
+      <p id="experiment-id" class="experiment-id">正在读取实验……</p>
+    </div>
+    <div class="hero-actions">
+      <nav class="page-nav"><a href="/">切换模式</a><a id="business-link" href="/">返回业务总览</a></nav>
+      <div class="status-box">
+      <span class="status-label">验收结论</span>
+      <strong id="acceptance-status">读取中</strong>
+      <small>原始实验数据只读</small>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="notice" class="notice hidden"></section>
+
+    <section id="summary-cards" class="summary-cards"></section>
+
+    <!-- 2026/09/06 关注关系可视化，新增功能：独立展示“关注者指向被关注者”的固定社交网络。 -->
+    <section class="panel relationship-panel">
+      <div class="panel-heading split-heading relationship-heading">
+        <div>
+          <p class="section-tag cyan">关注网络</p>
+          <h2>谁在关注谁，一眼看清信息入口</h2>
+          <p class="heading-note">箭头严格按照“关注者 → 被关注者”绘制；点击Agent可聚焦其关注与粉丝关系</p>
+        </div>
+        <div class="relationship-badge">
+          <span>FIXED NETWORK</span>
+          <strong id="network-snapshot-note">固定网络快照</strong>
+        </div>
+      </div>
+      <div class="relationship-layout">
+        <div>
+          <div id="follow-network-chart" class="follow-network-chart"></div>
+          <div class="legend relationship-legend">
+            <span><i class="follow-line outgoing"></i>当前Agent关注的人</span>
+            <span><i class="follow-line incoming"></i>关注当前Agent的人</span>
+            <span><i class="follow-node-symbol"></i>球体大小：Agent影响力</span>
+            <span>再次点击已选Agent可恢复全图</span>
+          </div>
+        </div>
+        <aside id="follow-node-details" class="follow-node-details">
+          <p class="side-kicker">RELATION VIEW</p>
+          <h3>点击任意Agent</h3>
+          <p>查看该Agent关注了谁、被谁关注，以及它在固定网络中的影响力。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="panel network-panel">
+      <div class="panel-heading split-heading">
+        <div>
+          <p class="section-tag blue">传播网络</p>
+          <h2>逐轮舆情在社交网络中的演化</h2>
+          <p class="heading-note">箭头按评论实际传播方向绘制；默认突出本轮新增信息流，也可查看截至当前轮的累计传播</p>
+        </div>
+        <div class="controls">
+          <label>
+            <span>实验场景</span>
+            <select id="scenario-select"></select>
+          </label>
+          <label class="step-control">
+            <span>观察第 <strong id="step-value">1</strong> 轮</span>
+            <input id="step-slider" type="range" min="1" max="1" value="1">
+          </label>
+          <button id="play-button" type="button">▶ 播放轮次</button>
+        </div>
+      </div>
+
+      <!-- 2026/10/9，新增功能：逐轮时间轴与本轮/累计传播视图切换。 -->
+      <div class="network-toolbar">
+        <div id="step-timeline" class="step-timeline" aria-label="实验轮次时间轴"></div>
+        <div class="flow-mode-toggle" role="group" aria-label="传播统计范围">
+          <button type="button" class="is-active" data-flow-mode="round" aria-pressed="true">本轮演化</button>
+          <button type="button" data-flow-mode="cumulative" aria-pressed="false">累计传播</button>
+        </div>
+      </div>
+      <div id="network-official-details" class="network-official-details hidden" aria-live="polite"></div>
+
+      <div class="network-layout">
+        <div>
+          <div id="network-chart" class="network-chart"></div>
+          <div class="legend">
+            <span><i class="node-symbol"></i>节点大小：Agent影响力</span>
+            <span><i class="emotion-symbol positive"></i>积极</span>
+            <span><i class="emotion-symbol neutral"></i>中性</span>
+            <span><i class="emotion-symbol negative"></i>负面</span>
+            <span><i class="line-symbol active"></i>已发生邻居曝光</span>
+            <span><i class="line-symbol continued"></i>曝光后继续表达</span>
+            <span><i class="pulse-symbol"></i>本轮表达Agent</span>
+          </div>
+        </div>
+        <aside id="node-details" class="node-details">
+          <p class="side-kicker">NODE INSPECTOR</p>
+          <h3>点击任意Agent</h3>
+          <p>查看其本轮情绪、官方态度和传播活动；再次点击可恢复全图。</p>
+        </aside>
+      </div>
+      <div id="network-stats" class="metric-strip"></div>
+    </section>
+
+    <section class="panel cascade-panel">
+      <div class="panel-heading split-heading cascade-heading">
+        <div>
+          <p class="section-tag orange">单评论追踪</p>
+          <h2>一条评论如何形成传播链</h2>
+          <p class="heading-note">实线代表看见后继续表达，虚线终点代表看见但未继续表达</p>
+        </div>
+        <label class="comment-picker">
+          <span>选择评论</span>
+          <select id="comment-select"></select>
+        </label>
+      </div>
+      <blockquote id="comment-text" class="comment-text">正在加载评论传播数据……</blockquote>
+      <div id="cascade-stats" class="metric-strip compact"></div>
+      <div id="cascade-chart" class="cascade-chart"></div>
+      <div class="legend cascade-legend">
+        <span><i class="cascade-node root"></i>首次表达</span>
+        <span><i class="cascade-node continued"></i>继续表达</span>
+        <span><i class="cascade-node stopped"></i>看见但停止</span>
+        <span>横向位置表示轮次，节点提示显示Agent和传播权重</span>
+      </div>
+    </section>
+
+    <section class="panel comparison-panel">
+      <div class="panel-heading">
+        <p id="comparison-tag" class="section-tag teal">传播对照</p>
+        <h2 id="comparison-title">同一张社交网络中的传播差异</h2>
+        <p id="comparison-note" class="heading-note">正在读取实验模式……</p>
+      </div>
+      <div id="comparison-grid" class="comparison-grid">
+        <div id="strategy-bars" class="strategy-bars"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>场景</th><th>曝光次数</th><th>继续传播</th><th>继续传播率</th><th>最大深度</th><th>平均深度</th><th>数据质量</th>
+              </tr>
+            </thead>
+            <tbody id="strategy-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="insight-grid">
+      <article class="panel insight-panel success">
+        <div class="panel-heading">
+          <p class="section-tag teal">验收发现</p>
+          <h2 id="findings-title">传播数据闭环</h2>
+        </div>
+        <ul id="findings" class="insight-list"></ul>
+      </article>
+      <article class="panel insight-panel caution">
+        <div class="panel-heading">
+          <p class="section-tag orange">解释边界</p>
+          <h2>当前结果不能直接等同现实传播规模</h2>
+        </div>
+        <ul id="limitations" class="insight-list"></ul>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    社交网络与评论传播专题 · 数据来自只读实验目录 · 页面不调用大模型、不修改仿真结果
+  </footer>
+  <script src="/network/app.js"></script>
+</body>
+</html>

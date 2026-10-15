@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "event_id": "event_huxinyu_2022_001",
+  "step": 1,
+  "mode": "historical_calibration",
+  "comment_count": 60,
+  "emotion_targets": {
+    "negative": 51,
+    "neutral": 9,
+    "positive": 0
+  },
+  "observed_distribution": {
+    "negative": {
+      "estimate": 0.85,
+      "source_expression": "约85%"
+    },
+    "neutral": {
+      "lower": 0.1,
+      "upper": 0.15,
+      "source_expression": "约10%-15%"
+    },
+    "positive": {
+      "estimate": 0.0,
+      "source_expression": "近乎为零"
+    }
+  },
+  "source": {
+    "type": "manual_group_trend_reference",
+    "file": "real_trend_source.xlsx",
+    "sheet": "Sheet1",
+    "source_row": 3
+  },
+  "evaluation_role": "initial_condition"
+}

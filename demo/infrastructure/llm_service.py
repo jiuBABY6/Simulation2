@@ -157,8 +157,9 @@ def call_deepseek_json(
     attempt_count = 0
     succeeded = False
     try:
+        # 2026/09/06 配置文档同步，修改功能：缺少密钥时明确提示通过环境变量配置。
         if not DEEPSEEK_API_KEY or DEEPSEEK_API_KEY.startswith("请在"):
-            raise ValueError("请先在 project_config.py 中填写 DEEPSEEK_API_KEY。")
+            raise ValueError("请先设置环境变量 DEEPSEEK_API_KEY。")
 
         headers = {
             "Authorization": f"Bearer {DEEPSEEK_API_KEY}",

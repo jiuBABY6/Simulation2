@@ -1,0 +1,381 @@
+{
+  "experiment_id": "event_beiguo_xiantianxia_crash_20260920_002_20261013_122213_379538",
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "mode": "historical_replay",
+  "status": "completed",
+  "step_count": 3,
+  "official_update_count": 1,
+  "official_updates": [
+    {
+      "step": 2,
+      "published_at": "2026-09-20 21:38",
+      "official_statement": "9月20日17时21分许，我大队辖区天鹅路翠园街至朝阳北大街路段发生一起单方交通事故。经查，驾驶人孙某因操作不当，车辆失控冲入商场大门，造成2人轻微受伤。伤者经送医检查，无大碍。经公安机关检测，排除孙某酒驾、毒驾嫌疑，事故正在进一步调查处置。",
+      "official_statement_status": "incomplete",
+      "source_url": "人工采集表：北国先[1].xlsx，Sheet1!D4；原始通报链接未采集"
+    }
+  ],
+  "initialization": {
+    "mode": "historical_calibration",
+    "calibrated_step": 1,
+    "evaluation_role": "initial_condition",
+    "target_emotion_counts": {
+      "negative": 21,
+      "neutral": 24,
+      "positive": 15
+    },
+    "actual_emotion_counts": {
+      "positive": 15,
+      "neutral": 24,
+      "negative": 21
+    },
+    "source": {
+      "type": "manual_group_trend_reference",
+      "file": "real_trend_source.xlsx",
+      "sheet": "Sheet1",
+      "source_row": 3
+    },
+    "source_snapshot": "initial_opinion.json"
+  },
+  "simulation_options": {
+    "emotion_choice_mode": "evidence_based_all",
+    "incremental_comment_count": 50,
+    "active_opinion_window": 2,
+    "network": {
+      "neighbors_per_agent": 5
+    },
+    "visibility": {
+      "neighbor_comment_count": 4,
+      "public_comment_count": 11
+    },
+    "context_exposure": {
+      "public_discourse_reach_rate": 0.65,
+      "positive_evidence_reach_rate": 0.5
+    }
+  },
+  "public_context_enabled": true,
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_expression",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 0,
+        "reached_agent_count": 0,
+        "reach_rate": 0.0,
+        "source_agent_count": 0,
+        "propagated_comment_count": 0,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 0,
+        "average_propagation_depth": 0.0,
+        "total_effective_weight": 0
+      },
+      "period": "2026.09.20 17:00-21:38",
+      "phase": "通告前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": true,
+      "public_context": {
+        "step": 1,
+        "period": "2026.09.20 17:00-21:38",
+        "phase": "事故发生及通报前信息传播",
+        "verified_updates": [
+          {
+            "evidence_id": "verified_001_incident",
+            "content": "现场视频显示车辆冲入商场入口，事故原因、人员伤情和责任认定尚无权威结论。",
+            "source_refs": [
+              "event_input.json"
+            ],
+            "update_kind": "confirmed_fact",
+            "evidence_strength": "strong",
+            "evidence_target": "event_outcome",
+            "claim_id": "verified_001_incident"
+          }
+        ],
+        "public_discourse": [
+          {
+            "context_id": "public_001_safety_and_humor",
+            "content": "讨论同时关注公共安全、保险赔付和车辆技术，也出现以玩梗和黑色幽默消解严肃性的表达。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:row3"
+            ],
+            "status": "ongoing_discussion",
+            "unresolved_concern": true
+          }
+        ],
+        "positive_evidence": [
+          {
+            "evidence_id": "positive_001_humor",
+            "content": "部分公众以幽默表达缓解突发事故带来的紧张感。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:row3"
+            ],
+            "target": "public_discourse",
+            "evidence_strength": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.266667,
+        "negative_count": 8,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_expression",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.066667,
+        "accept_rate": 0.133333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 120,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 29,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 237.132
+      },
+      "comment_generation": {
+        "step": 2,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 5,
+        "initial_request_count": 5,
+        "refill_request_count": 0,
+        "rescue_request_count": 0,
+        "generation_wave_count": 1,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 50,
+        "rejection_counts": {},
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 5,
+            "neutral": 25,
+            "negative": 20
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 3,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.09.20 21:38-2026.09.21 09:38",
+      "phase": "通告发布后12小时内",
+      "official_statement_timing": {
+        "introduced_step": 2,
+        "is_new": true
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 2,
+        "period": "2026.09.20 21:38-2026.09.21 09:38",
+        "phase": "通告发布后12小时内",
+        "verified_updates": [
+          {
+            "evidence_id": "verified_002_notice",
+            "content": "警方通报车辆因操作不当失控，造成两人轻微受伤，并排除酒驾、毒驾嫌疑。",
+            "source_refs": [
+              "official_response_timeline.json:step2"
+            ],
+            "update_kind": "final_conclusion",
+            "evidence_strength": "strong",
+            "evidence_target": "fact_clarification",
+            "claim_id": "official_statement_step_2"
+          }
+        ],
+        "public_discourse": [
+          {
+            "context_id": "public_002_technical_questions",
+            "content": "公众继续讨论主动刹车、保险赔付和驾驶安全，并对事故原因的技术细节保持追问。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:row4"
+            ],
+            "status": "public_question",
+            "unresolved_concern": true
+          }
+        ],
+        "positive_evidence": [
+          {
+            "evidence_id": "positive_002_no_serious_injury",
+            "content": "伤者无大碍以及警方及时通报，为庆幸和有限认可提供了事实依据。",
+            "source_refs": [
+              "official_response_timeline.json:step2"
+            ],
+            "target": "official_response",
+            "evidence_strength": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.266667,
+        "negative_count": 8,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_expression",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.066667,
+        "accept_rate": 0.133333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 120,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 29,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 237.508
+      },
+      "comment_generation": {
+        "step": 3,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 6,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 60,
+        "rejection_counts": {
+          "重复文本": 10
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 2,
+            "neutral": 26,
+            "negative": 22
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 3,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.09.21 09:38以后",
+      "phase": "通告发布12小时以后",
+      "official_statement_timing": {
+        "introduced_step": 2,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 3,
+        "period": "2026.09.21 09:38以后",
+        "phase": "通告发布12小时以后",
+        "verified_updates": [],
+        "public_discourse": [
+          {
+            "context_id": "public_003_continued_questions",
+            "content": "讨论继续聚焦驾驶行为、主动刹车系统、车辆安全、事故责任和信息透明度，同时仍存在围观、调侃和玩梗表达。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:row5"
+            ],
+            "status": "ongoing_discussion",
+            "unresolved_concern": true
+          }
+        ],
+        "positive_evidence": [
+          {
+            "evidence_id": "positive_003_safety_recognition",
+            "content": "部分公众继续表达对无人重伤的庆幸，并对车辆被动安全表现给予有限认可。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:row5"
+            ],
+            "target": "public_discourse",
+            "evidence_strength": "moderate"
+          }
+        ]
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.266667,
+    "negative_count": 8,
+    "negative_denominator": 30,
+    "negative_rate_basis": "agent_expression",
+    "expression_count": 30,
+    "silent_agent_count": 0,
+    "question_rate": 0.066667,
+    "accept_rate": 0.133333,
+    "official_attitude_applicable_count": 30,
+    "global_trend": "worsening"
+  },
+  "comment_quality": {
+    "quality_status": "normal",
+    "llm_comment_count": 100,
+    "history_fallback_count": 0,
+    "emergency_fallback_count": 0,
+    "fallback_count": 0,
+    "generation_attempts": 11,
+    "initial_request_count": 10,
+    "refill_request_count": 1,
+    "rescue_request_count": 0,
+    "warning_steps": [],
+    "emotion_coverage_status": "complete",
+    "emotion_coverage_warning_steps": []
+  },
+  "propagation_summary": {
+    "exposure_count": 240,
+    "reached_agent_count": 30,
+    "reach_rate": 1.0,
+    "source_agent_count": 29,
+    "propagated_comment_count": 58,
+    "continued_propagation_count": 0,
+    "continued_agent_count": 0,
+    "continuation_rate": 0.0,
+    "max_propagation_depth": 1,
+    "average_propagation_depth": 1.0,
+    "total_effective_weight": 474.64
+  },
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_beiguo_xiantianxia_crash_20260920_002_20261013_122213_379538\\historical_replay\\state"
+}

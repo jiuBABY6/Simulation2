@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_1497151510",
+  "source_user_id": "1497151510",
+  "identity": {
+    "gender": "f",
+    "location": "河北 石家庄",
+    "verified": true,
+    "followers_count": 229000
+  },
+  "action_preference": {
+    "original_preference": 0.294954,
+    "repost_preference": 0.705046
+  },
+  "topic_preference": {
+    "社会事件": 0.295535,
+    "新闻时事": 0.212615,
+    "娱乐": 0.019844,
+    "其他": 0.472006
+  },
+  "information_orientation": {
+    "fact_rate": 0.266667,
+    "opinion_rate": 0.660284,
+    "questioning_rate": 0.07305
+  },
+  "emotion_expression": {
+    "positive_rate": 0.424823,
+    "neutral_rate": 0.284397,
+    "negative_rate": 0.29078
+  },
+  "data_info": {
+    "total_posts": 1407,
+    "topic_sample_count": 1407,
+    "expression_sample_count": 1407,
+    "faction_sample_count": 1377
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.254703,
+    "表态判断派": 0.237337,
+    "情绪激进派": 0.146889,
+    "矛盾激化派": 0.004342,
+    "吃瓜派": 0.356729
+  }
+}

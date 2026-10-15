@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五策略实验可视化</title>
+  <link rel="stylesheet" href="/strategy/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">FIVE-STRATEGY COMPARISON · READ ONLY</p>
+      <h1>五策略实验可视化</h1>
+      <p class="subtitle">比较不回应、事实通报、共情安抚、辟谣澄清和处置进展的逐轮结果</p>
+      <p id="experiment-id" class="experiment-id">正在读取实验……</p>
+    </div>
+    <nav>
+      <a href="/">切换模式</a>
+      <a id="network-link" href="/network/">社交网络与评论追踪</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="notice" class="notice hidden"></section>
+    <section id="summary-cards" class="summary-cards"></section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag">趋势对照</p>
+          <h2>五种策略的逐轮负面情绪率</h2>
+          <p>仅展示实验原始指标，不重新计算、不调用大模型。</p>
+        </div>
+      </div>
+      <div id="trend-chart" class="trend-chart"></div>
+      <div id="trend-legend" class="legend"></div>
+      <div id="announcement-details" class="announcement-details hidden" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag teal">策略摘要</p>
+          <h2>最终状态与传播表现</h2>
+        </div>
+      </div>
+      <div id="strategy-grid" class="strategy-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag orange">效果比较</p>
+          <h2>策略效果核心指标</h2>
+          <p>累计负面强度为各轮负面率之和；相对不回应减少值越高，表示累计负面负担下降越多。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>策略</th><th>最终负面率</th><th>负面峰值</th><th>累计负面强度</th>
+              <th>较不回应减少</th><th>情绪恢复率</th><th>效果持续</th>
+              <th>反弹率</th><th>最终质疑率</th><th>最终接受率</th>
+            </tr>
+          </thead>
+          <tbody id="effect-table"></tbody>
+        </table>
+      </div>
+      <div class="metric-note">“—”表示原实验未产生该指标或该场景不适用，不按0处理。</div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag">系统比较结论</p>
+          <h2>各评价维度的最优项</h2>
+          <p>并列结果会同时列出；该区域忠实展示实验汇总，不代表现实政策结论。</p>
+        </div>
+      </div>
+      <div id="comparison-grid" class="comparison-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading detail-heading">
+        <div>
+          <p class="section-tag teal">完整指标</p>
+          <h2>单策略全量指标与逐轮明细</h2>
+          <p>切换策略，查看结果指标、累计效果、传播规模、评论质量和每轮原始统计。</p>
+        </div>
+        <label class="strategy-picker">
+          <span>当前策略</span>
+          <select id="metric-strategy"></select>
+        </label>
+      </div>
+      <div id="metric-groups" class="metric-groups"></div>
+      <h3 class="subheading">逐轮指标</h3>
+      <div class="table-wrap round-table-wrap">
+        <table class="round-table">
+          <thead>
+            <tr>
+              <th>轮次</th><th>负面率</th><th>质疑率</th><th>接受率</th><th>态度适用人数</th><th>全局趋势</th>
+              <th>曝光</th><th>触达人数</th><th>触达率</th><th>源Agent</th><th>传播评论</th>
+              <th>继续传播</th><th>继续传播人数</th><th>继续传播率</th><th>最大深度</th><th>平均深度</th><th>有效权重</th>
+            </tr>
+          </thead>
+          <tbody id="round-table"></tbody>
+        </table>
+      </div>
+      <h3 class="subheading">逐轮评论生成质量</h3>
+      <div class="table-wrap round-table-wrap">
+        <table class="round-table">
+          <thead>
+            <tr>
+              <th>轮次</th><th>质量状态</th><th>候选评论</th><th>LLM评论</th>
+              <th>历史兜底</th><th>应急兜底</th><th>兜底总量</th><th>生成尝试</th>
+              <th>首轮请求</th><th>补充请求</th><th>救援请求</th><th>生成波次</th>
+              <th>质量目标</th><th>模型返回</th><th>拒绝原因</th><th>校验错误</th>
+            </tr>
+          </thead>
+          <tbody id="round-quality-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag orange">运行审计</p>
+          <h2>耗时与大模型调用</h2>
+          <p>用于判断实验成本、失败重试和各阶段耗时，不参与策略优劣排名。</p>
+        </div>
+      </div>
+      <div id="performance-summary" class="performance-summary"></div>
+      <div class="audit-grid">
+        <div>
+          <h3 class="subheading">阶段耗时</h3>
+          <div id="stage-performance" class="compact-list"></div>
+        </div>
+        <div>
+          <h3 class="subheading">LLM请求类型</h3>
+          <div id="request-performance" class="compact-list"></div>
+        </div>
+        <div>
+          <h3 class="subheading">策略耗时</h3>
+          <div id="strategy-performance" class="compact-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>五策略实验可视化 · 数据来自只读实验目录</footer>
+  <script src="/strategy/app.js"></script>
+</body>
+</html>

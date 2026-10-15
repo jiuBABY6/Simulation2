@@ -56,12 +56,24 @@ def build_initial_event_state(event_input):
     """根据固定事件信息创建无官方声明的第一个时间步状态。"""
     if not isinstance(event_input, dict) or not event_input.get("event_id"):
         raise ValueError("event_input 必须包含有效的 event_id。")
-    return {
+    state = {
         "event_id": event_input["event_id"],
         "step": 1,
         "official_statement": "",
         "official_statement_status": "none",
     }
+    # 2026/10/9，修改功能：历史复现首轮携带条件化公众语境和客观事件；
+    # 普通实验结构不变。
+    for field in (
+        "public_context",
+        "public_context_timing",
+        "objective_event_context",
+        "objective_event_timing",
+        "simulation_mode",
+    ):
+        if field in event_input:
+            state[field] = event_input[field]
+    return state
 
 
 # 2026/08/22 系统重置与状态初始化 新增功能：为新仿真创建完整且不覆盖旧数据的状态目录。

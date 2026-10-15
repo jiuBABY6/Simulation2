@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_6283762074",
+  "source_user_id": "6283762074",
+  "identity": {
+    "gender": "m",
+    "location": "河北",
+    "verified": true,
+    "followers_count": 75000
+  },
+  "action_preference": {
+    "original_preference": 0.988764,
+    "repost_preference": 0.011236
+  },
+  "topic_preference": {
+    "社会事件": 0.215054,
+    "新闻时事": 0.268817,
+    "娱乐": 0.021505,
+    "其他": 0.494624
+  },
+  "information_orientation": {
+    "fact_rate": 0.771739,
+    "opinion_rate": 0.119565,
+    "questioning_rate": 0.108696
+  },
+  "emotion_expression": {
+    "positive_rate": 0.326087,
+    "neutral_rate": 0.532609,
+    "negative_rate": 0.141304
+  },
+  "data_info": {
+    "total_posts": 89,
+    "topic_sample_count": 89,
+    "expression_sample_count": 89,
+    "faction_sample_count": 89
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.138298,
+    "表态判断派": 0.042553,
+    "情绪激进派": 0.010638,
+    "矛盾激化派": 0.021277,
+    "吃瓜派": 0.787234
+  }
+}

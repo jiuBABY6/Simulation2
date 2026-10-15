@@ -60,8 +60,8 @@ SOCIAL_NETWORK_FILE = Path(
 SINGLE_DECISION_RESULT_FILE = EXAMPLE_DIR / "decision_result.json"
 SINGLE_LLM_RESULT_FILE = EXAMPLE_DIR / "decision_result_llm.json"
 
-# 2026/09/06 GitHub推送安全处理，修改功能：从环境变量读取模型配置，避免提交本机密钥。
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+# 2026/09/06 GitHub推送安全处理，修改功能：从环境变量读取模型配置，避免提交本机密key。
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "API_KEY")
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash")
 DEEPSEEK_ENDPOINT = os.environ.get(
     "DEEPSEEK_ENDPOINT",

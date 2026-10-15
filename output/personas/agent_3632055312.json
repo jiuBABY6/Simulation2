@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_3632055312",
+  "source_user_id": "3632055312",
+  "identity": {
+    "gender": "m",
+    "location": "其他",
+    "verified": true,
+    "followers_count": 1260000
+  },
+  "action_preference": {
+    "original_preference": 0.806452,
+    "repost_preference": 0.193548
+  },
+  "topic_preference": {
+    "社会事件": 0.314286,
+    "新闻时事": 0.085714,
+    "娱乐": 0.257143,
+    "其他": 0.342857
+  },
+  "information_orientation": {
+    "fact_rate": 0.117647,
+    "opinion_rate": 0.764706,
+    "questioning_rate": 0.117647
+  },
+  "emotion_expression": {
+    "positive_rate": 0.352941,
+    "neutral_rate": 0.264706,
+    "negative_rate": 0.382353
+  },
+  "data_info": {
+    "total_posts": 31,
+    "topic_sample_count": 31,
+    "expression_sample_count": 31,
+    "faction_sample_count": 31
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.361111,
+    "表态判断派": 0.111111,
+    "情绪激进派": 0.111111,
+    "矛盾激化派": 0.055556,
+    "吃瓜派": 0.361111
+  }
+}

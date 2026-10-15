@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_3871112345",
+  "source_user_id": "3871112345",
+  "identity": {
+    "gender": "m",
+    "location": "湖南",
+    "verified": false,
+    "followers_count": 11000
+  },
+  "action_preference": {
+    "original_preference": 0.990291,
+    "repost_preference": 0.009709
+  },
+  "topic_preference": {
+    "社会事件": 0.934579,
+    "新闻时事": 0.009346,
+    "娱乐": 0.009346,
+    "其他": 0.046729
+  },
+  "information_orientation": {
+    "fact_rate": 0.481132,
+    "opinion_rate": 0.509434,
+    "questioning_rate": 0.009434
+  },
+  "emotion_expression": {
+    "positive_rate": 0.028302,
+    "neutral_rate": 0.028302,
+    "negative_rate": 0.943396
+  },
+  "data_info": {
+    "total_posts": 103,
+    "topic_sample_count": 103,
+    "expression_sample_count": 103,
+    "faction_sample_count": 103
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.472222,
+    "表态判断派": 0.009259,
+    "情绪激进派": 0.462963,
+    "矛盾激化派": 0.009259,
+    "吃瓜派": 0.046296
+  }
+}

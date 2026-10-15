@@ -1,0 +1,609 @@
+{
+  "experiment_id": "event_baoding_driving_school_crash_20261006_001_20261010_154112_520553",
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "mode": "historical_replay",
+  "status": "completed",
+  "step_count": 7,
+  "official_update_count": 1,
+  "official_updates": [
+    {
+      "step": 6,
+      "published_at": "2026-10-06 22:33",
+      "official_statement": "10月6日中午，复兴路与朝阳大街交口发生惊险一幕：一名驾驶人在行车途中突发疾病，车辆瞬间失控，接连撞到路口待行车辆、道路护栏等才停下。危急时刻，多名过路群众没有犹豫，纷纷上前查看情况，救助驾驶人到安全地带，并第一时间拨打120送医救治。万幸的是，事故未造成人员伤害。一场突如其来的意外，因为一群热心市民的迅速行动，变成了秋日街头最温暖的画面。为这些平凡英雄点赞！",
+      "official_statement_status": "incomplete",
+      "source_url": "人工采集表：real_trend_source.xlsx，Sheet1!D8；正式发布账号和原始链接待补"
+    }
+  ],
+  "initialization": {
+    "mode": "historical_calibration",
+    "calibrated_step": 1,
+    "evaluation_role": "initial_condition",
+    "target_emotion_counts": {
+      "negative": 27,
+      "neutral": 15,
+      "positive": 18
+    },
+    "actual_emotion_counts": {
+      "positive": 18,
+      "neutral": 15,
+      "negative": 27
+    },
+    "source": {
+      "type": "manual_group_trend_reference",
+      "file": "real_trend_source.xlsx",
+      "sheet": "Sheet1",
+      "source_row": 3
+    },
+    "source_snapshot": "initial_opinion.json"
+  },
+  "simulation_options": {
+    "emotion_choice_mode": "evidence_based_all",
+    "incremental_comment_count": 50,
+    "active_opinion_window": 2
+  },
+  "public_context_enabled": true,
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.4,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 0,
+        "reached_agent_count": 0,
+        "reach_rate": 0.0,
+        "source_agent_count": 0,
+        "propagated_comment_count": 0,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 0,
+        "average_propagation_depth": 0.0,
+        "total_effective_weight": 0
+      },
+      "period": "2026.10.06 16:00-18:30",
+      "phase": "通告前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": true,
+      "public_context": {
+        "step": 1,
+        "period": "2026.10.06 16:00-18:30",
+        "phase": "通告前",
+        "verified_updates": [
+          {
+            "evidence_id": "verified_001_video",
+            "content": "公开传播的现场视频显示，一辆带有“学员服务车”标识的白色车辆在道路上多次发生碰撞，先后撞击其他车辆、道路护栏和路边石墩后停止。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:D3"
+            ]
+          },
+          {
+            "evidence_id": "verified_001_scene",
+            "content": "媒体报道和现场目击信息表明，事发地点位于河北保定一处购物广场附近路口；事件传播初期，事故原因、驾驶者身份、人员伤亡和责任认定尚未获得权威确认。",
+            "source_refs": [
+              "real_trend_source.xlsx:Sheet1:D3",
+              "real_trend_source.xlsx:Sheet1:E3"
+            ]
+          }
+        ],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.533333,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 113,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 23,
+        "propagated_comment_count": 17,
+        "continued_propagation_count": 11,
+        "continued_agent_count": 11,
+        "continuation_rate": 0.097345,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 220.91
+      },
+      "comment_generation": {
+        "step": 2,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 5,
+        "initial_request_count": 5,
+        "refill_request_count": 0,
+        "rescue_request_count": 0,
+        "generation_wave_count": 1,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 50,
+        "rejection_counts": {},
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 3,
+            "neutral": 21,
+            "negative": 26
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 3,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.10.06 18:30-19:30",
+      "phase": "通告前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 2,
+        "period": "2026.10.06 18:30-19:30",
+        "phase": "通告前",
+        "verified_updates": [],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.533333,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 114,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 24,
+        "propagated_comment_count": 18,
+        "continued_propagation_count": 11,
+        "continued_agent_count": 11,
+        "continuation_rate": 0.096491,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.473684,
+        "total_effective_weight": 192.0749
+      },
+      "comment_generation": {
+        "step": 3,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 49,
+        "history_fallback_count": 1,
+        "emergency_fallback_count": 0,
+        "fallback_count": 1,
+        "generation_attempts": 6,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 61,
+        "rejection_counts": {
+          "重复文本": 12
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 2,
+            "neutral": 21,
+            "negative": 27
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 3,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.10.06 19:30-20:30",
+      "phase": "通告前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 3,
+        "period": "2026.10.06 19:30-20:30",
+        "phase": "通告前",
+        "verified_updates": [],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 0.6,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 116,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 24,
+        "propagated_comment_count": 16,
+        "continued_propagation_count": 11,
+        "continued_agent_count": 11,
+        "continuation_rate": 0.094828,
+        "max_propagation_depth": 3,
+        "average_propagation_depth": 1.672414,
+        "total_effective_weight": 185.62307
+      },
+      "comment_generation": {
+        "step": 4,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 7,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 64,
+        "rejection_counts": {
+          "重复文本": 12,
+          "重复 task_id": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 27,
+            "negative": 23
+          },
+          "required_task_count": 2,
+          "completed_required_task_count": 2,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.10.06 20:30-21:30",
+      "phase": "通告前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 4,
+        "period": "2026.10.06 20:30-21:30",
+        "phase": "通告前",
+        "verified_updates": [],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 0.6,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 118,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 24,
+        "propagated_comment_count": 18,
+        "continued_propagation_count": 9,
+        "continued_agent_count": 9,
+        "continuation_rate": 0.076271,
+        "max_propagation_depth": 4,
+        "average_propagation_depth": 1.872881,
+        "total_effective_weight": 183.212809
+      },
+      "comment_generation": {
+        "step": 5,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 6,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 51,
+        "rejection_counts": {
+          "重复文本": 1
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 23,
+            "negative": 27
+          },
+          "required_task_count": 2,
+          "completed_required_task_count": 2,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.10.06 21:30-22:33",
+      "phase": "通告发布前",
+      "official_statement_timing": {
+        "introduced_step": null,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 5,
+        "period": "2026.10.06 21:30-22:33",
+        "phase": "通告发布前",
+        "verified_updates": [],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 0.533333,
+        "question_rate": 0.3,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 114,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 24,
+        "propagated_comment_count": 18,
+        "continued_propagation_count": 9,
+        "continued_agent_count": 9,
+        "continuation_rate": 0.078947,
+        "max_propagation_depth": 5,
+        "average_propagation_depth": 1.710526,
+        "total_effective_weight": 184.430527
+      },
+      "comment_generation": {
+        "step": 6,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 50,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 6,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 51,
+        "rejection_counts": {
+          "重复文本": 1
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "complete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 26,
+            "negative": 23
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 3,
+          "missing_task_ids": []
+        }
+      },
+      "period": "2026.10.06 22:33-2026.10.07 17:00",
+      "phase": "通告发布后",
+      "official_statement_timing": {
+        "introduced_step": 6,
+        "is_new": true
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 6,
+        "period": "2026.10.06 22:33-2026.10.07 17:00",
+        "phase": "通告发布后",
+        "verified_updates": [
+          {
+            "evidence_id": "verified_006_notice",
+            "content": "通告称驾驶人员在行车途中突发疾病，车辆随后失控并发生连续碰撞；通告同时称事故未造成人员伤害。",
+            "source_refs": [
+              "official_response_timeline.json:step6",
+              "real_trend_source.xlsx:Sheet1:D8"
+            ]
+          }
+        ],
+        "public_discourse": [],
+        "positive_evidence": [
+          {
+            "evidence_id": "positive_006_no_injury",
+            "content": "通告称事故未造成人员伤害。",
+            "source_refs": [
+              "official_response_timeline.json:step6"
+            ],
+            "target": "event_outcome"
+          },
+          {
+            "evidence_id": "positive_006_rescue",
+            "content": "通告称多名过路群众主动查看情况、救助驾驶人员并拨打120。",
+            "source_refs": [
+              "official_response_timeline.json:step6"
+            ],
+            "target": "social_action"
+          }
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.533333,
+        "question_rate": 0.333333,
+        "accept_rate": 0.0,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 114,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 24,
+        "propagated_comment_count": 20,
+        "continued_propagation_count": 9,
+        "continued_agent_count": 9,
+        "continuation_rate": 0.078947,
+        "max_propagation_depth": 3,
+        "average_propagation_depth": 1.368421,
+        "total_effective_weight": 199.05274
+      },
+      "comment_generation": {
+        "step": 7,
+        "quality_status": "normal",
+        "comment_count": 50,
+        "llm_comment_count": 47,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 6,
+        "initial_request_count": 5,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 47,
+        "model_returned_comment_count": 55,
+        "rejection_counts": {
+          "重复文本": 8
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "incomplete",
+          "required_counts": {
+            "positive": 1,
+            "neutral": 1,
+            "negative": 1
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 28,
+            "negative": 22
+          },
+          "required_task_count": 3,
+          "completed_required_task_count": 2,
+          "missing_task_ids": [
+            "step_7_001"
+          ]
+        }
+      },
+      "period": "2026.10.07 17:00以后",
+      "phase": "通告发布后的持续讨论",
+      "official_statement_timing": {
+        "introduced_step": 6,
+        "is_new": false
+      },
+      "is_calibration_point": false,
+      "public_context": {
+        "step": 7,
+        "period": "2026.10.07 17:00以后",
+        "phase": "通告发布后的持续讨论",
+        "verified_updates": [],
+        "public_discourse": [],
+        "positive_evidence": []
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.533333,
+    "question_rate": 0.333333,
+    "accept_rate": 0.0,
+    "official_attitude_applicable_count": 30,
+    "global_trend": "worsening"
+  },
+  "comment_quality": {
+    "quality_status": "normal",
+    "llm_comment_count": 296,
+    "history_fallback_count": 4,
+    "emergency_fallback_count": 0,
+    "fallback_count": 4,
+    "generation_attempts": 36,
+    "initial_request_count": 30,
+    "refill_request_count": 5,
+    "rescue_request_count": 1,
+    "warning_steps": [],
+    "emotion_coverage_status": "incomplete",
+    "emotion_coverage_warning_steps": [
+      7
+    ]
+  },
+  "propagation_summary": {
+    "exposure_count": 689,
+    "reached_agent_count": 30,
+    "reach_rate": 1.0,
+    "source_agent_count": 24,
+    "propagated_comment_count": 75,
+    "continued_propagation_count": 60,
+    "continued_agent_count": 22,
+    "continuation_rate": 0.087083,
+    "max_propagation_depth": 5,
+    "average_propagation_depth": 1.519594,
+    "total_effective_weight": 1165.304046
+  },
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_baoding_driving_school_crash_20261006_001_20261010_154112_520553\\historical_replay\\state"
+}

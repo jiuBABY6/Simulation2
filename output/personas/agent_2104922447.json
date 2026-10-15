@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_2104922447",
+  "source_user_id": "2104922447",
+  "identity": {
+    "gender": "m",
+    "location": "山东",
+    "verified": true,
+    "followers_count": 524000
+  },
+  "action_preference": {
+    "original_preference": 1.0,
+    "repost_preference": 0.0
+  },
+  "topic_preference": {
+    "社会事件": 0.067797,
+    "新闻时事": 0.043584,
+    "娱乐": 0.594431,
+    "其他": 0.294189
+  },
+  "information_orientation": {
+    "fact_rate": 0.493333,
+    "opinion_rate": 0.351515,
+    "questioning_rate": 0.155152
+  },
+  "emotion_expression": {
+    "positive_rate": 0.249697,
+    "neutral_rate": 0.643636,
+    "negative_rate": 0.106667
+  },
+  "data_info": {
+    "total_posts": 822,
+    "topic_sample_count": 822,
+    "expression_sample_count": 822,
+    "faction_sample_count": 822
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.118501,
+    "表态判断派": 0.038694,
+    "情绪激进派": 0.020556,
+    "矛盾激化派": 0.006046,
+    "吃瓜派": 0.816203
+  }
+}

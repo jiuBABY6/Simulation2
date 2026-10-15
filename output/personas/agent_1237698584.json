@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_1237698584",
+  "source_user_id": "1237698584",
+  "identity": {
+    "gender": "m",
+    "location": "天津",
+    "verified": false,
+    "followers_count": 678
+  },
+  "action_preference": {
+    "original_preference": 0.095588,
+    "repost_preference": 0.904412
+  },
+  "topic_preference": {
+    "社会事件": 0.184783,
+    "新闻时事": 0.148551,
+    "娱乐": 0.192029,
+    "其他": 0.474638
+  },
+  "information_orientation": {
+    "fact_rate": 0.094545,
+    "opinion_rate": 0.858182,
+    "questioning_rate": 0.047273
+  },
+  "emotion_expression": {
+    "positive_rate": 0.330909,
+    "neutral_rate": 0.301818,
+    "negative_rate": 0.367273
+  },
+  "data_info": {
+    "total_posts": 272,
+    "topic_sample_count": 272,
+    "expression_sample_count": 272,
+    "faction_sample_count": 272
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.151625,
+    "表态判断派": 0.231047,
+    "情绪激进派": 0.184116,
+    "矛盾激化派": 0.018051,
+    "吃瓜派": 0.415162
+  }
+}

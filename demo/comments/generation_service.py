@@ -228,6 +228,15 @@ def normalize_comments(
         if stance not in STANCES:
             reject("无效 stance")
             continue
+        # 2026/10/8，新增功能：历史校准任务必须返回与人工配额一致且语义对应的情绪标签。
+        required_emotion = (
+            task_map[task_id].get("required_emotion")
+            if task_map and task_id in task_map
+            else None
+        )
+        if required_emotion is not None and emotion != required_emotion:
+            reject("情绪不符合任务")
+            continue
 
         profile = profile_map[profile_id]
         comment = {
@@ -254,6 +263,16 @@ def normalize_comments(
                     ),
                 }
             )
+            if task.get("required_emotion") is not None:
+                comment["required_emotion"] = task["required_emotion"]
+            # 2026/10/9，新增功能：保留历史复现评论的反应对象和证据链，供诊断与展示使用。
+            for field in (
+                "reaction_target",
+                "evidence_ids",
+                "positive_evidence",
+            ):
+                if task.get(field):
+                    comment[field] = task[field]
             accepted_task_ids.add(task_id)
         normalized.append(comment)
         used_texts.add(text)

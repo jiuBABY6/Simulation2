@@ -11,3 +11,9 @@ __pycache__/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local tool review/build workspace; not project source or experiment data.
+.codex_ppt_review/
+
+# Local secret file. Commit only templates such as .env.example.
+.env

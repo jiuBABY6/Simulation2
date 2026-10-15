@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "steps": [
+    {
+      "step": 1,
+      "period": "2026.10.06 16:00-18:30",
+      "phase": "通告前",
+      "verified_updates": [
+        {
+          "evidence_id": "verified_001_video",
+          "content": "公开传播的现场视频显示，一辆带有“学员服务车”标识的白色车辆在道路上多次发生碰撞，先后撞击其他车辆、道路护栏和路边石墩后停止。",
+          "source_refs": [
+            "real_trend_source.xlsx:Sheet1:D3"
+          ]
+        },
+        {
+          "evidence_id": "verified_001_scene",
+          "content": "媒体报道和现场目击信息表明，事发地点位于河北保定一处购物广场附近路口；事件传播初期，事故原因、驾驶者身份、人员伤亡和责任认定尚未获得权威确认。",
+          "source_refs": [
+            "real_trend_source.xlsx:Sheet1:D3",
+            "real_trend_source.xlsx:Sheet1:E3"
+          ]
+        }
+      ],
+      "public_discourse": [],
+      "positive_evidence": []
+    },
+    {
+      "step": 2,
+      "period": "2026.10.06 18:30-19:30",
+      "phase": "通告前",
+      "verified_updates": [],
+      "public_discourse": [],
+      "positive_evidence": []
+    },
+    {
+      "step": 3,
+      "period": "2026.10.06 19:30-20:30",
+      "phase": "通告前",
+      "verified_updates": [],
+      "public_discourse": [],
+      "positive_evidence": []
+    },
+    {
+      "step": 4,
+      "period": "2026.10.06 20:30-21:30",
+      "phase": "通告前",
+      "verified_updates": [],
+      "public_discourse": [],
+      "positive_evidence": []
+    },
+    {
+      "step": 5,
+      "period": "2026.10.06 21:30-22:33",
+      "phase": "通告发布前",
+      "verified_updates": [],
+      "public_discourse": [],
+      "positive_evidence": []
+    },
+    {
+      "step": 6,
+      "period": "2026.10.06 22:33-2026.10.07 17:00",
+      "phase": "通告发布后",
+      "verified_updates": [
+        {
+          "evidence_id": "verified_006_notice",
+          "content": "通告称驾驶人员在行车途中突发疾病，车辆随后失控并发生连续碰撞；通告同时称事故未造成人员伤害。",
+          "source_refs": [
+            "official_response_timeline.json:step6",
+            "real_trend_source.xlsx:Sheet1:D8"
+          ]
+        }
+      ],
+      "public_discourse": [],
+      "positive_evidence": [
+        {
+          "evidence_id": "positive_006_no_injury",
+          "content": "通告称事故未造成人员伤害。",
+          "source_refs": [
+            "official_response_timeline.json:step6"
+          ],
+          "target": "event_outcome"
+        },
+        {
+          "evidence_id": "positive_006_rescue",
+          "content": "通告称多名过路群众主动查看情况、救助驾驶人员并拨打120。",
+          "source_refs": [
+            "official_response_timeline.json:step6"
+          ],
+          "target": "social_action"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "period": "2026.10.07 17:00以后",
+      "phase": "通告发布后的持续讨论",
+      "verified_updates": [],
+      "public_discourse": [],
+      "positive_evidence": []
+    }
+  ]
+}

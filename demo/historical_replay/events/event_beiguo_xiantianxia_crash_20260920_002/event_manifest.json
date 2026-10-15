@@ -1,0 +1,9 @@
+{
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "title": "北国先天下广场车辆冲入商场事件（新数据三阶段版）",
+  "initial_opinion_file": "initial_opinion.json",
+  "public_context_timeline_file": "public_context_timeline.json",
+  "real_trend_source_file": "real_trend_source.xlsx",
+  "real_trend_source_original_name": "北国先[1].xlsx",
+  "real_trend_source_sha256": "513015AFB8EE03A47A08B3F0DF3DA185E083477CB3E30127A326243E7B6FABDF"
+}

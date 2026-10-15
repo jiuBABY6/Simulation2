@@ -1,0 +1,258 @@
+{
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "data_type": "manual_group_trend_reference",
+  "stage_count": 7,
+  "source": {
+    "file": "驾校撞车(1).xlsx",
+    "sheet": "Sheet1",
+    "range": "A3:H9",
+    "header_row": 2
+  },
+  "scope": "人工整理材料中的群体舆情阶段变化",
+  "methodology": [
+    "动态读取表头之后所有同时包含时间段和社会情绪的非空阶段行。",
+    "“关键节点”作为阶段名称，“当前”作为采样方法说明保存。",
+    "保留材料中明确写出的约值和区间，不把人工判断视为精确抽样统计。",
+    "区间仅为绘图生成中点，同时保留下限、上限和原始表达。",
+    "“近乎为零”仅按展示值 0 处理，不代表统计意义上的绝对为零。",
+    "各情绪比例不强制归一化，避免改写原材料中的人工估计。"
+  ],
+  "limitations": [
+    "数据只能反映群体层面的阶段性变化，不能用于验证单个 Agent 的判断。",
+    "数据来自人工整理和有限历史材料，不是完整平台样本或严格抽样结果。",
+    "当前只对照可共同定义的情绪趋势，不把真实材料推导为接受率或质疑率。"
+  ],
+  "periods": [
+    {
+      "step": 1,
+      "period": "10月6日16：00~18：30",
+      "phase": "通告前",
+      "sampling_method": "取事故视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.45,
+          "upper": 0.45,
+          "estimate": 0.45,
+          "method": "stated_approximation",
+          "source_expression": "负面: 45%"
+        },
+        "neutral": {
+          "lower": 0.25,
+          "upper": 0.25,
+          "estimate": 0.25,
+          "method": "stated_approximation",
+          "source_expression": "中性: 25%"
+        },
+        "positive": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "正面: 30%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面: 45% 主要集中在对公共安全的担忧、对驾校管理混乱的指责以及对肇事者行为的愤怒。这是最底层的社会情绪基调。 中性: 25% 主要是信息查询和社交分享行为。 正面: 30% 主要表现为网络玩梗、反讽幽默以及对“无人伤亡”结果的庆幸。这部分情绪虽然看起来“积极”，实则是对荒诞现实的一种解构和无奈接受。",
+      "public_opinion_summary": "当前舆论呈现“娱乐化解构”与“安全焦虑”并存的复杂态势。约半数评论通过“飞驰人生”、“GTA”、“科目五”等梗进行戏谑调侃，将事故娱乐化；但深层情绪仍指向对公共安全的担忧，大量网友质疑驾校管理漏洞（如绿牌车外派、副驾无教练），并警惕“报复社会”倾向。此外，地域标签（保定）及商场风水玄学讨论也占据一定比例，反映出公众在震惊之余，试图通过幽默或归因来消解对突发失……",
+      "source_row": 3
+    },
+    {
+      "step": 2,
+      "period": "10月6日18：30~19：30",
+      "phase": "通告前",
+      "sampling_method": "取事故视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.75,
+          "upper": 0.75,
+          "estimate": 0.75,
+          "method": "stated_approximation",
+          "source_expression": "负面情绪 (75%"
+        },
+        "neutral": {
+          "lower": 0.2,
+          "upper": 0.2,
+          "estimate": 0.2,
+          "method": "stated_approximation",
+          "source_expression": "中性情绪 (20%"
+        },
+        "positive": {
+          "lower": 0.05,
+          "upper": 0.05,
+          "estimate": 0.05,
+          "method": "stated_approximation",
+          "source_expression": "正面情绪 (5%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面情绪 (75%) 这是主导情绪，主要包含愤怒、恐惧、指责和担忧。 对驾驶员行为的指责与定性。 对驾校管理的愤怒。 对公共安全的恐惧与后怕。 对车辆失控原因的负面猜测。 中性情绪 (20%) 这部分情绪主要表现为围观、玩梗、讽刺或单纯的信息询问，虽然带有娱乐色彩，但核心并非支持事故本身，而是对荒诞场景的反应。 正面情绪 (5%) 极少数的正面情绪，主要集中……",
+      "public_opinion_summary": "当前舆论以负面担忧与讽刺调侃为主。公众强烈质疑驾校管理违规（无教练、非正规车），恐惧公共安全威胁，多数评论定性为“报复社会”或“故意犯罪”，要求严惩。同时，大量网友玩梗，整体情绪充满对监管缺失的愤怒及对潜在危险的焦虑。 总结： 舆论聚焦驾校违规与公共安全隐患，质疑恶意犯罪，伴随大量讽刺玩梗，整体呈负面焦虑态势。",
+      "source_row": 4
+    },
+    {
+      "step": 3,
+      "period": "10月6日19：30~20：30",
+      "phase": "通告前",
+      "sampling_method": "取事故视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.65,
+          "upper": 0.65,
+          "estimate": 0.65,
+          "method": "stated_approximation",
+          "source_expression": "负面情绪 (65%"
+        },
+        "neutral": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "中性情绪 (30%"
+        },
+        "positive": {
+          "lower": 0.05,
+          "upper": 0.05,
+          "estimate": 0.05,
+          "method": "stated_approximation",
+          "source_expression": "正面情绪 (5%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面情绪 (65%) 主要体现为愤怒、恐惧、指责和担忧。。 对公共安全的极度担忧。 对驾校/驾驶员的强烈指责。 对监管缺失的不满。 同情受害者。 中性情绪 (30%) 主要体现为戏谑、玩梗、好奇和旁观。 正面情绪 (5%) 主要体现为庆幸、赞扬特定行为或极少数误解。",
+      "public_opinion_summary": "当前舆论以负面批判与戏谑调侃为主。公众对公共安全深感担忧，强烈指责驾校违规使用非教练车（无副刹）、管理混乱及驾驶员疑似“报复社会”或严重操作失误（油门焊死）。同时，大量网友结合保定近期多起事故，通过梗进行讽刺性调侃，并对电动车女士的幸运脱险表示庆幸。整体情绪在愤怒谴责中夹杂着对荒诞现实的无奈与吃瓜心态。 总结： 舆论聚焦驾校违规与驾驶失控，充斥安全焦虑与讽刺……",
+      "source_row": 5
+    },
+    {
+      "step": 4,
+      "period": "10月6日20：30~21：30",
+      "phase": "通告前",
+      "sampling_method": "取事故视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.6,
+          "upper": 0.6,
+          "estimate": 0.6,
+          "method": "stated_approximation",
+          "source_expression": "负面 (Negative): 60%"
+        },
+        "neutral": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "中性 (Neutral): 30%"
+        },
+        "positive": {
+          "lower": 0.1,
+          "upper": 0.1,
+          "estimate": 0.1,
+          "method": "stated_approximation",
+          "source_expression": "正面 (Positive): 10%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面 (Negative): 60% 恐慌与后怕：大量用户表达了对事故危险性的恐惧，特别是针对现场行人、电动车骑行者及其他车辆驾驶员的安全担忧。许多评论强调了“命大”、“幸运”等词汇，反映出对潜在严重后果的焦虑。 愤怒与指责：公众对驾驶员的操作失误、驾校的管理疏漏（如教练是否在位、副刹车是否有效）以及车辆安全性（特别是新能源汽车失控问题）表现出强烈的不满和质……",
+      "public_opinion_summary": "当前舆论以负面和戏谑为主。公众对事故危险性感到恐慌，强烈质疑驾校管理疏漏、教练缺位及车辆安全性（特别是电车失控与副刹失效）。大量评论讽刺涉事驾校为“黑驾校”，并调侃事故场景如同电影《飞驰人生》或游戏GTA，折射出对驾考制度及“马路杀手”的不满。虽有部分声音庆幸无人伤亡，但整体情绪充满焦虑与不信任，矛头直指责任方监管不力。 总结： 舆论聚焦安全焦虑与责任问责，……",
+      "source_row": 6
+    },
+    {
+      "step": 5,
+      "period": "10月6日21：30~10月6日22：33发布",
+      "phase": "通告前",
+      "sampling_method": "取事故视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.4,
+          "upper": 0.4,
+          "estimate": 0.4,
+          "method": "stated_approximation",
+          "source_expression": "负面情绪 (40%"
+        },
+        "neutral": {
+          "lower": 0.55,
+          "upper": 0.55,
+          "estimate": 0.55,
+          "method": "stated_approximation",
+          "source_expression": "中性/调侃情绪 (55%"
+        },
+        "positive": {
+          "lower": 0.05,
+          "upper": 0.05,
+          "estimate": 0.05,
+          "method": "stated_approximation",
+          "source_expression": "正面情绪 (5%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面情绪 (40%)：担忧、质疑与愤怒 这部分情绪主要源于对公共安全的恐惧以及对事件责任方的不信任。 中性/调侃情绪 (55%)：戏谑、吃瓜与讽刺 这是占比最高的情绪类型，网友通过幽默和解构来消解事件的严肃性和恐怖感。 正面情绪 (5%)：庆幸与微弱肯定 正面情绪极少，主要集中在对结果的宽慰。",
+      "public_opinion_summary": "当前舆论呈现“戏谑围观为主，深层质疑为辅”的特征。大量网友借用《飞驰人生》、GTA等影视游戏梗进行调侃，将惊险事故娱乐化，讽刺驾校管理混乱及车辆违规上路（非黄牌教练车）。同时，部分声音表达对公共安全的担忧，质疑驾驶员状态（酒驾/毒驾/报复社会）及电动车安全性，谴责驾校监管缺失。整体情绪表面轻松幽默，实则隐含对交通乱象的不满与对责任方合规性的强烈不信任。 总结……",
+      "source_row": 7
+    },
+    {
+      "step": 6,
+      "period": "10月6日22：33发布~10月7日17：00",
+      "phase": "通告（不是蓝底百字通告，而是普通文稿）",
+      "sampling_method": "取通告视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.55,
+          "upper": 0.55,
+          "estimate": 0.55,
+          "method": "stated_approximation",
+          "source_expression": "负面 (55%"
+        },
+        "neutral": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "中性 (30%"
+        },
+        "positive": {
+          "lower": 0.15,
+          "upper": 0.15,
+          "estimate": 0.15,
+          "method": "stated_approximation",
+          "source_expression": "正面 (15%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面 (55%) 这是目前舆论场中最强烈的声音，主要集中在对官方通报理由（“突发疾病”）的强烈不信任，以及对驾校管理混乱的愤怒。 核心质疑点：“突发恶疾” vs “意识清醒的操作” 对驾校及车辆身份的质疑 对公共安全担忧及追责呼吁 中性 (30%) 这部分情绪主要体现为网络亚文化的解构、讽刺以及对事件本身的围观心态。 玩梗与讽刺 地域调侃 纯粹围观 正面 (……",
+      "public_opinion_summary": "当前舆论以质疑和讽刺为主。公众普遍不信“突发疾病”说，指出视频中司机有倒车、换挡等复杂操作，怀疑是酒驾、毒驾或故意行为，并质疑驾校违规使用无副刹私家车及体检漏洞。部分网友调侃“恶疾”梗及保定地域热点，另有声音庆幸无人伤亡并称赞车辆未起火的质量。整体情绪对官方解释持高度不信任态度，呼吁严查真相并终身禁驾。 总结：舆论主导为质疑“突发疾病”借口，聚焦司机意识清醒……",
+      "source_row": 8
+    },
+    {
+      "step": 7,
+      "period": "10月7日17：00~",
+      "phase": "通告（不是蓝底百字通告，而是普通文稿）",
+      "sampling_method": "取通告视频下该时间段评论分析舆论",
+      "sentiment": {
+        "negative": {
+          "lower": 0.65,
+          "upper": 0.65,
+          "estimate": 0.65,
+          "method": "stated_approximation",
+          "source_expression": "负面：约 65%"
+        },
+        "neutral": {
+          "lower": 0.1,
+          "upper": 0.1,
+          "estimate": 0.1,
+          "method": "stated_approximation",
+          "source_expression": "中性情绪：约 10%"
+        },
+        "positive": {
+          "lower": 0.25,
+          "upper": 0.25,
+          "estimate": 0.25,
+          "method": "stated_approximation",
+          "source_expression": "正面：约 25%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "负面：约 65% 评论区充斥着对“突发疾病”这一解释的不信任，逻辑反驳声浪最高。包括对驾驶员状态的怀疑、对驾校责任的追究、以及对交通安全的担忧。 正面：约 25% 主要集中在对路人见义勇为的赞美，以及对无人伤亡的庆幸。这部分情绪虽然积极，但往往是在承认事件发生后的反应，而非对事件起因的认可。 中性情绪：约 10% 包括一些纯围观、询问车型、或简短的表情符号回……",
+      "public_opinion_summary": "当前舆论呈现“质疑主导、温情并存”的复杂态势。绝大多数网友对官方通报的“突发疾病”说法持强烈怀疑态度，普遍指出车辆能完成倒车、换挡、转向等复杂操作与“失能”逻辑相悖，猜测可能涉及学员误操作、驾校管理疏漏或隐瞒真相，负面情绪占比高。与此同时，部分舆论高度赞扬保定市民危急时刻的见义勇为，肯定城市温度及车辆安全性。整体看，公众对事件起因的信任度较低，但对民间互助行……",
+      "source_row": 9
+    }
+  ]
+}

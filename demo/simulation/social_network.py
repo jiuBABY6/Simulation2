@@ -85,6 +85,11 @@ def build_fixed_social_network(personas, config):
     ):
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f"{field_name} 必须是非负整数。")
+    if neighbor_comment_count > neighbors_per_agent:
+        raise ValueError(
+            "neighbor_comment_count 不能大于 neighbors_per_agent；"
+            "当前模型每名邻居每轮最多提供一条表达。"
+        )
 
     influence_weights = calculate_influence_weights(personas, verified_bonus)
     edges = []
@@ -180,6 +185,14 @@ def validate_social_network(snapshot, expected_agent_ids=None):
             {"source_agent_id": source, "target_agent_id": target}
         )
 
+    neighbors_per_agent = snapshot.get("neighbors_per_agent", 0)
+    if (
+        isinstance(neighbors_per_agent, bool)
+        or not isinstance(neighbors_per_agent, int)
+        or neighbors_per_agent < 0
+    ):
+        raise ValueError("网络快照中的neighbors_per_agent不合法。")
+
     visibility = snapshot.get("visibility", {})
     if not isinstance(visibility, dict):
         raise ValueError("社交网络快照的visibility必须是JSON对象。")
@@ -191,6 +204,11 @@ def validate_social_network(snapshot, expected_agent_ids=None):
     ):
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f"网络快照中的{field_name}不合法。")
+    if neighbor_comment_count > neighbors_per_agent:
+        raise ValueError(
+            "网络快照中的neighbor_comment_count不能大于"
+            "neighbors_per_agent。"
+        )
 
     # 2026/9/5，社交网络传播第二阶段A，新增功能：兼容旧快照并校验传播衰减系数。
     propagation_decay_factor = snapshot.get("propagation_decay_factor", 1.0)
@@ -204,7 +222,7 @@ def validate_social_network(snapshot, expected_agent_ids=None):
     return {
         "network_version": snapshot.get("network_version", 1),
         "network_seed": snapshot.get("network_seed", 2026),
-        "neighbors_per_agent": snapshot.get("neighbors_per_agent", 0),
+        "neighbors_per_agent": neighbors_per_agent,
         "propagation_decay_factor": float(propagation_decay_factor),
         "visibility": {
             "neighbor_comment_count": neighbor_comment_count,

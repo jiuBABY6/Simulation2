@@ -1,6 +1,6 @@
 # 系统架构与代码地图
 
-## 总体流程
+## 五策略实验
 
 ```text
 事件输入与官方策略
@@ -18,6 +18,26 @@
 策略效果、数据质量和性能结果比较
 ```
 
+## 历史趋势复现
+
+```text
+事件初始资料＋第一轮人工评论环境
+        ↓
+公共事实广播＋个体语境曝光＋真实官方通告
+        ↓
+Persona稳定画像＋个体证据影响＋上一轮状态迟滞
+        ↓
+规则层裁决个体情绪转移与官方态度
+        ↓
+LLM解释既定状态、判断发言并生成原创表达
+        ↓
+实际表达 → 状态、传播与分层指标
+```
+
+历史入口不读取第2轮以后的真实评论或真实情绪比例，不使用本地群体配额、概率转移或坍缩熔断。
+
+历史复现的默认对照对象是 Agent 实际发表的评论。内部情绪用于解释主体状态，生成评论池用于描述信息环境，二者都不替代实际表达。状态改变由 Persona、上一轮状态和该 Agent 当轮可用证据共同约束：证据客观强度与Persona个体影响分离，事件情绪和官方态度也彼此独立。历史路径使用`persona_decision_v3 / personalized_hysteresis_v3 / official_attitude_v3`：第一轮情绪由LLM初始化，后续情绪转移和官方态度均由本地个体规则裁决；官方态度继续拆分事实结论立场与回应过程评价。LLM只在该裁决下解释理由、判断发言并生成原创表达。五策略仍使用原有决策口径。
+
 ## 核心模块
 
 | 文件 | 单一职责 |
@@ -25,30 +45,45 @@
 | `main.py` | 五策略实验统一入口 |
 | `project_config.py` | 路径、模型和运行参数 |
 | `experiment_runner.py` | 共享基线、动态进场、策略分叉和结果比较 |
-| `config/comment_profiles.json` | 评论生成使用的人物类型模板，不属于Agent Persona |
-| `config/social_network_config.json` | 固定网络、邻居传播、公共补充和逐层衰减配置 |
-| `comments/` | 评论角度规划、初始评论、增量评论、校验与评论池访问 |
-| `agents/` | Agent认知决策、候选选择、批量决策、状态和Persona访问 |
-| `simulation/` | 单轮运行、事件状态、传播、实验批次和状态隔离 |
-| `simulation/social_network.py` | 固定社交网络、影响力权重和关注关系查询 |
-| `simulation/propagation_tracking.py` | Agent表达谱系、邻居曝光事件构建和传播历史保存 |
-| `evaluation/metrics.py` | 计算Agent指标、趋势和过程效果 |
-| `evaluation/propagation_metrics.py` | 计算传播覆盖、继续传播、层级和有效权重指标 |
-| `infrastructure/llm_service.py` | 统一HTTP请求、JSON解析、重试和性能统计 |
-| `infrastructure/json_storage.py` | JSON与JSONL读写 |
+| `comments/` | 评论角度、生成、校验与评论池访问 |
+| `agents/` | Agent认知决策、历史原创表达与发言资格、五策略候选选择、批量决策、状态和Persona访问 |
+| `agents/decision_profile.py` | 将Persona与群体分位数转换为稳定决策画像，并按个体门槛生成情绪迟滞约束 |
+| `agents/evidence_appraisal.py` | 将客观证据与Persona主题、信息取向和状态惯性结合，分别生成情绪与官方态度的个体影响 |
+| `agents/official_attitude.py` | 按事实证据、过程回应、未解决关切和上一轮状态裁决个体官方态度 |
+| `simulation/` | 单轮运行、事件状态、个体语境曝光、传播、实验批次和状态隔离 |
+| `historical_replay/main.py` | 历史趋势复现入口 |
+| `historical_replay/public_context.py` | 逐轮公众语境校验，拒绝数值拟合目标 |
+| `historical_replay/replay_runner.py` | 历史时间线编排和结果汇总 |
+| `historical_replay/run_manifest.py` | 保存输入、核心代码、模型、随机种子和Persona画像指纹 |
+| `evaluation/metrics.py` | Agent内部状态、实际表达、趋势和过程效果指标 |
+| `infrastructure/llm_service.py` | HTTP请求、JSON解析、重试和性能统计 |
 
 ## 状态边界
 
-- `output/personas`是长期画像，只读加载。
-- `demo/state`是默认临时状态；正式实验使用批次内独立状态目录。
-- `demo/experiments`保存不可覆盖的事件、策略、评论、状态和结果快照。
-- 五个策略共享进场前基线，进场后使用独立目录，禁止互相读取状态。
-- 五个策略读取实验根目录的同一网络快照；网络结构不随策略演化，场景状态彼此隔离。
-- 每个场景分别保存`propagation_history.jsonl`；共享基线传播记录随状态快照复制，进场后继续独立追加。
-- 历史趋势复现位于`demo/historical_replay`，不调用五策略入口。
+- `output/personas` 是长期画像，只读加载；
+- `demo/state` 是默认临时状态，正式实验使用批次内独立状态目录；
+- `demo/experiments` 保存不可覆盖的输入、状态和结果快照；
+- 五个策略共享进场前基线，进场后场景彼此隔离；
+- 历史趋势复现拥有独立入口和事件目录，不调用五策略分叉。
+
+## 可视化三层结构
+
+```text
+统一入口与模式选择
+        ↓
+┌──────────────┬──────────────┐
+│ 历史复现层   │ 五策略实验层 │
+│ historical/  │ strategy/    │
+└──────┬───────┴──────┬───────┘
+       └──── shared/network ────┘
+        实验适配、社交网络、评论传播链
+```
+
+- `visualization/historical/` 只负责历史结果、真实趋势与探索性对照；
+- `visualization/strategy/` 只负责五策略逐轮和横向指标；
+- `visualization/shared/` 负责实验目录适配以及两种模式共用的网络能力；
+- `visualization/app.py` 是唯一服务入口，不包含业务指标计算。
 
 ## LLM与本地逻辑边界
 
-LLM负责事件角度、评论文本、Agent认知状态和全局趋势判断。本地代码负责字段校验、去重、兜底、候选评分、可复现选择、进场规则、指标公式和结果比较。所有网络请求必须经过`infrastructure/llm_service.py`。
-
-## 权重是怎么计算出来的
+LLM负责事件角度、评论文本、历史首轮情绪初始化、后续既定状态的解释、发言意愿和全局趋势判断。历史模式在同一次Agent决策请求中生成原创表达，五策略仍从个人可见候选评论中选择表达。本地代码负责公共事实与个体语境拆分、Persona稳定画像、客观证据分级、情绪转移和官方态度个体裁决、证据边界校验、去重、兜底、进场规则、指标公式和结果存储；这些约束在个体层保持可解释性，不设置群体比例或拟合目标。所有网络请求经过 `infrastructure/llm_service.py`。

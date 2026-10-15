@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_5044281310",
+  "source_user_id": "5044281310",
+  "identity": {
+    "gender": "m",
+    "location": "上海 静安区",
+    "verified": true,
+    "followers_count": 32723000
+  },
+  "action_preference": {
+    "original_preference": 0.999745,
+    "repost_preference": 0.000255
+  },
+  "topic_preference": {
+    "社会事件": 0.426296,
+    "新闻时事": 0.350236,
+    "娱乐": 0.165881,
+    "其他": 0.057587
+  },
+  "information_orientation": {
+    "fact_rate": 0.841616,
+    "opinion_rate": 0.119521,
+    "questioning_rate": 0.038863
+  },
+  "emotion_expression": {
+    "positive_rate": 0.238914,
+    "neutral_rate": 0.460754,
+    "negative_rate": 0.300331
+  },
+  "data_info": {
+    "total_posts": 7845,
+    "topic_sample_count": 7845,
+    "expression_sample_count": 7845,
+    "faction_sample_count": 7843
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.396662,
+    "表态判断派": 0.00446,
+    "情绪激进派": 0.002803,
+    "矛盾激化派": 0.000255,
+    "吃瓜派": 0.595821
+  }
+}

@@ -8,6 +8,10 @@ import re
 
 from infrastructure.llm_service import call_deepseek_json
 from project_config import COMMENT_POOL_MAX_TOKENS
+from simulation.evidence_policy import (
+    build_official_statement_evidence,
+    objective_event_is_positive_eligible,
+)
 
 
 EVENT_ANGLE_COUNT = 8
@@ -58,6 +62,9 @@ EXPRESSION_MODES = (
         "expression_instruction": "提出合理的后续处理或信息公开建议。",
     },
 )
+
+# 2026/10/8，新增功能：历史校准任务可声明硬情绪要求；普通角度任务仍可省略该字段。
+TASK_EMOTIONS = ("negative", "neutral", "positive")
 
 
 # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：构造事件角度规划提示词。
@@ -225,6 +232,34 @@ def validate_comment_tasks(comment_tasks, expected_count=None):
             item.get("expression_instruction")
             or expression_mode_map.get(expression_mode, "")
         ).strip()
+        required_emotion = item.get("required_emotion")
+        if required_emotion is not None:
+            required_emotion = str(required_emotion).strip().lower()
+        source_type = str(item.get("source_type", "event")).strip() or "event"
+        reaction_target = item.get("reaction_target")
+        if reaction_target is not None:
+            reaction_target = str(reaction_target).strip()
+            if not reaction_target:
+                raise ValueError(f"第 {index} 个评论任务的 reaction_target 为空。")
+        evidence_ids = item.get("evidence_ids", [])
+        if not isinstance(evidence_ids, list) or any(
+            not isinstance(evidence_id, str) or not evidence_id.strip()
+            for evidence_id in evidence_ids
+        ):
+            raise ValueError(f"第 {index} 个评论任务的 evidence_ids 不合法。")
+        evidence_ids = list(
+            dict.fromkeys(evidence_id.strip() for evidence_id in evidence_ids)
+        )
+        positive_evidence = item.get("positive_evidence", [])
+        if not isinstance(positive_evidence, list) or any(
+            not isinstance(evidence, dict)
+            or not str(evidence.get("evidence_id", "")).strip()
+            or not str(evidence.get("content", "")).strip()
+            for evidence in positive_evidence
+        ):
+            raise ValueError(
+                f"第 {index} 个评论任务的 positive_evidence 不合法。"
+            )
         if not task_id or task_id in task_ids:
             raise ValueError(f"评论任务编号为空或重复：{task_id}")
         if not angle_id or not angle_name or not focus:
@@ -236,17 +271,41 @@ def validate_comment_tasks(comment_tasks, expected_count=None):
             )
         if not expression_instruction:
             raise ValueError(f"第 {index} 个评论任务缺少表达要求。")
+        if (
+            required_emotion is not None
+            and required_emotion not in TASK_EMOTIONS
+        ):
+            raise ValueError(
+                f"第 {index} 个评论任务的 required_emotion 不合法："
+                f"{required_emotion}"
+            )
+        if (
+            required_emotion == "positive"
+            and reaction_target is not None
+            and not positive_evidence
+        ):
+            raise ValueError(
+                f"第 {index} 个正面评论任务缺少 positive_evidence。"
+            )
         task_ids.add(task_id)
-        tasks.append(
-            {
-                "task_id": task_id,
-                "angle_id": angle_id,
-                "angle_name": angle_name,
-                "focus": focus,
-                "expression_mode": expression_mode,
-                "expression_instruction": expression_instruction,
-            }
-        )
+        normalized_task = {
+            "task_id": task_id,
+            "angle_id": angle_id,
+            "angle_name": angle_name,
+            "focus": focus,
+            "expression_mode": expression_mode,
+            "expression_instruction": expression_instruction,
+            "source_type": source_type,
+        }
+        if required_emotion is not None:
+            normalized_task["required_emotion"] = required_emotion
+        if reaction_target is not None:
+            normalized_task["reaction_target"] = reaction_target
+        if evidence_ids:
+            normalized_task["evidence_ids"] = evidence_ids
+        if positive_evidence:
+            normalized_task["positive_evidence"] = positive_evidence
+        tasks.append(normalized_task)
     return tasks
 
 
@@ -273,6 +332,7 @@ def build_angle_tasks(angles, comment_count, task_prefix, start_offset=0):
                 "angle_id": angle["angle_id"],
                 "angle_name": angle["angle_name"],
                 "focus": angle["focus"],
+                "source_type": angle.get("source_type", "event"),
                 **expression,
             }
         )
@@ -287,6 +347,46 @@ def build_initial_angle_tasks(angle_plan, comment_count):
         comment_count,
         "initial",
     )
+
+
+# 2026/10/8，新增功能：将历史初始条件的情绪配额确定性且均匀地附加到评论任务。
+def apply_required_emotion_targets(comment_tasks, emotion_targets):
+    """返回带 required_emotion 的任务副本，不影响没有配额的普通任务。"""
+    tasks = validate_comment_tasks(comment_tasks)
+    if not isinstance(emotion_targets, dict):
+        raise ValueError("emotion_targets 必须是JSON对象。")
+
+    targets = {}
+    for emotion in TASK_EMOTIONS:
+        value = emotion_targets.get(emotion, 0)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"emotion_targets.{emotion} 必须是非负整数。")
+        targets[emotion] = value
+    total = sum(targets.values())
+    if total != len(tasks):
+        raise ValueError(
+            "情绪配额总数与评论任务数不一致："
+            f"{total} != {len(tasks)}"
+        )
+
+    assigned = {emotion: 0 for emotion in TASK_EMOTIONS}
+    calibrated_tasks = []
+    for position, task in enumerate(tasks, start=1):
+        candidates = [
+            emotion
+            for emotion in TASK_EMOTIONS
+            if assigned[emotion] < targets[emotion]
+        ]
+        selected = max(
+            candidates,
+            key=lambda emotion: (
+                position * targets[emotion] / total - assigned[emotion],
+                -TASK_EMOTIONS.index(emotion),
+            ),
+        )
+        calibrated_tasks.append({**task, "required_emotion": selected})
+        assigned[selected] += 1
+    return validate_comment_tasks(calibrated_tasks, expected_count=len(tasks))
 
 
 # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：声明出现后补充公共评价角度。
@@ -314,18 +414,244 @@ def select_active_angles(angle_plan, current_state):
 
 
 # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：按当前状态分配每轮增量评论角度任务。
-def build_incremental_angle_tasks(angle_plan, current_state, comment_count):
+def build_incremental_angle_tasks(
+    angle_plan,
+    current_state,
+    comment_count,
+    *,
+    evidence_based=False,
+    previous_comments=None,
+):
     """根据本轮活跃角度生成增量评论任务。"""
     step = current_state.get("step")
     if not isinstance(step, int) or step < 2:
         raise ValueError("增量评论任务的 step 必须大于或等于 2。")
     active_angles = select_active_angles(angle_plan, current_state)
-    return build_angle_tasks(
+    tasks = build_angle_tasks(
         active_angles,
         comment_count,
         f"step_{step}",
         start_offset=step - 2,
     )
+    if not evidence_based:
+        return tasks
+    return apply_evidence_based_emotion_coverage(
+        tasks,
+        current_state,
+        previous_comments or [],
+    )
+
+
+# 2026/10/9，修改功能：条件化历史回放使用本阶段公众语境、客观事件、
+# 官方声明和模拟评论设置最小情绪覆盖，避免增量评论单类坍缩。
+def apply_evidence_based_emotion_coverage(
+    comment_tasks,
+    current_state,
+    previous_comments,
+):
+    """为有内部证据的情绪各分配一个任务，其余任务由模型自由判断。"""
+
+    tasks = validate_comment_tasks(comment_tasks)
+    if not isinstance(current_state, dict):
+        return tasks
+
+    objective_context = current_state.get("objective_event_context", {})
+    objective_events = (
+        objective_context.get("events", [])
+        if isinstance(objective_context, dict)
+        else []
+    )
+    official_evidence = build_official_statement_evidence(current_state)
+    public_context = current_state.get("public_context", {})
+    public_discourse = (
+        public_context.get("public_discourse", [])
+        if isinstance(public_context, dict)
+        else []
+    )
+    verified_updates = (
+        public_context.get("verified_updates", [])
+        if isinstance(public_context, dict)
+        else []
+    )
+    conditioned_positive = (
+        public_context.get("positive_evidence", [])
+        if isinstance(public_context, dict)
+        else []
+    )
+    simulated_comments = [
+        item
+        for item in previous_comments
+        if isinstance(item, dict) and item.get("comment_id")
+    ]
+
+    positive_candidates = []
+    positive_candidates.extend(
+        {
+            "evidence_id": item.get("evidence_id"),
+            "content": item.get("content", ""),
+            "target": item.get("target", "public_discourse"),
+        }
+        for item in conditioned_positive
+        if item.get("evidence_id")
+    )
+    positive_candidates.extend(
+        {
+            "evidence_id": item.get("context_id"),
+            "content": item.get("content", ""),
+            "target": "social_action",
+        }
+        for item in public_discourse
+        if item.get("status") == "social_action" and item.get("context_id")
+    )
+    for item in objective_events:
+        if not objective_event_is_positive_eligible(item.get("event_type")):
+            continue
+        positive_candidates.append(
+            {
+                "evidence_id": item.get("objective_event_id"),
+                "content": item.get("content", ""),
+                "target": "social_action",
+            }
+        )
+    if (
+        official_evidence is not None
+        and official_evidence["positive_eligible"]
+    ):
+        positive_candidates.append(
+            {
+                "evidence_id": official_evidence["evidence_id"],
+                "content": official_evidence["content"],
+                "target": "official_response",
+            }
+        )
+    positive_candidates.extend(
+        {
+            "evidence_id": item.get("comment_id"),
+            "content": item.get("text", ""),
+            "target": "public_discourse",
+        }
+        for item in simulated_comments
+        if item.get("emotion") == "positive"
+    )
+
+    neutral_candidates = [
+        {
+            "evidence_id": item.get("objective_event_id"),
+            "content": item.get("content", ""),
+        }
+        for item in objective_events
+    ]
+    neutral_candidates.extend(
+        {
+            "evidence_id": item.get("evidence_id"),
+            "content": item.get("content", ""),
+        }
+        for item in verified_updates
+        if item.get("evidence_id")
+    )
+    if official_evidence is not None:
+        neutral_candidates.append(
+            {
+                "evidence_id": official_evidence["evidence_id"],
+                "content": official_evidence["content"],
+            }
+        )
+    neutral_candidates.extend(
+        {
+            "evidence_id": item.get("comment_id"),
+            "content": item.get("text", ""),
+        }
+        for item in simulated_comments
+        if item.get("emotion") == "neutral"
+    )
+    negative_candidates = [
+        {
+            "evidence_id": item.get("comment_id"),
+            "content": item.get("text", ""),
+        }
+        for item in simulated_comments
+        if item.get("emotion") == "negative"
+    ]
+    negative_candidates.extend(
+        {
+            "evidence_id": item.get("context_id"),
+            "content": item.get("content", ""),
+        }
+        for item in public_discourse
+        if item.get("status")
+        in {"public_question", "unverified_claim", "ongoing_discussion"}
+        and item.get("context_id")
+    )
+
+    assignments = []
+    if positive_candidates:
+        evidence = positive_candidates[0]
+        assignments.append(
+            {
+                "emotion": "positive",
+                "reaction_target": evidence.get("target", "public_discourse"),
+                "evidence_ids": [evidence.get("evidence_id")],
+                "positive_evidence": [evidence],
+                "prefer_official": evidence.get("target")
+                in {"official_response", "fact_clarification"},
+            }
+        )
+    if neutral_candidates:
+        evidence = neutral_candidates[0]
+        assignments.append(
+            {
+                "emotion": "neutral",
+                "reaction_target": "event_outcome",
+                "evidence_ids": [evidence.get("evidence_id")],
+                "prefer_official": True,
+            }
+        )
+    if negative_candidates:
+        evidence = negative_candidates[0]
+        assignments.append(
+            {
+                "emotion": "negative",
+                "reaction_target": "public_discourse",
+                "evidence_ids": [evidence.get("evidence_id")],
+                "prefer_official": False,
+            }
+        )
+
+    assigned_indexes = set()
+    for assignment in assignments:
+        preferred_indexes = [
+            index
+            for index, task in enumerate(tasks)
+            if index not in assigned_indexes
+            and (
+                not assignment["prefer_official"]
+                or task.get("source_type") == "official_statement"
+            )
+        ]
+        fallback_indexes = [
+            index for index in range(len(tasks)) if index not in assigned_indexes
+        ]
+        candidate_indexes = preferred_indexes or fallback_indexes
+        if not candidate_indexes:
+            break
+        selected_index = candidate_indexes[0]
+        assigned_indexes.add(selected_index)
+        tasks[selected_index] = {
+            **tasks[selected_index],
+            "required_emotion": assignment["emotion"],
+            "reaction_target": assignment["reaction_target"],
+            "evidence_ids": [
+                evidence_id
+                for evidence_id in assignment["evidence_ids"]
+                if evidence_id
+            ],
+            **(
+                {"positive_evidence": assignment["positive_evidence"]}
+                if assignment.get("positive_evidence")
+                else {}
+            ),
+        }
+    return validate_comment_tasks(tasks, expected_count=len(tasks))
 
 
 # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：统一格式化提示词中的角度任务。

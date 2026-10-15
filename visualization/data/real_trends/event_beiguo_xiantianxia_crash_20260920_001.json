@@ -1,0 +1,94 @@
+{
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_001",
+  "data_type": "manual_group_trend_reference",
+  "stage_count": 2,
+  "source": {
+    "file": "北国先(1).xlsx",
+    "sheet": "Sheet1",
+    "range": "A3:H4",
+    "header_row": 2
+  },
+  "scope": "人工整理材料中的群体舆情阶段变化",
+  "methodology": [
+    "动态读取表头之后所有同时包含时间段和社会情绪的非空阶段行。",
+    "“关键节点”作为阶段名称，“当前”作为采样方法说明保存。",
+    "保留材料中明确写出的约值和区间，不把人工判断视为精确抽样统计。",
+    "区间仅为绘图生成中点，同时保留下限、上限和原始表达。",
+    "“近乎为零”仅按展示值 0 处理，不代表统计意义上的绝对为零。",
+    "各情绪比例不强制归一化，避免改写原材料中的人工估计。"
+  ],
+  "limitations": [
+    "数据只能反映群体层面的阶段性变化，不能用于验证单个 Agent 的判断。",
+    "数据来自人工整理和有限历史材料，不是完整平台样本或严格抽样结果。",
+    "当前只对照可共同定义的情绪趋势，不把真实材料推导为接受率或质疑率。",
+    "当前只有两个观测阶段，只能描述一次上升、下降或持平方向；差异指标仅供探索，不计算峰值轮次差或趋势拟合优度。"
+  ],
+  "periods": [
+    {
+      "step": 1,
+      "period": "2026年09月20日17时事件发生~2026年09月20日21：38通告前",
+      "phase": "通告前",
+      "sampling_method": "取2026年09月20日17时事件发生~2026年09月21日06时的事故视频下评论来模拟该时间线",
+      "sentiment": {
+        "negative": {
+          "lower": 0.35,
+          "upper": 0.35,
+          "estimate": 0.35,
+          "method": "stated_approximation",
+          "source_expression": "负面 (Negative)35%"
+        },
+        "neutral": {
+          "lower": 0.4,
+          "upper": 0.4,
+          "estimate": 0.4,
+          "method": "stated_approximation",
+          "source_expression": "中性 (Neutral)40%"
+        },
+        "positive": {
+          "lower": 0.25,
+          "upper": 0.25,
+          "estimate": 0.25,
+          "method": "stated_approximation",
+          "source_expression": "正面 (Positive)25%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "中性 (Neutral)40% 以好奇、询问事实、理性探讨赔偿为主，情绪波动小。 负面 (Negative)35% 包含对安全的担忧、对司机的指责、对法律后果的严肃看待。 正面 (Positive)25% 以玩梗、讽刺、黑色幽默为主，属于网络特有的消解严肃性的情绪。",
+      "public_opinion_summary": "当前舆论呈现显著的“娱乐化解构”特征。虽有个别对公共安全及赔偿的担忧，但主流情绪并非愤怒，而是以黑色幽默和玩梗为主。网友热衷于调侃“购物车”、“0元购”、商场业绩暴增及沃尔沃品牌特性，将严重事故转化为网络段子。同时，公众对保险赔付、司机身份及车辆技术（如主动刹车失效）保持高度好奇与理性质疑。整体氛围偏向吃瓜看戏，严肃的道德谴责被消解，反映出网民面对突发社会新……",
+      "source_row": 3
+    },
+    {
+      "step": 2,
+      "period": "2026年09月20日21：38后通告后",
+      "phase": "通告",
+      "sampling_method": "取2026年09月20日21：38后通告下的评论来模拟该时间线",
+      "sentiment": {
+        "negative": {
+          "lower": 0.3,
+          "upper": 0.3,
+          "estimate": 0.3,
+          "method": "stated_approximation",
+          "source_expression": "负面 (Negative)30%"
+        },
+        "neutral": {
+          "lower": 0.45,
+          "upper": 0.45,
+          "estimate": 0.45,
+          "method": "stated_approximation",
+          "source_expression": "中性 (Neutral)45%"
+        },
+        "positive": {
+          "lower": 0.25,
+          "upper": 0.25,
+          "estimate": 0.25,
+          "method": "stated_approximation",
+          "source_expression": "正面 (Positive)25%"
+        }
+      },
+      "estimate_sum": 1.0,
+      "group_summary": "中性 (Neutral)45% 以好奇、询问事实、理性探讨赔偿为主，情绪波动小，占比最大。 负面 (Negative)30% 包含对通报真实性的质疑、对公共安全的愤怒、对司机的谴责及对技术的担忧。 正面 (Positive)25% 包括对警方效率的点赞、庆幸无人重伤、以及对事故的幽默化解构",
+      "public_opinion_summary": "通报发布后，舆论呈现理性回归与深度质疑并存的态势。虽然“保定速度”获部分点赞，且庆幸无人重伤，但大量评论聚焦于技术细节（如AEB为何失效）及性别猜测。公众对“操作不当”的官方定性持保留态度，阴谋论（如平账、故意报复）仍有市场。同时，关于保险赔付、驾照门槛及自动挡安全性的讨论占据主流。整体情绪从初期的猎奇玩梗转向对公共安全机制和技术可靠性的严肃审视，信任赤字依……",
+      "source_row": 4
+    }
+  ]
+}

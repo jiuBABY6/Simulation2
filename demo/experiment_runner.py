@@ -44,7 +44,7 @@ from simulation.state_manager import (
 # MAX_WORKERS = 5
 # INCREMENTAL_COMMENT_COUNT = 20
 MAX_STEPS = 10
-MAX_AGENTS = 10
+MAX_AGENTS = 30
 MAX_WORKERS = 5
 INCREMENTAL_COMMENT_COUNT = 20
 RANDOM_SEED = 2026
@@ -309,13 +309,46 @@ def load_official_response_options(response_file, event_id):
 
 
 # 2026/08/25 第五次联调问题修复，修改功能：保留无声明场景的空官方态度指标。
-def extract_policy_metrics(round_metrics):
-    """提取官方回应策略需要使用的指标，并保留不适用的空值。"""
+def extract_policy_metrics(round_metrics, negative_rate_basis="agent_internal"):
+    """提取策略指标，并显式记录负面率的观测对象和分母。
+
+    五策略继续使用 ``agent_internal``，保持既有进场和策略比较语义；历史
+    趋势复现显式传入 ``agent_expression``，用 Agent 实际发表的评论与真实
+    评论比较。通过参数隔离两类实验，避免历史口径修正悄然改变五策略。
+    """
     try:
         attitude_summary = round_metrics["official_attitude_distribution"]
         attitude = attitude_summary["distribution"]
+        if negative_rate_basis == "agent_internal":
+            negative_summary = round_metrics["agent_negative_emotion"]
+            negative_rate = negative_summary["negative_rate"]
+            negative_count = negative_summary["negative_count"]
+            negative_denominator = negative_summary["agent_count"]
+            expression_summary = round_metrics.get(
+                "agent_expression_distribution", {}
+            )
+        elif negative_rate_basis == "agent_expression":
+            expression_summary = round_metrics["agent_expression_distribution"]
+            negative_item = expression_summary["distribution"]["negative"]
+            negative_rate = negative_item["rate"]
+            negative_count = negative_item["count"]
+            negative_denominator = expression_summary[
+                "classified_expression_count"
+            ]
+        else:
+            raise ValueError(
+                "negative_rate_basis 只能是 agent_internal 或 "
+                "agent_expression。"
+            )
         return {
-            "negative_rate": round_metrics["agent_negative_emotion"]["negative_rate"],
+            "negative_rate": negative_rate,
+            "negative_count": negative_count,
+            "negative_denominator": negative_denominator,
+            "negative_rate_basis": negative_rate_basis,
+            "expression_count": expression_summary.get("expression_count"),
+            "silent_agent_count": expression_summary.get(
+                "silent_agent_count"
+            ),
             "question_rate": attitude["question"]["rate"],
             "accept_rate": attitude["accept"]["rate"],
             "official_attitude_applicable_count": attitude_summary.get(
@@ -446,6 +479,7 @@ def prepare_scenario_state(
     strategy_name,
     event_id,
     baseline_state_dir=None,
+    initial_state_context=None,
 ):
     """为一个实验策略创建初始状态，必要时复用共享基线快照。"""
     scenario_dir = Path(experiment_dir) / strategy_name
@@ -454,9 +488,14 @@ def prepare_scenario_state(
         raise FileExistsError(f"实验策略目录已经存在：{scenario_dir}")
 
     if baseline_state_dir is None:
+        initial_event_input = {"event_id": event_id}
+        if initial_state_context is not None:
+            if not isinstance(initial_state_context, dict):
+                raise ValueError("initial_state_context 必须是 JSON 对象。")
+            initial_event_input.update(initial_state_context)
         initialize_simulation_state(
             state_dir=state_dir,
-            event_input={"event_id": event_id},
+            event_input=initial_event_input,
         )
     else:
         initialize_state_from_snapshot(
@@ -488,6 +527,7 @@ def run_simulation_step(
     event_file,
     comment_pool_file,
     social_network_file=None,
+    incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
 ):
     """使用指定状态、事件和评论池运行一个时间步并返回性能结果。"""
     environment = os.environ.copy()
@@ -507,6 +547,12 @@ def run_simulation_step(
     environment["PYTHONIOENCODING"] = "utf-8"
 
     # 2026/09/05 代码结构重构，修改功能：以包模块方式启动迁移后的仿真运行器。
+    if (
+        isinstance(incremental_comment_count, bool)
+        or not isinstance(incremental_comment_count, int)
+        or incremental_comment_count < 1
+    ):
+        raise ValueError("incremental_comment_count 必须是正整数。")
     command = [
         sys.executable,
         "-m",
@@ -516,7 +562,7 @@ def run_simulation_step(
         "--workers",
         str(MAX_WORKERS),
         "--incremental-comments",
-        str(INCREMENTAL_COMMENT_COUNT),
+        str(incremental_comment_count),
     ]
     process = subprocess.run(
         command,
@@ -611,6 +657,10 @@ def load_step_comment_quality(incremental_file, event_id, step):
         ),
         "rejection_counts": record.get("rejection_counts", {}),
         "validation_errors": record.get("validation_errors", []),
+        "emotion_coverage": record.get(
+            "emotion_coverage",
+            {"status": "not_required"},
+        ),
     }
 
 
@@ -626,6 +676,16 @@ def summarize_comment_quality(quality_records):
         quality_status = "degraded"
     else:
         quality_status = "normal"
+    coverage_statuses = {
+        record.get("emotion_coverage", {}).get("status", "not_required")
+        for record in quality_records
+    }
+    if "incomplete" in coverage_statuses:
+        emotion_coverage_status = "incomplete"
+    elif "complete" in coverage_statuses:
+        emotion_coverage_status = "complete"
+    else:
+        emotion_coverage_status = "not_required"
     return {
         "quality_status": quality_status,
         "llm_comment_count": sum(
@@ -661,18 +721,34 @@ def summarize_comment_quality(quality_records):
             for record in quality_records
             if record["quality_status"] != "normal"
         ],
+        # 2026/10/9，新增功能：单独汇总情绪覆盖，避免与兜底质量状态混为一谈。
+        "emotion_coverage_status": emotion_coverage_status,
+        "emotion_coverage_warning_steps": [
+            record["step"]
+            for record in quality_records
+            if record.get("emotion_coverage", {}).get("status")
+            == "incomplete"
+        ],
     }
 
 
 # 2026/08/25 第八次联调问题修复，新增功能：统一读取共享基线和独立场景的单轮结果。
-def load_round_result(state_dir, event_id, step):
+def load_round_result(
+    state_dir,
+    event_id,
+    step,
+    negative_rate_basis="agent_internal",
+):
     """读取一个时间步的策略指标，并在增量轮次附加评论质量。"""
     metrics_file = Path(state_dir) / "metrics_history.jsonl"
     incremental_file = Path(state_dir) / "incremental_comment_history.jsonl"
     round_metrics = load_step_metrics(metrics_file, event_id, step)
     round_result = {
         "step": step,
-        "policy_metrics": extract_policy_metrics(round_metrics),
+        "policy_metrics": extract_policy_metrics(
+            round_metrics,
+            negative_rate_basis=negative_rate_basis,
+        ),
         # 2026/9/5，社交网络传播第二阶段A，新增功能：场景逐轮结果附带传播指标。
         "propagation_metrics": round_metrics.get("propagation_metrics", {}),
     }

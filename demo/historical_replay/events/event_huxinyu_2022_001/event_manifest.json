@@ -1,0 +1,11 @@
+{
+  "event_id": "event_huxinyu_2022_001",
+  "title": "胡某宇失联事件",
+  "initial_opinion_file": "initial_opinion.json",
+  "initial_opinion_mode": "historical_calibration",
+  "initial_opinion_note": "历史趋势复现使用第一轮人工统计初始化公共评论池。",
+  "public_context_timeline_file": "public_context_timeline.json",
+  "real_trend_source_file": "real_trend_source.xlsx",
+  "real_trend_source_original_name": "example.xlsx",
+  "real_trend_source_sha256": "D1A3BCAF700F2873D26FBBF42CACB5E0FB60C979773E11A47A01410B3651E52B"
+}

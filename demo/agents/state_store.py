@@ -13,6 +13,8 @@ from project_config import AGENT_STATE_FILE
 DEFAULT_AGENT_STATE = {
     "current_emotion": None,
     "official_attitude": None,
+    "claim_position": None,
+    "process_evaluation": None,
     "will_comment": False,
     "last_action": "none",
     "last_comment_faction": None,
@@ -30,6 +32,7 @@ COMMENT_MEMORY_FIELDS = (
     "orientation",
     "stance",
     "introduced_step",
+    "evidence_ids",
 )
 
 
@@ -92,6 +95,17 @@ def summarize_emotion_transitions(history):
     }
 
 
+def count_consecutive_comment_rounds(states):
+    """统计历史末尾连续发言轮数；遇到一次沉默即停止。"""
+
+    count = 0
+    for state in reversed(states):
+        if state.get("will_comment") is not True:
+            break
+        count += 1
+    return count
+
+
 class AgentStateStore:
     """负责 Agent 状态历史的读取、摘要和追加保存。"""
 
@@ -141,6 +155,7 @@ class AgentStateStore:
                 "latest_official_attitude": None,
                 "action_counts": {},
                 "comment_count": 0,
+                "consecutive_comment_rounds": 0,
                 "faction_counts": {},
                 "own_comment_history": [],
             }
@@ -189,6 +204,9 @@ class AgentStateStore:
             "comment_count": sum(
                 1 for state in states if state.get("will_comment") is True
             ),
+            "consecutive_comment_rounds": count_consecutive_comment_rounds(
+                states
+            ),
             "faction_counts": dict(Counter(factions)),
             "own_comment_history": own_comment_history,
         }
@@ -198,23 +216,33 @@ class AgentStateStore:
         """把一次 Agent 决策转换为统一的历史状态记录。"""
         will_comment = bool(decision.get("will_comment", False))
         last_comment = build_comment_memory(decision)
+        state = {
+            "current_emotion": decision.get("current_emotion"),
+            "official_attitude": decision.get("official_attitude"),
+            # 2026/10/14，新增功能：历史复现把事实接受和过程评价分开保存；
+            # 五策略没有这些字段时保持 None，不改变旧路径的状态语义。
+            "claim_position": decision.get("claim_position"),
+            "process_evaluation": decision.get("process_evaluation"),
+            "will_comment": will_comment,
+            "last_action": "comment" if will_comment else "wait",
+            "last_comment_faction": (
+                decision.get("comment_faction") if will_comment else None
+            ),
+            "last_comment_id": (
+                decision.get("selected_comment_id") if will_comment else None
+            ),
+            "last_comment": last_comment,
+        }
+        # 2026/10/12，历史复现发言决策：只在历史决策实际提供这些
+        # 字段时保存，避免五策略状态契约出现无意义的空字段。
+        for field in ("silence_reason", "participation_assessment"):
+            if field in decision:
+                state[field] = decision.get(field)
         return {
             "event_id": event_id,
             "step": step,
             "agent_id": agent_id,
-            "state": {
-                "current_emotion": decision.get("current_emotion"),
-                "official_attitude": decision.get("official_attitude"),
-                "will_comment": will_comment,
-                "last_action": "comment" if will_comment else "wait",
-                "last_comment_faction": (
-                    decision.get("comment_faction") if will_comment else None
-                ),
-                "last_comment_id": (
-                    decision.get("selected_comment_id") if will_comment else None
-                ),
-                "last_comment": last_comment,
-            },
+            "state": state,
         }
 
     def save_decision_states(self, decision_results):

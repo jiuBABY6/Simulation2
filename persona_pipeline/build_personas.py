@@ -30,11 +30,11 @@ MONGODB_DATABASE = "weibo"
 USERS_COLLECTION = "user"
 POSTS_COLLECTION = "weibo"
 
-DEEPSEEK_API_KEY = "API_key"
+DEEPSEEK_API_KEY = "API_KEY"
 DEEPSEEK_MODEL = "deepseek-v4-flash"
 DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions"
 
-DEMO_USER_LIMIT = 16  # 设为 0 时处理 users 集合中的所有用户。
+DEMO_USER_LIMIT = 0  # 设为 0 时处理 users 集合中的所有用户。
 CLASSIFICATION_BATCH_SIZE = 10
 MAX_TEXT_CHARS = 800
 OUTPUT_DIR = "output/personas"

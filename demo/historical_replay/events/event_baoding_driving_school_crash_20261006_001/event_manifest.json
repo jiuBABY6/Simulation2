@@ -1,0 +1,9 @@
+{
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "title": "保定驾校车辆碰撞事件",
+  "initial_opinion_file": "initial_opinion.json",
+  "public_context_timeline_file": "public_context_timeline.json",
+  "real_trend_source_file": "real_trend_source.xlsx",
+  "real_trend_source_original_name": "驾校撞车(1).xlsx",
+  "real_trend_source_sha256": "87630F55CDF2D09C4B392FF7ECA86281B210AD133CA934BB2948D4D5D80E1B6F"
+}

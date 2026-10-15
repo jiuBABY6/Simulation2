@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "event_id": "event_baoding_driving_school_crash_20261006_001",
+  "step": 1,
+  "mode": "historical_calibration",
+  "comment_count": 60,
+  "emotion_targets": {
+    "negative": 27,
+    "neutral": 15,
+    "positive": 18
+  },
+  "observed_distribution": {
+    "negative": {
+      "estimate": 0.45,
+      "source_expression": "负面：45%"
+    },
+    "neutral": {
+      "estimate": 0.25,
+      "source_expression": "中性：25%"
+    },
+    "positive": {
+      "estimate": 0.30,
+      "source_expression": "正面：30%"
+    }
+  },
+  "source": {
+    "type": "manual_group_trend_reference",
+    "file": "real_trend_source.xlsx",
+    "sheet": "Sheet1",
+    "source_row": 3
+  },
+  "evaluation_role": "initial_condition"
+}

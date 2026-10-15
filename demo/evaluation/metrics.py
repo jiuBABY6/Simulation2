@@ -6,6 +6,7 @@
 """
 
 import json
+import math
 
 from comments.repository import load_comment_pool, load_incremental_comments
 from simulation.event_context import load_event_context
@@ -78,6 +79,12 @@ def simplify_comments(comments):
 # 2026/08/24 第三次联调问题修复，修改功能：使用紧凑输入并限制趋势分析的输出规模。
 def build_global_trend_prompt(event_context, initial_comments, incremental_comments):
     """构造初始评论与当前轮增量评论的全局趋势分析提示词。"""
+    allowed_comment_ids = [
+        comment.get("comment_id").strip()
+        for comment in initial_comments + incremental_comments
+        if isinstance(comment.get("comment_id"), str)
+        and comment.get("comment_id").strip()
+    ]
     output_format = {
         "trend_direction": "improving | stable | worsening",
         "reason": "不超过100字的一句话说明",
@@ -95,13 +102,16 @@ def build_global_trend_prompt(event_context, initial_comments, incremental_comme
 【当前轮增量评论】
 {json.dumps(simplify_comments(incremental_comments), ensure_ascii=False)}
 
+【允许引用的评论编号】
+{json.dumps(allowed_comment_ids, ensure_ascii=False)}
+
 判断标准：
 1. 负面、质疑和激进表达减少，趋向中性、理性或接受，判断为 improving。
 2. 情绪和立场没有明显变化，判断为 stable。
 3. 负面、质疑、批评、激进或对立表达增加，判断为 worsening。
 4. 只能依据提供的评论进行判断，不要计算或编造精确比例。
 5. reason 必须为一句话且不超过 {GLOBAL_TREND_REASON_LIMIT} 字。
-6. evidence_comment_ids 必须来自上面的评论编号，最多返回 {GLOBAL_TREND_EVIDENCE_LIMIT} 个。
+6. evidence_comment_ids 只能逐字复制“允许引用的评论编号”中的值，最多返回 {GLOBAL_TREND_EVIDENCE_LIMIT} 个；没有可靠证据时返回空数组。
 
 只返回一个紧凑JSON对象，不要换行或补充其他字段：
 {json.dumps(output_format, ensure_ascii=False)}
@@ -109,6 +119,7 @@ def build_global_trend_prompt(event_context, initial_comments, incremental_comme
 
 
 # 2026/08/24 第三次联调问题修复，修改功能：规范化过长说明并限制有效证据编号数量。
+# 2026/10/08 历史复现趋势证据容错，修改功能：非法证据编号降级为可审计告警，不再中断整轮实验。
 def validate_global_trend(result, valid_comment_ids):
     """检查并规范化LLM返回的全局趋势结果。"""
     if not isinstance(result, dict):
@@ -120,23 +131,52 @@ def validate_global_trend(result, valid_comment_ids):
     if not reason:
         raise ValueError("全局趋势分析结果缺少reason。")
 
-    evidence_ids = result.get("evidence_comment_ids")
-    if not isinstance(evidence_ids, list):
-        raise ValueError("evidence_comment_ids 必须是数组。")
-    if any(not isinstance(item, str) for item in evidence_ids):
-        raise ValueError("evidence_comment_ids 只能包含字符串编号。")
-    invalid_ids = [item for item in evidence_ids if item not in valid_comment_ids]
-    if invalid_ids:
-        raise ValueError("全局趋势分析引用了不存在的评论编号。")
+    normalized_valid_ids = {
+        item.strip()
+        for item in valid_comment_ids
+        if isinstance(item, str) and item.strip()
+    }
+    raw_evidence_ids = result.get("evidence_comment_ids")
+    validation_issues = []
+    invalid_ids = []
+    valid_evidence_ids = []
 
-    unique_evidence_ids = list(dict.fromkeys(evidence_ids))[
+    # evidence_comment_ids 只用于解释趋势结论，不参与负面率、官方态度或
+    # 传播指标计算。模型偶发返回越界编号时保留核心趋势，并记录过滤结果，
+    # 避免一个辅助证据字段使已经完成的 Agent 决策和传播计算全部作废。
+    if not isinstance(raw_evidence_ids, list):
+        validation_issues.append("evidence_comment_ids_not_array")
+        raw_evidence_ids = []
+
+    for item in raw_evidence_ids:
+        if not isinstance(item, str):
+            validation_issues.append("non_string_evidence_id")
+            invalid_ids.append(str(item))
+            continue
+        normalized_id = item.strip()
+        if normalized_id not in normalized_valid_ids:
+            invalid_ids.append(normalized_id)
+            continue
+        valid_evidence_ids.append(normalized_id)
+
+    unique_evidence_ids = list(dict.fromkeys(valid_evidence_ids))[
         :GLOBAL_TREND_EVIDENCE_LIMIT
     ]
+    unique_invalid_ids = list(dict.fromkeys(invalid_ids))[
+        :GLOBAL_TREND_EVIDENCE_LIMIT
+    ]
+    if unique_invalid_ids:
+        validation_issues.append("invalid_evidence_comment_ids_filtered")
 
     return {
         "trend_direction": result["trend_direction"],
         "reason": reason[:GLOBAL_TREND_REASON_LIMIT],
         "evidence_comment_ids": unique_evidence_ids,
+        "evidence_validation": {
+            "status": "filtered" if validation_issues else "valid",
+            "issues": list(dict.fromkeys(validation_issues)),
+            "invalid_ids": unique_invalid_ids,
+        },
     }
 
 
@@ -148,6 +188,11 @@ def analyze_global_trend(event_context, initial_comments, incremental_comments):
             "trend_direction": "stable",
             "reason": "当前只有初始评论，作为后续趋势比较的基线。",
             "evidence_comment_ids": [],
+            "evidence_validation": {
+                "status": "valid",
+                "issues": [],
+                "invalid_ids": [],
+            },
         }
 
     prompt = build_global_trend_prompt(
@@ -207,6 +252,58 @@ def calculate_emotion_distribution(agent_decisions):
     }
 
 
+# 2026/10/12，历史趋势复现观测口径修正，新增功能：单独统计 Agent
+# 实际发表的评论，不再用内部情绪或生成候选评论冒充公众可观测表达。
+def calculate_expression_distribution(agent_decisions):
+    """统计 Agent 本轮实际表达的评论情绪和明确分母。
+
+    ``current_emotion`` 是 Agent 的内部状态；真实采集数据则来自已经发表的
+    评论。二者必须分别统计。表达情绪以最终选中评论的 ``emotion`` 为准，
+    分布分母只包含具有合法三分类标签的实际表达，同时保留沉默和未分类数量。
+    """
+
+    agent_count = len(agent_decisions)
+    expressions = []
+    for record in agent_decisions:
+        decision = record.get("decision", {})
+        selected_comment = decision.get("selected_comment")
+        if decision.get("will_comment") is True and isinstance(
+            selected_comment, dict
+        ):
+            expressions.append(selected_comment)
+
+    counts = {
+        emotion: sum(
+            1 for comment in expressions if comment.get("emotion") == emotion
+        )
+        for emotion in EMOTIONS
+    }
+    classified_count = sum(counts.values())
+    expression_count = len(expressions)
+    distribution = {
+        emotion: {
+            "count": counts[emotion],
+            "rate": (
+                round(counts[emotion] / classified_count, 6)
+                if classified_count
+                else None
+            ),
+        }
+        for emotion in EMOTIONS
+    }
+    return {
+        "agent_count": agent_count,
+        "expression_count": expression_count,
+        "silent_agent_count": agent_count - expression_count,
+        "participation_rate": (
+            round(expression_count / agent_count, 6) if agent_count else 0.0
+        ),
+        "classified_expression_count": classified_count,
+        "unclassified_expression_count": expression_count - classified_count,
+        "distribution": distribution,
+    }
+
+
 # 2026/08/25 第五次联调问题修复，修改功能：无声明时将官方态度指标标为不适用。
 def calculate_attitude_distribution(agent_decisions, statement_status=None):
     """仅使用存在官方声明时的适用Agent计算官方态度分布。"""
@@ -250,6 +347,95 @@ def calculate_attitude_distribution(agent_decisions, statement_status=None):
     }
 
 
+# 2026/10/14，新增功能：把群体趋同作为可观测诊断，而不是实验熔断条件。
+def calculate_attitude_diagnostics(agent_decisions, statement_status=None):
+    """诊断官方态度多样性、同步转向和两个内部判断维度。"""
+
+    statement_applicable = (
+        statement_status != "none"
+        if statement_status is not None
+        else any(
+            record.get("decision", {}).get("official_attitude")
+            != "not_applicable"
+            for record in agent_decisions
+        )
+    )
+    decisions = [
+        record.get("decision", {})
+        for record in agent_decisions
+        if statement_applicable
+        and record.get("decision", {}).get("official_attitude")
+        in OFFICIAL_ATTITUDES
+    ]
+    count = len(decisions)
+
+    attitude_counts = {
+        attitude: sum(
+            decision.get("official_attitude") == attitude
+            for decision in decisions
+        )
+        for attitude in OFFICIAL_ATTITUDES
+    }
+    nonzero_rates = [value / count for value in attitude_counts.values() if value]
+    entropy = -sum(rate * math.log(rate) for rate in nonzero_rates)
+    normalized_entropy = entropy / math.log(len(OFFICIAL_ATTITUDES)) if count else None
+    largest_group_count = max(attitude_counts.values(), default=0)
+
+    transition_reasons = [
+        decision.get("official_attitude_resolution", {}).get(
+            "transition_reason"
+        )
+        for decision in decisions
+    ]
+    changed_count = sum(
+        reason in {"changed_after_threshold", "moved_one_level_only"}
+        for reason in transition_reasons
+    )
+
+    def dimension_distribution(field, values):
+        return {
+            value: {
+                "count": sum(decision.get(field) == value for decision in decisions),
+                "rate": (
+                    round(
+                        sum(decision.get(field) == value for decision in decisions)
+                        / count,
+                        6,
+                    )
+                    if count
+                    else None
+                ),
+            }
+            for value in values
+        }
+
+    return {
+        "applicable_agent_count": count,
+        "largest_attitude_group_count": largest_group_count,
+        "largest_attitude_group_rate": (
+            round(largest_group_count / count, 6) if count else None
+        ),
+        "normalized_attitude_entropy": (
+            round(normalized_entropy, 6)
+            if normalized_entropy is not None
+            else None
+        ),
+        "changed_agent_count": changed_count,
+        "synchronized_transition_rate": (
+            round(changed_count / count, 6) if count else None
+        ),
+        "claim_position_distribution": dimension_distribution(
+            "claim_position",
+            ("accepted", "unresolved", "challenged"),
+        ),
+        "process_evaluation_distribution": dimension_distribution(
+            "process_evaluation",
+            ("satisfied", "partial", "dissatisfied"),
+        ),
+        "diagnostic_only": True,
+    }
+
+
 # 2026/08/25 第五次联调问题修复，修改功能：保存完整情绪分布并按声明状态计算官方态度。
 def calculate_round_metrics(
     event_context,
@@ -269,7 +455,17 @@ def calculate_round_metrics(
         "agent_emotion_distribution": calculate_emotion_distribution(
             successful_decisions
         ),
+        "agent_expression_distribution": calculate_expression_distribution(
+            successful_decisions
+        ),
         "official_attitude_distribution": calculate_attitude_distribution(
+            successful_decisions,
+            event_context.get("current_state", {}).get(
+                "official_statement_status",
+                "none",
+            ),
+        ),
+        "official_attitude_diagnostics": calculate_attitude_diagnostics(
             successful_decisions,
             event_context.get("current_state", {}).get(
                 "official_statement_status",

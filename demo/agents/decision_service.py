@@ -12,6 +12,7 @@ from agents.decision_engine import (
     build_allowed_choices,
     build_decision_prompt,
     build_final_decision,
+    build_generated_expression_comment,
     select_best_candidate,
     validate_cognition_decision,
 )
@@ -19,6 +20,9 @@ from simulation.event_context import load_event_context
 from infrastructure.json_storage import load_json, save_json
 from infrastructure.llm_service import call_deepseek_json
 from agents.persona_repository import load_first_persona
+from agents.historical_participation import (
+    apply_historical_participation_policy,
+)
 from project_config import (
     COMMENT_POOL_FILE,
     COMMENT_SELECTION_SEED,
@@ -28,6 +32,10 @@ from project_config import (
     POLICY_FILE,
     SINGLE_LLM_RESULT_FILE,
 )
+from simulation.options import uses_evidence_based_emotions
+
+
+HISTORICAL_DECISION_TEMPERATURE = 0.1
 
 
 # 2026/08/21 新增功能：只根据个人可见评论生成Agent认知决策。
@@ -39,12 +47,13 @@ def decide_agent_cognition(
     previous_state,
     history_summary,
 ):
-    """调用LLM决定情绪、官方态度、评论意愿和评论派系。"""
+    """调用LLM形成认知说明；历史官方态度由个体规则预先裁决。"""
     choices = build_allowed_choices(
         event_context,
         policy,
         visible_comments,
         persona,
+        previous_state,
     )
     prompt = build_decision_prompt(
         event_context,
@@ -53,10 +62,13 @@ def decide_agent_cognition(
         previous_state,
         history_summary,
     )
+    evidence_based = uses_evidence_based_emotions(event_context)
     cognition_decision = call_deepseek_json(
         prompt,
         "你必须严格遵守允许选项，只返回一个合法 JSON 对象。",
-        temperature=0,
+        # 2026/10/14，修改功能：历史复现用于机制评测，需要降低相同输入
+        # 下的随机漂移；五策略继续保留原有 0.3，不改变既有实验行为。
+        temperature=HISTORICAL_DECISION_TEMPERATURE if evidence_based else 0.3,
         max_tokens=1500,
         # 2026/09/04 Demo性能基线，新增功能：标记Agent认知决策请求类型。
         request_type="agent_decision",
@@ -71,7 +83,7 @@ def decide_one_agent(
     visible_comments,
     state_store,
 ):
-    """先形成Agent认知，再从个人可见评论中选择最终表达。"""
+    """形成Agent认知；历史复现原创表达，五策略沿用候选评论选择。"""
     event_id = event_context["event_id"]
     step = event_context["current_state"]["step"]
     agent_id = persona["agent_id"]
@@ -86,40 +98,48 @@ def decide_one_agent(
         previous_state,
         history_summary,
     )
+    if uses_evidence_based_emotions(event_context):
+        # 2026/10/12，历史复现发言决策：内部状态先独立形成，再根据
+        # 新证据、状态变化、表达重复和连续发言疲劳判断是否公开表达。
+        # 该后置门控不改写情绪或官方态度，也不进入五策略路径。
+        cognition_decision = apply_historical_participation_policy(
+            cognition_decision,
+            persona,
+            event_context,
+            visible_comments,
+            previous_state,
+            history_summary,
+        )
 
     selected_comment = None
     scored_candidates = []
     no_fresh_candidate = False
     if cognition_decision["will_comment"]:
-        # 2026/08/25 第八次联调问题修复，新增功能：从个人历史提取已发表评论，避免本轮重复选择。
-        own_comment_history = history_summary.get("own_comment_history", [])
-        excluded_comment_ids = {
-            item.get("comment_id")
-            for item in own_comment_history
-            if isinstance(item, dict) and item.get("comment_id")
-        }
-        excluded_comment_texts = {
-            item.get("text")
-            for item in own_comment_history
-            if isinstance(item, dict) and item.get("text")
-        }
-        # 2026/08/25 第五次联调问题修复，修改功能：让最终评论优先匹配本轮官方态度。
-        # 2026/08/25 第六次联调问题修复，修改功能：从评分最高的三条评论中进行可复现选择。
-        # 2026/9/5，社交网络传播，修改功能：最终表达严格限制在本轮个人可见评论中。
-        selected_comment, scored_candidates = select_best_candidate(
-            visible_comments,
-            event_context,
-            persona,
-            cognition_decision["current_emotion"],
-            cognition_decision["comment_faction"],
-            cognition_decision["official_attitude"],
-            COMMENT_SELECTION_TOP_K,
-            COMMENT_SELECTION_SEED,
-            excluded_comment_ids,
-            excluded_comment_texts,
-        )
+        if uses_evidence_based_emotions(event_context):
+            # 2026/10/12，历史复现原创表达：复用认知决策的同一次LLM
+            # 调用，不额外增加请求；评论池只提供个人舆情环境。
+            selected_comment = build_generated_expression_comment(
+                cognition_decision,
+                event_context,
+                persona,
+            )
+            scored_candidates = [
+                {
+                    "comment_id": selected_comment["comment_id"],
+                    "score": 1.0,
+                }
+            ]
+        else:
+            selected_comment, scored_candidates = _select_legacy_comment(
+                cognition_decision,
+                visible_comments,
+                event_context,
+                persona,
+                history_summary,
+            )
         if selected_comment is None:
-            # 2026/08/25 第八次联调问题修复，修改功能：没有新候选时结束评论行为，不回退到个人旧评论。
+            # 五策略没有新候选时结束评论行为；历史原创表达在此前已校验，
+            # 不会进入这个兼容分支。
             cognition_decision = dict(cognition_decision)
             cognition_decision["will_comment"] = False
             cognition_decision["comment_faction"] = None
@@ -128,11 +148,13 @@ def decide_one_agent(
             cognition_decision["decision_reason"] = reason
             no_fresh_candidate = True
 
-    if selected_comment is not None and selected_comment.get(
-        "comment_id"
-    ) not in {
-        comment.get("comment_id") for comment in visible_comments
-    }:
+    if (
+        selected_comment is not None
+        and not uses_evidence_based_emotions(event_context)
+        and selected_comment.get("comment_id") not in {
+            comment.get("comment_id") for comment in visible_comments
+        }
+    ):
         raise ValueError("Agent最终表达不在个人可见评论范围内。")
 
     decision = build_final_decision(
@@ -141,16 +163,62 @@ def decide_one_agent(
         scored_candidates,
         len(visible_comments),
     )
-    if no_fresh_candidate:
+    if uses_evidence_based_emotions(event_context):
+        decision["selection_source"] = (
+            "agent_original_expression"
+            if decision["will_comment"]
+            else "agent_silence"
+        )
+    elif no_fresh_candidate:
         decision["selection_source"] = "no_fresh_candidate"
     return {
         "event_id": event_id,
         "step": step,
         "agent_id": agent_id,
-        "decision_method": "constrained_llm",
+        "decision_method": (
+            "rule_attitude_constrained_llm"
+            if uses_evidence_based_emotions(event_context)
+            else "constrained_llm"
+        ),
         "status": "success",
         "decision": decision,
     }
+
+
+def _select_legacy_comment(
+    cognition_decision,
+    visible_comments,
+    event_context,
+    persona,
+    history_summary,
+):
+    """保留五策略原有候选评论选择，避免历史机制影响策略实验。"""
+
+    # 2026/08/25 第八次联调问题修复：从个人历史提取已发表评论，
+    # 避免五策略路径在本轮重复选择。
+    own_comment_history = history_summary.get("own_comment_history", [])
+    excluded_comment_ids = {
+        item.get("comment_id")
+        for item in own_comment_history
+        if isinstance(item, dict) and item.get("comment_id")
+    }
+    excluded_comment_texts = {
+        item.get("text")
+        for item in own_comment_history
+        if isinstance(item, dict) and item.get("text")
+    }
+    return select_best_candidate(
+        visible_comments,
+        event_context,
+        persona,
+        cognition_decision["current_emotion"],
+        cognition_decision["comment_faction"],
+        cognition_decision["official_attitude"],
+        COMMENT_SELECTION_TOP_K,
+        COMMENT_SELECTION_SEED,
+        excluded_comment_ids,
+        excluded_comment_texts,
+    )
 
 
 def run_single_agent(persona=None):

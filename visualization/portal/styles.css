@@ -1,0 +1,51 @@
+:root {
+  --ink: #eaf4ff;
+  --muted: #9bb0c7;
+  --line: rgba(164, 207, 255, .18);
+  --blue: #4b8fff;
+  --teal: #42d7c5;
+  --orange: #ff9b4a;
+}
+* { box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(44, 113, 218, .25), transparent 32%),
+    radial-gradient(circle at 85% 70%, rgba(31, 189, 164, .2), transparent 30%),
+    linear-gradient(145deg, #071426, #0b223c 56%, #0a3541);
+}
+.portal-shell { width: min(1180px, 92vw); margin: 0 auto; padding: 70px 0; }
+header { max-width: 760px; margin-bottom: 42px; }
+.eyebrow, .tag { margin: 0 0 10px; color: #78b5ff; font-size: 11px; font-weight: 800; letter-spacing: .18em; }
+h1 { margin: 0; font-size: clamp(42px, 6vw, 70px); letter-spacing: .04em; }
+.subtitle { margin: 16px 0 0; color: #b8cee2; font-size: 17px; line-height: 1.7; }
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.mode-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 430px;
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(8, 28, 50, .72);
+  box-shadow: 0 28px 70px rgba(0, 7, 18, .28);
+  backdrop-filter: blur(15px);
+}
+.mode-card::after { content: ""; position: absolute; inset: auto -80px -90px auto; width: 260px; height: 260px; border-radius: 50%; background: rgba(77, 143, 255, .12); }
+.mode-card.historical::after { background: rgba(66, 215, 197, .12); }
+.mode-number { position: absolute; top: 25px; right: 30px; color: rgba(255,255,255,.08); font-size: 72px; font-weight: 900; }
+.mode-card h2 { margin: 0 0 14px; font-size: 32px; }
+.mode-card > p:not(.tag) { min-height: 76px; color: var(--muted); line-height: 1.8; }
+.historical .tag { color: var(--teal); }
+label { display: grid; gap: 8px; margin-top: 28px; color: #b8cee2; font-size: 12px; }
+select { width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; color: white; background: #0a2039; }
+.meta { min-height: 46px; padding: 10px 0; color: #89a2bb; font-size: 12px; line-height: 1.6; }
+button { position: relative; z-index: 1; width: 100%; margin-top: 12px; padding: 14px; border: 0; border-radius: 12px; color: white; background: linear-gradient(90deg, #276ed8, #4a91ff); font-weight: 800; cursor: pointer; }
+.historical button { background: linear-gradient(90deg, #148d84, #28b9aa); }
+button:disabled { cursor: not-allowed; opacity: .45; }
+.notice { margin-bottom: 20px; padding: 13px 16px; border: 1px solid rgba(255,120,120,.35); border-radius: 12px; color: #ffd0d0; background: rgba(124, 27, 43, .28); }
+.hidden { display: none; }
+@media (max-width: 800px) { .portal-shell { padding: 42px 0; } .mode-grid { grid-template-columns: 1fr; } }

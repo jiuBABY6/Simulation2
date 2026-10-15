@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_7895256180",
+  "source_user_id": "7895256180",
+  "identity": {
+    "gender": "f",
+    "location": "河南",
+    "verified": true,
+    "followers_count": 136000
+  },
+  "action_preference": {
+    "original_preference": 0.977513,
+    "repost_preference": 0.022487
+  },
+  "topic_preference": {
+    "社会事件": 0.426165,
+    "新闻时事": 0.007929,
+    "娱乐": 0.061117,
+    "其他": 0.50479
+  },
+  "information_orientation": {
+    "fact_rate": 0.173769,
+    "opinion_rate": 0.652461,
+    "questioning_rate": 0.173769
+  },
+  "emotion_expression": {
+    "positive_rate": 0.04592,
+    "neutral_rate": 0.343244,
+    "negative_rate": 0.610836
+  },
+  "data_info": {
+    "total_posts": 3024,
+    "topic_sample_count": 3023,
+    "expression_sample_count": 3024,
+    "faction_sample_count": 2674
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.296006,
+    "表态判断派": 0.076148,
+    "情绪激进派": 0.16648,
+    "矛盾激化派": 0.154162,
+    "吃瓜派": 0.307204
+  }
+}

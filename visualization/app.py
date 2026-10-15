@@ -1,27 +1,43 @@
-"""启动无需第三方依赖的历史趋势复现本地网页。"""
+"""统一可视化入口：路由历史复现、五策略和共享网络页面。"""
 
 from __future__ import annotations
 
 import argparse
 import json
 import mimetypes
+import sys
 import webbrowser
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from comparison_service import compare_negative_trends
-from config import DEFAULT_HOST, DEFAULT_PORT, REAL_DATA_PATH, STATIC_DIR
-from simulation_data_loader import list_experiments, load_experiment
+# 支持现有的 ``python visualization/app.py`` 启动方式，同时统一使用包导入。
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-
-def _load_real_trend() -> dict[str, object]:
-    if not REAL_DATA_PATH.is_file():
-        raise FileNotFoundError(
-            "缺少处理后的真实趋势数据，请先运行 python visualization/real_data_processor.py"
-        )
-    return json.loads(REAL_DATA_PATH.read_text(encoding="utf-8"))
+from visualization.config import (
+    DEFAULT_HOST,
+    DEFAULT_PORT,
+    HISTORICAL_STATIC_DIR,
+    NETWORK_STATIC_DIR,
+    PORTAL_DIR,
+    STRATEGY_STATIC_DIR,
+)
+from visualization.historical.service import (
+    build_comparison as build_historical_comparison,
+    load_dashboard as load_historical_dashboard,
+    load_reference_for_request,
+)
+from visualization.historical.real_trend_repository import list_real_trends
+from visualization.shared.experiment_catalog import list_experiments
+from visualization.shared.network.service import (
+    build_comment_cascade,
+    build_comment_catalog,
+    build_network_view,
+    build_report_summary,
+)
+from visualization.strategy.service import load_dashboard as load_strategy_dashboard
 
 
 class VisualizationHandler(BaseHTTPRequestHandler):
@@ -40,9 +56,10 @@ class VisualizationHandler(BaseHTTPRequestHandler):
             {"error": str(error)}, status=HTTPStatus.INTERNAL_SERVER_ERROR
         )
 
-    def _serve_static(self, relative_path: str) -> None:
-        requested = (STATIC_DIR / relative_path).resolve()
-        if STATIC_DIR.resolve() not in requested.parents and requested != STATIC_DIR.resolve():
+    def _serve_static(self, static_dir: Path, relative_path: str) -> None:
+        static_root = static_dir.resolve()
+        requested = (static_dir / relative_path).resolve()
+        if static_root not in requested.parents and requested != static_root:
             self.send_error(HTTPStatus.FORBIDDEN)
             return
         if not requested.is_file():
@@ -51,47 +68,133 @@ class VisualizationHandler(BaseHTTPRequestHandler):
         content = requested.read_bytes()
         content_type, _ = mimetypes.guess_type(requested.name)
         self.send_response(HTTPStatus.OK)
-        self.send_header("Content-Type", f"{content_type or 'application/octet-stream'}; charset=utf-8")
+        media_type = content_type or "application/octet-stream"
+        self.send_header("Content-Type", f"{media_type}; charset=utf-8")
         self.send_header("Content-Length", str(len(content)))
         self.end_headers()
         self.wfile.write(content)
 
-    # 2026/09/02 历史趋势可视化，新增功能：提供只读实验、真实趋势和对照接口。
+    # 三层可视化 API：业务页面各自拥有命名空间，网络分析保持共享。
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
         try:
-            if parsed.path == "/api/experiments":
-                self._send_json({"experiments": list_experiments()})
+            if parsed.path == "/api/catalog":
+                mode = parse_qs(parsed.query).get("mode", [""])[0] or None
+                self._send_json(
+                    {"experiments": list_experiments(mode=mode)}
+                )
                 return
-            if parsed.path == "/api/real-trend":
-                self._send_json(_load_real_trend())
+            if parsed.path == "/api/historical/real-trends":
+                self._send_json({"real_trends": list_real_trends()})
                 return
-            if parsed.path in {"/api/dashboard", "/api/comparison"}:
-                experiment_id = parse_qs(parsed.query).get("experiment_id", [""])[0]
+            if parsed.path == "/api/historical/real-trend":
+                query = parse_qs(parsed.query)
+                self._send_json(
+                    load_reference_for_request(
+                        experiment_id=query.get("experiment_id", [""])[0],
+                        event_id=query.get("event_id", [""])[0],
+                    )
+                )
+                return
+            if parsed.path in {
+                "/api/historical/dashboard",
+                "/api/historical/comparison",
+            }:
+                experiment_id = parse_qs(parsed.query).get(
+                    "experiment_id", [""]
+                )[0]
                 if not experiment_id:
                     raise ValueError("缺少 experiment_id")
-                simulation = load_experiment(experiment_id)
-                if parsed.path == "/api/dashboard":
-                    self._send_json(simulation)
+                if parsed.path == "/api/historical/dashboard":
+                    self._send_json(load_historical_dashboard(experiment_id))
                 else:
+                    self._send_json(build_historical_comparison(experiment_id))
+                return
+            if parsed.path == "/api/strategy/dashboard":
+                experiment_id = parse_qs(parsed.query).get(
+                    "experiment_id", [""]
+                )[0]
+                if not experiment_id:
+                    raise ValueError("缺少 experiment_id")
+                self._send_json(load_strategy_dashboard(experiment_id))
+                return
+            if parsed.path in {
+                "/api/network/report",
+                "/api/network/view",
+                "/api/network/comments",
+                "/api/network/cascade",
+            }:
+                query = parse_qs(parsed.query)
+                experiment_id = query.get("experiment_id", [""])[0]
+                if not experiment_id:
+                    raise ValueError("缺少 experiment_id")
+                scenario_id = query.get("scenario", [""])[0] or None
+                if parsed.path == "/api/network/report":
+                    self._send_json(build_report_summary(experiment_id))
+                elif parsed.path == "/api/network/view":
+                    raw_step = query.get("step", [""])[0]
+                    step = int(raw_step) if raw_step else None
                     self._send_json(
-                        compare_negative_trends(simulation, _load_real_trend())
+                        build_network_view(experiment_id, scenario_id, step)
+                    )
+                elif parsed.path == "/api/network/comments":
+                    self._send_json(
+                        build_comment_catalog(experiment_id, scenario_id)
+                    )
+                else:
+                    comment_id = query.get("comment_id", [""])[0]
+                    self._send_json(
+                        build_comment_cascade(
+                            experiment_id, scenario_id, comment_id
+                        )
                     )
                 return
             if parsed.path in {"/", "/index.html"}:
-                self._serve_static("index.html")
+                self._serve_static(PORTAL_DIR, "index.html")
                 return
-            self._serve_static(parsed.path.lstrip("/"))
-        except (OSError, ValueError, json.JSONDecodeError) as error:
+            if parsed.path.startswith("/portal/"):
+                self._serve_static(
+                    PORTAL_DIR, parsed.path.removeprefix("/portal/")
+                )
+                return
+            if parsed.path in {"/historical", "/historical/"}:
+                self._serve_static(HISTORICAL_STATIC_DIR, "index.html")
+                return
+            if parsed.path.startswith("/historical/"):
+                self._serve_static(
+                    HISTORICAL_STATIC_DIR,
+                    parsed.path.removeprefix("/historical/"),
+                )
+                return
+            if parsed.path in {"/strategy", "/strategy/"}:
+                self._serve_static(STRATEGY_STATIC_DIR, "index.html")
+                return
+            if parsed.path.startswith("/strategy/"):
+                self._serve_static(
+                    STRATEGY_STATIC_DIR,
+                    parsed.path.removeprefix("/strategy/"),
+                )
+                return
+            if parsed.path in {"/network", "/network/"}:
+                self._serve_static(NETWORK_STATIC_DIR, "index.html")
+                return
+            if parsed.path.startswith("/network/"):
+                self._serve_static(
+                    NETWORK_STATIC_DIR,
+                    parsed.path.removeprefix("/network/"),
+                )
+                return
+            self.send_error(HTTPStatus.NOT_FOUND)
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
             self._send_error_json(error)
 
     def log_message(self, format_string: str, *args: object) -> None:
         print(f"[可视化] {format_string % args}")
 
 
-# 2026/09/02 历史趋势可视化，新增功能：启动隔离的本地只读展示服务。
+# 2026/10/10，三层可视化共用一个只读 HTTP 入口。
 def main() -> None:
-    parser = argparse.ArgumentParser(description="历史趋势复现数据展示")
+    parser = argparse.ArgumentParser(description="舆情模拟统一可视化入口")
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--no-browser", action="store_true")
@@ -99,8 +202,8 @@ def main() -> None:
 
     server = ThreadingHTTPServer((args.host, args.port), VisualizationHandler)
     url = f"http://{args.host}:{args.port}"
-    print(f"历史趋势复现可视化已启动：{url}")
-    print("按 Ctrl+C 停止服务。历史实验文件始终以只读方式加载。")
+    print(f"舆情模拟统一可视化已启动：{url}")
+    print("按 Ctrl+C 停止服务。实验文件始终以只读方式加载。")
     if not args.no_browser:
         webbrowser.open(url)
     try:

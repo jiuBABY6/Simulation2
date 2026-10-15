@@ -29,8 +29,57 @@ def _normalize_string_list(values):
     )
 
 
+def _collect_cited_neighbor_lineage(selected_comment, agent_view):
+    """汇总原创表达明确引用的邻居表达谱系。
+
+    历史复现的 Agent 会生成原创文字，不会把邻居评论对象直接作为最终
+    表达。因此必须用原创表达的 evidence_ids 回查个人可见评论；只有
+    明确引用且来源为 neighbor_propagation 的评论才构成传播父节点。
+    """
+
+    if not isinstance(selected_comment, dict) or not isinstance(
+        agent_view,
+        dict,
+    ):
+        return None
+    evidence_ids = set(
+        _normalize_string_list(selected_comment.get("evidence_ids"))
+    )
+    if not evidence_ids:
+        return None
+
+    parent_ids = []
+    root_ids = []
+    depths = []
+    for comment in agent_view.get("visible_comments", []):
+        if (
+            not isinstance(comment, dict)
+            or comment.get("source_type") != "neighbor_propagation"
+            or comment.get("comment_id") not in evidence_ids
+        ):
+            continue
+        parent_ids.extend(
+            _normalize_string_list(comment.get("source_expression_ids", []))
+        )
+        roots = _normalize_string_list(comment.get("root_expression_ids", []))
+        root_ids.extend(roots)
+        depth = comment.get("propagation_depth")
+        if isinstance(depth, int) and not isinstance(depth, bool) and depth >= 1:
+            depths.append(depth)
+
+    parent_ids = list(dict.fromkeys(parent_ids))
+    if not parent_ids:
+        return None
+    root_ids = list(dict.fromkeys(root_ids)) or parent_ids.copy()
+    return {
+        "depth": max(depths, default=1),
+        "parent_ids": parent_ids,
+        "root_ids": root_ids,
+    }
+
+
 # 2026/9/5，社交网络传播第二阶段A，新增功能：为Agent实际表达补充传播层级和父表达信息。
-def attach_expression_lineage(result):
+def attach_expression_lineage(result, agent_view=None):
     """返回补充表达编号、传播深度和父表达编号的决策结果。"""
     if not isinstance(result, dict) or result.get("status") != "success":
         return result
@@ -57,7 +106,14 @@ def attach_expression_lineage(result):
         result.get("agent_id"),
         comment.get("comment_id"),
     )
-    if comment.get("source_type") == "neighbor_propagation":
+    cited_lineage = _collect_cited_neighbor_lineage(comment, agent_view)
+    if cited_lineage is not None:
+        # 2026/10/12，历史原创表达传播谱系：原创表达引用邻居评论时，
+        # 继承直接父表达与根表达；传播深度使用被引用路径中的最深层级。
+        depth = cited_lineage["depth"]
+        parent_ids = cited_lineage["parent_ids"]
+        root_ids = cited_lineage["root_ids"]
+    elif comment.get("source_type") == "neighbor_propagation":
         depth = comment.get("propagation_depth", 1)
         if isinstance(depth, bool) or not isinstance(depth, int) or depth < 1:
             depth = 1
@@ -115,6 +171,12 @@ def build_propagation_events(agent_views, decision_results):
         result = decisions_by_agent.get(target_agent_id, {})
         decision = result.get("decision", {})
         selected_comment_id = decision.get("selected_comment_id")
+        selected_comment = decision.get("selected_comment", {})
+        expression_evidence_ids = set(
+            selected_comment.get("evidence_ids", [])
+            if isinstance(selected_comment, dict)
+            else []
+        )
         resulting_expression_id = decision.get("expression_id")
 
         for comment in view.get("visible_comments", []):
@@ -134,7 +196,12 @@ def build_propagation_events(agent_views, decision_results):
                 if propagation_event_id in seen_event_ids:
                     continue
                 seen_event_ids.add(propagation_event_id)
-                was_selected = selected_comment_id == comment_id
+                # 2026/10/12，历史原创表达不再逐字选择邻居评论；只要原创
+                # 表达显式引用该邻居评论，就视为一次有效的继续传播。
+                was_selected = (
+                    selected_comment_id == comment_id
+                    or comment_id in expression_evidence_ids
+                )
                 events.append(
                     {
                         "propagation_event_id": propagation_event_id,

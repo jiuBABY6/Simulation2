@@ -17,12 +17,24 @@ STATE_FIELDS = (
     "official_statement",
     "official_statement_status",
 )
+OPTIONAL_STATE_FIELDS = (
+    "public_context",
+    "public_context_timing",
+    "objective_event_context",
+    "objective_event_timing",
+    "simulation_mode",
+)
 
 
 def append_event_state_record(
     event_input,
     official_statement="",
     official_statement_status="none",
+    public_context=None,
+    public_context_timing=None,
+    objective_event_context=None,
+    objective_event_timing=None,
+    simulation_mode=None,
     state_file=EVENT_STATE_FILE,
 ):
     """追加当前时间步的事件状态记录。
@@ -32,6 +44,11 @@ def append_event_state_record(
         official_statement：本轮人工输入的官方声明，没有声明时传空字符串。
         official_statement_status：本轮人工选择的声明类型，只能是 none、clear、
             incomplete 或 conflict。
+        public_context：条件化历史回放的本轮公众语境。
+        public_context_timing：该语境对应的阶段与时间范围。
+        objective_event_context：可选的本轮客观事件，只由历史复现入口传入。
+        objective_event_timing：可选的客观事件阶段和时间范围。
+        simulation_mode：可选运行模式标记。
         state_file：事件状态历史 JSON 文件路径。
 
     返回：
@@ -58,6 +75,31 @@ def append_event_state_record(
         "official_statement": normalize_text(official_statement),
         "official_statement_status": official_statement_status,
     }
+    if public_context is not None:
+        if not isinstance(public_context, dict):
+            raise ValueError("public_context 必须是 JSON 对象。")
+        state_record["public_context"] = dict(public_context)
+    if public_context_timing is not None:
+        if not isinstance(public_context_timing, dict):
+            raise ValueError("public_context_timing 必须是 JSON 对象。")
+        state_record["public_context_timing"] = dict(public_context_timing)
+    if objective_event_context is not None:
+        if not isinstance(objective_event_context, dict):
+            raise ValueError("objective_event_context 必须是 JSON 对象。")
+        state_record["objective_event_context"] = dict(
+            objective_event_context
+        )
+    if objective_event_timing is not None:
+        if not isinstance(objective_event_timing, dict):
+            raise ValueError("objective_event_timing 必须是 JSON 对象。")
+        state_record["objective_event_timing"] = dict(
+            objective_event_timing
+        )
+    if simulation_mode is not None:
+        normalized_mode = str(simulation_mode).strip()
+        if not normalized_mode:
+            raise ValueError("simulation_mode 不能为空。")
+        state_record["simulation_mode"] = normalized_mode
 
     history.append(state_record)
     history.sort(key=lambda item: (item["event_id"], item["step"]))
@@ -91,9 +133,11 @@ def load_event_state_history(state_file=EVENT_STATE_FILE, event_id=None):
             continue
         if event_id is not None and record["event_id"] != event_id:
             continue
-        normalized.append(
-            {field: record[field] for field in STATE_FIELDS}
-        )
+        normalized_record = {field: record[field] for field in STATE_FIELDS}
+        for field in OPTIONAL_STATE_FIELDS:
+            if field in record:
+                normalized_record[field] = record[field]
+        normalized.append(normalized_record)
 
     normalized.sort(key=lambda item: (item["event_id"], item["step"]))
     return normalized
@@ -118,6 +162,24 @@ def is_valid_state_record(record):
     if not isinstance(record.get("step"), int) or record["step"] < 1:
         return False
     if record.get("official_statement_status") not in VALID_STATEMENT_STATUS:
+        return False
+    if "objective_event_context" in record and not isinstance(
+        record["objective_event_context"], dict
+    ):
+        return False
+    if "public_context" in record and not isinstance(
+        record["public_context"], dict
+    ):
+        return False
+    if "public_context_timing" in record and not isinstance(
+        record["public_context_timing"], dict
+    ):
+        return False
+    if "objective_event_timing" in record and not isinstance(
+        record["objective_event_timing"], dict
+    ):
+        return False
+    if "simulation_mode" in record and not str(record["simulation_mode"]).strip():
         return False
     return True
 

@@ -1,0 +1,111 @@
+{
+  "version": "policy_v0.1",
+  "reference_population_size": 61,
+  "band_definition": {
+    "low": "value < p25",
+    "medium": "p25 <= value < p75",
+    "high": "value >= p75"
+  },
+  "topic_quantiles": {
+    "社会事件": {
+      "p25": 0.122074,
+      "p50": 0.217503,
+      "p75": 0.297297
+    },
+    "新闻时事": {
+      "p25": 0.0625,
+      "p50": 0.186567,
+      "p75": 0.268817
+    },
+    "娱乐": {
+      "p25": 0.065538,
+      "p50": 0.17629,
+      "p75": 0.25
+    },
+    "其他": {
+      "p25": 0.15873,
+      "p50": 0.25,
+      "p75": 0.409341
+    }
+  },
+  "orientation_quantiles": {
+    "fact_rate": {
+      "p25": 0.261261,
+      "p50": 0.337629,
+      "p75": 0.684823
+    },
+    "opinion_rate": {
+      "p25": 0.211838,
+      "p50": 0.440066,
+      "p75": 0.63881
+    },
+    "questioning_rate": {
+      "p25": 0.038863,
+      "p50": 0.083744,
+      "p75": 0.152017
+    }
+  },
+  "emotion_quantiles": {
+    "positive_rate": {
+      "p25": 0.214641,
+      "p50": 0.328498,
+      "p75": 0.476038
+    },
+    "neutral_rate": {
+      "p25": 0.268263,
+      "p50": 0.334573,
+      "p75": 0.459637
+    },
+    "negative_rate": {
+      "p25": 0.141692,
+      "p50": 0.237644,
+      "p75": 0.378583
+    }
+  },
+  "action_preference_rule": {
+    "strong_preference_gap": 0.9908680000000001
+  },
+  "candidate_rules": {
+    "emotion": {
+      "positive": [
+        "neutral",
+        "positive"
+      ],
+      "neutral": [
+        "neutral"
+      ],
+      "negative": [
+        "neutral",
+        "negative"
+      ]
+    },
+    "official_statement": {
+      "none": {
+        "default": [
+          "not_applicable"
+        ]
+      },
+      "clear": {
+        "default": [
+          "accept",
+          "wait",
+          "question"
+        ]
+      },
+      "incomplete": {
+        "default": [
+          "accept",
+          "wait",
+          "question"
+        ]
+      },
+      "conflict": {
+        "default": [
+          "accept",
+          "wait",
+          "question"
+        ]
+      }
+    }
+  }
+}

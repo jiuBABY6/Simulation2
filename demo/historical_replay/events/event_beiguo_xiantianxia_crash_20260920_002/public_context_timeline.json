@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "event_id": "event_beiguo_xiantianxia_crash_20260920_002",
+  "steps": [
+    {
+      "step": 1,
+      "period": "2026.09.20 17:00-21:38",
+      "phase": "事故发生及通报前信息传播",
+      "verified_updates": [
+        {
+          "evidence_id": "verified_001_incident",
+          "update_kind": "confirmed_fact",
+          "evidence_strength": "strong",
+          "evidence_target": "event_outcome",
+          "content": "现场视频显示车辆冲入商场入口，事故原因、人员伤情和责任认定尚无权威结论。",
+          "source_refs": ["event_input.json"]
+        }
+      ],
+      "public_discourse": [
+        {
+          "context_id": "public_001_safety_and_humor",
+          "content": "讨论同时关注公共安全、保险赔付和车辆技术，也出现以玩梗和黑色幽默消解严肃性的表达。",
+          "source_refs": ["real_trend_source.xlsx:Sheet1:row3"],
+          "status": "ongoing_discussion",
+          "unresolved_concern": true
+        }
+      ],
+      "positive_evidence": [
+        {
+          "evidence_id": "positive_001_humor",
+          "content": "部分公众以幽默表达缓解突发事故带来的紧张感。",
+          "source_refs": ["real_trend_source.xlsx:Sheet1:row3"],
+          "target": "public_discourse"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "period": "2026.09.20 21:38-2026.09.21 09:38",
+      "phase": "通告发布后12小时内",
+      "verified_updates": [
+        {
+          "evidence_id": "verified_002_notice",
+          "update_kind": "final_conclusion",
+          "evidence_strength": "strong",
+          "evidence_target": "fact_clarification",
+          "claim_id": "official_statement_step_2",
+          "content": "警方通报车辆因操作不当失控，造成两人轻微受伤，并排除酒驾、毒驾嫌疑。",
+          "source_refs": ["official_response_timeline.json:step2"]
+        }
+      ],
+      "public_discourse": [
+        {
+          "context_id": "public_002_technical_questions",
+          "content": "公众继续讨论主动刹车、保险赔付和驾驶安全，并对事故原因的技术细节保持追问。",
+          "source_refs": ["real_trend_source.xlsx:Sheet1:row4"],
+          "status": "public_question",
+          "unresolved_concern": true
+        }
+      ],
+      "positive_evidence": [
+        {
+          "evidence_id": "positive_002_no_serious_injury",
+          "content": "伤者无大碍以及警方及时通报，为庆幸和有限认可提供了事实依据。",
+          "source_refs": ["official_response_timeline.json:step2"],
+          "target": "official_response"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "period": "2026.09.21 09:38以后",
+      "phase": "通告发布12小时以后",
+      "verified_updates": [],
+      "public_discourse": [
+        {
+          "context_id": "public_003_continued_questions",
+          "content": "讨论继续聚焦驾驶行为、主动刹车系统、车辆安全、事故责任和信息透明度，同时仍存在围观、调侃和玩梗表达。",
+          "source_refs": [
+            "real_trend_source.xlsx:Sheet1:row5"
+          ],
+          "status": "ongoing_discussion",
+          "unresolved_concern": true
+        }
+      ],
+      "positive_evidence": [
+        {
+          "evidence_id": "positive_003_safety_recognition",
+          "content": "部分公众继续表达对无人重伤的庆幸，并对车辆被动安全表现给予有限认可。",
+          "source_refs": [
+            "real_trend_source.xlsx:Sheet1:row5"
+          ],
+          "target": "public_discourse"
+        }
+      ]
+    }
+  ]
+}

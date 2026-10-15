@@ -2,6 +2,7 @@
 
 from infrastructure.json_storage import load_json
 from project_config import EVENT_FILE, EVENT_STATE_FILE
+from simulation.options import normalize_simulation_options
 
 
 # 2026/08/28 第十七次联调修复-修复证据时间语义，新增功能：根据状态历史计算当前声明的首次发布轮次和持续时间。
@@ -93,6 +94,8 @@ def load_event_context(event_file=EVENT_FILE, event_state_file=EVENT_STATE_FILE)
         "event_id": event_input["event_id"],
         "event_content": event_input.get("event_content", ""),
         "event_labels": event_input.get("event_labels", {}),
+        # 2026/10/9，新增功能：事件级开关随上下文传递；未配置事件返回兼容默认值。
+        "simulation_options": normalize_simulation_options(event_input),
         "current_state": event_state,
     }
 
@@ -136,4 +139,5 @@ def validate_event_input(event_input):
         raise ValueError("事件必须包含 event_id。")
     if not event_input.get("event_content"):
         raise ValueError("事件必须包含 event_content。")
+    normalize_simulation_options(event_input)
     return event_input

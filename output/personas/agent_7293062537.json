@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_7293062537",
+  "source_user_id": "7293062537",
+  "identity": {
+    "gender": "m",
+    "location": "北京 海淀区",
+    "verified": true,
+    "followers_count": 1970000
+  },
+  "action_preference": {
+    "original_preference": 0.968421,
+    "repost_preference": 0.031579
+  },
+  "topic_preference": {
+    "社会事件": 0.060606,
+    "新闻时事": 0.313131,
+    "娱乐": 0.191919,
+    "其他": 0.434343
+  },
+  "information_orientation": {
+    "fact_rate": 0.581633,
+    "opinion_rate": 0.316327,
+    "questioning_rate": 0.102041
+  },
+  "emotion_expression": {
+    "positive_rate": 0.163265,
+    "neutral_rate": 0.795918,
+    "negative_rate": 0.040816
+  },
+  "data_info": {
+    "total_posts": 95,
+    "topic_sample_count": 95,
+    "expression_sample_count": 95,
+    "faction_sample_count": 95
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.4,
+    "表态判断派": 0.02,
+    "情绪激进派": 0.01,
+    "矛盾激化派": 0.01,
+    "吃瓜派": 0.56
+  }
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>舆情模拟可视化</title>
+  <link rel="stylesheet" href="/portal/styles.css">
+</head>
+<body>
+  <main class="portal-shell">
+    <header>
+      <p class="eyebrow">PUBLIC OPINION SIMULATION · READ ONLY</p>
+      <h1>选择分析模式</h1>
+      <p class="subtitle">统一读取已有实验结果；页面不会调用大模型，也不会修改模拟数据。</p>
+    </header>
+
+    <section id="notice" class="notice hidden"></section>
+    <section class="mode-grid">
+      <article class="mode-card strategy">
+        <div class="mode-number">01</div>
+        <p class="tag">STRATEGY COMPARISON</p>
+        <h2>五策略推演</h2>
+        <p>比较不回应、事实通报、共情安抚、辟谣澄清和处置进展，并查看网络传播与单评论链路。</p>
+        <label><span>实验批次</span><select id="strategy-experiment"></select></label>
+        <div id="strategy-meta" class="meta"></div>
+        <button type="button" data-mode="strategy_comparison">进入五策略界面</button>
+      </article>
+
+      <article class="mode-card historical">
+        <div class="mode-number">02</div>
+        <p class="tag">HISTORICAL REPLAY</p>
+        <h2>历史数据复现</h2>
+        <p>按照真实时间线查看模拟趋势、人工参考、官方节点，并进入同一批次的网络与评论追踪。</p>
+        <label><span>实验批次</span><select id="historical-experiment"></select></label>
+        <div id="historical-meta" class="meta"></div>
+        <button type="button" data-mode="historical_replay">进入历史复现界面</button>
+      </article>
+    </section>
+  </main>
+  <script src="/portal/app.js"></script>
+</body>
+</html>

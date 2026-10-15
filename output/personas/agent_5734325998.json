@@ -1,0 +1,43 @@
+{
+  "agent_id": "agent_5734325998",
+  "source_user_id": "5734325998",
+  "identity": {
+    "gender": "m",
+    "location": "浙江 杭州",
+    "verified": true,
+    "followers_count": 2534000
+  },
+  "action_preference": {
+    "original_preference": 0.964372,
+    "repost_preference": 0.035628
+  },
+  "topic_preference": {
+    "社会事件": 0.105093,
+    "新闻时事": 0.224737,
+    "娱乐": 0.105497,
+    "其他": 0.564673
+  },
+  "information_orientation": {
+    "fact_rate": 0.27497,
+    "opinion_rate": 0.576628,
+    "questioning_rate": 0.148403
+  },
+  "emotion_expression": {
+    "positive_rate": 0.314598,
+    "neutral_rate": 0.536595,
+    "negative_rate": 0.148807
+  },
+  "data_info": {
+    "total_posts": 2470,
+    "topic_sample_count": 2470,
+    "expression_sample_count": 2470,
+    "faction_sample_count": 2440
+  },
+  "comment_faction_preference": {
+    "观点输出派": 0.629857,
+    "表态判断派": 0.072393,
+    "情绪激进派": 0.021268,
+    "矛盾激化派": 0.001227,
+    "吃瓜派": 0.275256
+  }
+}
