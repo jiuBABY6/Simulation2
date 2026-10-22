@@ -9,7 +9,7 @@ from pathlib import Path
 
 from simulation.event_state_updater import is_valid_state_record
 from infrastructure.json_storage import load_json, save_json, validate_jsonl
-from project_config import DEFAULT_STATE_DIR, DEMO_DIR
+from project_config import DEMO_DIR
 
 
 EVENT_STATE_FILE_NAME = "event_state_history.json"
@@ -191,22 +191,3 @@ def validate_simulation_state(state_dir, event_id):
         "event_state_count": len(event_states),
         "jsonl_record_counts": record_counts,
     }
-
-
-# 2026/08/22 系统重置与状态初始化，修改功能：明确该函数只重置默认调试状态。
-def reset_default_debug_state(event_input):
-    """重置默认 demo/state，仅用于直接运行仿真执行器时的本地调试。"""
-    initial_state = build_initial_event_state(event_input)
-    state_path = validate_state_directory_path(DEFAULT_STATE_DIR)
-    expected_path = (DEMO_DIR / "state").resolve()
-    if state_path != expected_path:
-        raise ValueError("只允许重置固定的 demo/state 目录。")
-
-    state_path.mkdir(parents=True, exist_ok=True)
-    paths = build_state_file_paths(state_path)
-    save_json(paths["event_state"], [initial_state])
-
-    for file_name in JSONL_STATE_FILE_NAMES:
-        (state_path / file_name).write_text("", encoding="utf-8")
-
-    return validate_simulation_state(state_path, event_input["event_id"])

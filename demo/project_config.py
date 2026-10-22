@@ -56,8 +56,7 @@ SOCIAL_NETWORK_FILE = Path(
         str(STATE_DIR / "social_network_snapshot.json"),
     )
 ).resolve()
-# 2026/09/05 示例文件归档，修改功能：单 Agent 调试结果统一保存到 example 目录。
-SINGLE_DECISION_RESULT_FILE = EXAMPLE_DIR / "decision_result.json"
+# 单Agent LLM调试结果保存在示例目录；正式批次不写入此文件。
 SINGLE_LLM_RESULT_FILE = EXAMPLE_DIR / "decision_result_llm.json"
 
 # 2026/09/06 GitHub推送安全处理，修改功能：从环境变量读取模型配置，避免提交本机密key。

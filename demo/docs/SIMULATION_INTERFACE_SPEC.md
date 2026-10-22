@@ -6,7 +6,6 @@
 | --- | --- |
 | `main.run_complete_simulation()` | 创建批次、生成初始评论并执行三种回应方案和一组不回应基线 |
 | `experiment_runner.run_experiment(...)` | 运行共享基线、策略场景和结果比较 |
-| `ablation_runner.run_ablation_experiment(...)` | 在共享输入和首轮状态下运行反馈链路消融 |
 | `simulation.runner.run_one_simulation_step(...)` | 执行一个时间步 |
 | `historical_replay/main.py` | 执行指定轮次投入官方信息的历史路线 |
 
@@ -21,7 +20,6 @@
 - 指标模块只读决策和历史状态，输出统计结果；不修改Persona、评论或决策。
 - 传播指标只描述覆盖、继续传播和层级，不将传播越广或越深直接解释为策略越好。
 - 实验编排模块负责状态隔离和调用顺序，不复制业务算法。
-- 消融编排只能通过`simulation_options.ablation`关闭单条反馈路径；不得改写正式事件文件、Persona或决策常量。未配置时必须保持完整机制。
 - 存储模块负责序列化，不推导业务结论。
 
 ## 数据库与后端接入约束

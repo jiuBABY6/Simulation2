@@ -8,7 +8,6 @@
 
 import argparse
 from copy import deepcopy
-import json
 
 # 2026/08/22 增量评论累积对齐：初始评论生成器改为复用独立的评论生成服务。
 from comments.generation_service import (

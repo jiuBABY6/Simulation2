@@ -478,46 +478,6 @@ def summarize_visible_comments(candidates, current_step=None):
     }
 
 
-# 第一类决策：基于规则的决策
-
-# get_topic_match()
-# decide_emotion()
-# decide_official_attitude()
-# decide_will_comment()
-# decide_comment_faction()
-# score_candidate()
-# select_best_candidate()
-
-
-def get_topic_match(persona, event_context):
-    """读取 Agent 对当前事件主题的历史关注比例。"""
-    topic = event_context.get("event_labels", {}).get("topic", "其他")
-    return float(persona.get("topic_preference", {}).get(topic, 0.0))
-
-
-def decide_emotion(persona, policy, event_context, topic_match):
-    """依据事件情绪和 Persona 的历史情绪比例选择当前情绪。"""
-    event_emotion = event_context.get("event_labels", {}).get(
-        "event_valence", "neutral"
-    )
-    emotion_options = get_emotion_options(event_context, policy)
-    emotion_profile = persona.get("emotion_expression", {})
-    emotion_scores = {}
-
-    for emotion in emotion_options:
-        score = float(emotion_profile.get(f"{emotion}_rate", 0.0))
-        if emotion == "neutral" and event_emotion != "neutral":
-            score *= 0.4
-        if emotion == event_emotion:
-            score *= 1 + topic_match
-        emotion_scores[emotion] = round(score, 6)
-
-    if not emotion_scores:
-        return "neutral", {"neutral": 1.0}
-    current_emotion = max(emotion_scores, key=emotion_scores.get)
-    return current_emotion, emotion_scores
-
-
 # 2026/08/25 第五次联调问题修复，新增功能：统一读取不同声明状态下的官方态度候选项。
 def get_official_attitude_options(event_context, policy):
     """无声明时返回不适用，有声明时读取统一的三种态度选项。"""
@@ -537,65 +497,6 @@ def get_official_attitude_options(event_context, policy):
         if attitude in valid_attitudes
     ]
     return list(dict.fromkeys(options)) or ["accept", "wait", "question"]
-
-
-# 2026/08/25 第五次联调问题修复，修改功能：取消不完整声明对 accept 的结构性排除。
-def decide_official_attitude(persona, policy, event_context):
-    """根据统一候选项和 Persona 信息取向选择官方态度。"""
-    orientation = persona.get("information_orientation", {})
-    options = get_official_attitude_options(event_context, policy)
-
-    scores = {}
-    for attitude in options:
-        if attitude == "not_applicable":
-            scores[attitude] = 1.0
-        elif attitude == "accept":
-            scores[attitude] = float(orientation.get("fact_rate", 0.0))
-        elif attitude == "question":
-            scores[attitude] = float(orientation.get("questioning_rate", 0.0))
-        else:
-            scores[attitude] = float(persona.get("emotion_expression", {}).get("neutral_rate", 0.0))
-    attitude = max(scores, key=scores.get) if scores else "not_applicable"
-    return attitude, {key: round(value, 6) for key, value in scores.items()}
-
-
-def decide_will_comment(persona, event_context, topic_match, current_emotion):
-    """根据主题关注度和非中性情绪决定是否发表评论。"""
-    neutral_rate = float(persona.get("emotion_expression", {}).get("neutral_rate", 0.0))
-    score = (
-        topic_match * 0.80
-        + (1 - neutral_rate) * 0.20
-    )
-    will_comment = score >= 0.35 and current_emotion != "neutral"
-    return will_comment, round(score, 6)
-
-
-def get_faction_preference(persona):
-    """读取 Persona 中的派系偏好；旧 Persona 没有该字段时使用均匀偏好。"""
-    default = {faction: 0.2 for faction in FACTIONS}
-    preference = persona.get("comment_faction_preference", {})
-    default.update({key: float(value) for key, value in preference.items() if key in FACTIONS})
-    return default
-
-
-def decide_comment_faction(persona, event_context, current_emotion, topic_match):
-    """结合派系偏好、信息取向和官方声明状态选择评论派系。"""
-    scores = get_faction_preference(persona)
-    orientation = persona.get("information_orientation", {})
-    state = event_context.get("current_state", {})
-
-    scores["观点输出派"] += float(orientation.get("fact_rate", 0.0)) * 0.20
-    scores["表态判断派"] += float(orientation.get("opinion_rate", 0.0)) * 0.15
-
-    if state.get("official_statement_status") in ["incomplete", "conflict"]:
-        scores["观点输出派"] += float(orientation.get("questioning_rate", 0.0)) * 0.20
-    if current_emotion == "negative" and event_context.get("event_labels", {}).get("event_valence") == "negative":
-        scores["情绪激进派"] += 0.25
-    if topic_match < 0.15:
-        scores["吃瓜派"] += float(persona.get("emotion_expression", {}).get("neutral_rate", 0.0)) * 0.20
-
-    faction = max(scores, key=scores.get)
-    return faction, {key: round(value, 6) for key, value in scores.items()}
 
 
 def score_candidate(candidate, event_context, persona, current_emotion, faction):

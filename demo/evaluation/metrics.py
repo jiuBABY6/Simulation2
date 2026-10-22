@@ -1245,12 +1245,5 @@ def calculate_control_net_effect(treatment_metrics, control_metrics):
         "peak_negative_rate_reduction": values["negative_peak_rate"],
         "negative_area_reduction": values["negative_area"],
     }
-
-
-def calculate_run_stability(experiment_runs):
-    """预留：计算不同随机种子重复运行结果的稳定性。"""
-    raise NotImplementedError("多次运行稳定性将在后期实现。")
-
-
 if __name__ == "__main__":
     run_round_metrics()

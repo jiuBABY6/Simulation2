@@ -1,7 +1,5 @@
 """Agent 内部状态判断使用的评论证据边界。
 
-2026/10/18，新增功能：消融实验可让外部 LLM 增量评论继续出现在
-个人可见范围和公开表达阶段，但不允许它们直接改变 Agent 内部状态。
 本模块只筛选已有内存对象，不读取文件、不调用模型，也不修改评论。
 """
 
@@ -9,7 +7,6 @@ from __future__ import annotations
 
 from simulation.options import (
     DEFAULT_STRATEGY_EXPRESSION_WINDOW_ROUNDS,
-    excludes_llm_incremental_from_state,
     uses_evidence_based_emotions,
     uses_strategy_participation_gate,
 )
@@ -47,16 +44,6 @@ def _information_origin(comment: dict) -> str:
     if origin in {"exogenous", "endogenous"}:
         return origin
     return "endogenous" if _is_agent_expression(comment) else "exogenous"
-
-
-def _is_initial_comment(comment: dict) -> bool:
-    """兼容缺失轮次的旧评论；格式异常的轮次不冒充初始评论。"""
-
-    introduced_step = comment.get("introduced_step", 1)
-    try:
-        return int(introduced_step or 1) <= 1
-    except (TypeError, ValueError):
-        return False
 
 
 def _is_neighbor_comment(comment: dict) -> bool:
@@ -214,8 +201,8 @@ def build_state_evidence_view(visible_comments, event_context, persona=None):
 
     历史复现继续使用原有证据边界。回应方案实验对邻居表达和公共评论
     分别限流：邻居按传播根与权重保留，公共评论按Persona相关性和传播根
-    保留。外部评论消融开关在限流前应用，因此现有消融实验语义不变。
-    完整个人可见评论不在本函数内修改，仍可供后续发言与表达阶段使用。
+    保留。完整个人可见评论不在本函数内修改，仍可供后续行为判断、
+    发言与表达阶段使用。
     """
 
     comments = [
@@ -224,12 +211,6 @@ def build_state_evidence_view(visible_comments, event_context, persona=None):
         if isinstance(comment, dict)
     ]
     filtered = comments
-    if excludes_llm_incremental_from_state(event_context):
-        filtered = [
-            comment
-            for comment in filtered
-            if _is_initial_comment(comment) or _is_agent_expression(comment)
-        ]
 
     strategy_mode = (
         uses_strategy_participation_gate(event_context)
@@ -303,22 +284,3 @@ def build_state_evidence_view(visible_comments, event_context, persona=None):
         **public_filter_diagnostics,
     }
     return {"comments": filtered, "diagnostics": diagnostics}
-
-
-def select_state_evidence_comments(
-    visible_comments,
-    event_context,
-    persona=None,
-):
-    """返回允许进入 Agent 内部状态判断的个人可见评论。
-
-    默认模式返回全部评论。消融模式保留第 1 轮初始语境和 Agent 表达，
-    只排除第 2 轮以后由外部增量生成器产生的评论。官方通告不在评论
-    列表中，仍通过 ``event_context`` 独立进入状态判断。
-    """
-
-    return build_state_evidence_view(
-        visible_comments,
-        event_context,
-        persona,
-    )["comments"]

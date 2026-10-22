@@ -49,7 +49,7 @@ from project_config import (
     SOCIAL_NETWORK_CONFIG_FILE,
 )
 from simulation.social_network import build_fixed_social_network
-from simulation.options import get_ablation_options, get_simulation_options
+from simulation.options import get_simulation_options
 from simulation.counterfactual_controls import (
     CounterfactualIsolationError,
     audit_cross_scenario_controls,
@@ -448,18 +448,6 @@ def evaluate_response_entry(
     }
 
 
-# 2026/08/23 内容策略对照，修改功能：所有内容场景最多发布一次官方声明。
-# 2026/08/27 第十二次联调修复，修改功能：保留旧布尔调用并复用统一进场判断。
-def should_publish_response(entry_strategy, policy_metrics, response_count):
-    """根据统一动态进场规则判断下一轮是否首次发布官方声明。"""
-    decision = evaluate_response_entry(
-        entry_strategy,
-        policy_metrics,
-        response_count,
-    )
-    return decision["should_enter"]
-
-
 # 2026/08/22 系统重置与状态初始化 修改功能：使用统一状态管理器创建策略状态目录。
 # 2026/08/25 第八次联调问题修复，修改功能：场景可从统一的进场前状态快照开始运行。
 def prepare_scenario_state(
@@ -701,17 +689,6 @@ def run_shared_pre_entry_baseline(
     entry_reason = None
     stagnant_round_count = 0
     step_results = []
-    fixed_response_step = get_ablation_options(event_input).get(
-        "fixed_response_step"
-    )
-    if (
-        fixed_response_step is not None
-        and fixed_response_step > MAX_STEPS
-    ):
-        raise ValueError(
-            "消融实验固定官方投入轮次不能大于最大仿真轮数。"
-        )
-
     for step in range(1, MAX_STEPS + 1):
         step_result = run_simulation_step(
             state_dir,
@@ -732,25 +709,6 @@ def run_shared_pre_entry_baseline(
 
         if step == MAX_STEPS:
             break
-        if fixed_response_step is not None:
-            # 2026/10/18，新增功能：消融组必须在同一轮投入通告，
-            # 避免反馈机制改变动态触发时间后破坏因果可比性。
-            if step + 1 == fixed_response_step:
-                response_step = fixed_response_step
-                entry_reason = "ablation_fixed_step"
-                break
-            append_event_state_record(
-                event_input=event_input,
-                official_statement="",
-                official_statement_status="none",
-                **objective_state_fields(objective_timeline, step + 1),
-                scenario_id="_shared_baseline",
-                shared_input_sha256=shared_input_manifest.get(
-                    "shared_input_sha256"
-                ),
-                state_file=state_file,
-            )
-            continue
         entry_decision = evaluate_response_entry(
             entry_strategy,
             round_result["policy_metrics"],
@@ -879,7 +837,6 @@ def run_one_content_strategy(
             "strategy": strategy_id,
             "strategy_name": content_strategy["strategy_name"],
             "entry_strategy": entry_strategy,
-            "ablation_config": get_ablation_options(event_input),
             "status": "not_run",
             "reason": "official_response_not_triggered",
             "entry_triggered": False,
@@ -1002,7 +959,6 @@ def run_one_content_strategy(
         "strategy": strategy_id,
         "strategy_name": content_strategy["strategy_name"],
         "entry_strategy": entry_strategy,
-        "ablation_config": get_ablation_options(event_input),
         "status": "success",
         "entry_triggered": entry_triggered,
         "entry_reason": entry_reason,
@@ -1403,9 +1359,6 @@ def run_experiment(
         # 2026/10/19，新增功能：结果显式保存规范化后的运行选项，避免
         # 事件文件未填写默认值时无法还原实际增量评论数量。
         "simulation_options": get_simulation_options(event_input),
-        # 2026/10/18，新增功能：正式结果携带完整消融开关；默认运行也
-        # 明确记录为完整机制，避免后续只凭目录名猜测实验条件。
-        "ablation_config": get_ablation_options(event_input),
         # 2026/10/20，修改功能：共享的是客观输入，不再共享不回应
         # 场景生成的公众评论。公众反应和Agent表达在各方案内独立演化。
         "counterfactual_controls": {

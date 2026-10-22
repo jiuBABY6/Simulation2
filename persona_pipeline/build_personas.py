@@ -18,10 +18,7 @@ if __package__:  # 同时支持 ``python -m`` 与既有的直接脚本启动方�
     )
     from .policy_builder import build_global_policy_config
     from .text_processing import (
-        REPOST_PLACEHOLDERS,
-        clean_weibo_text,
         extract_user_record,
-        get_nested_value,
         iterate_post_records,
         normalize_user_id,
         should_skip_post,
@@ -35,10 +32,7 @@ else:  # pragma: no cover - 由直接脚本命令覆盖
     )
     from policy_builder import build_global_policy_config
     from text_processing import (
-        REPOST_PLACEHOLDERS,
-        clean_weibo_text,
         extract_user_record,
-        get_nested_value,
         iterate_post_records,
         normalize_user_id,
         should_skip_post,

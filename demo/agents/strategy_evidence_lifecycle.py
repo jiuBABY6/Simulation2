@@ -14,7 +14,6 @@ from __future__ import annotations
 from copy import deepcopy
 
 
-LIFECYCLE_WEIGHTS = {0: 1.0, 1: 0.55, 2: 0.25}
 MAX_EVIDENCE_MEMORY_GROUPS = 48
 
 
@@ -35,66 +34,6 @@ def _memory_from_state(previous_state):
         for group_id, entry in raw.items()
         if group_id and isinstance(entry, dict)
     }
-
-
-def _scaled_group(entry, age, weight):
-    """把首次评估结果按年龄衰减为本轮可用的权威证据组。"""
-
-    support = entry.get("directional_support", {})
-    return {
-        "evidence_group_id": entry["evidence_group_id"],
-        "evidence_ids": list(entry.get("evidence_ids", [])),
-        "source_kinds": list(entry.get("source_kinds", ["authoritative"])),
-        "directional_support": {
-            emotion: round(float(value) * weight, 6)
-            for emotion, value in support.items()
-            if isinstance(value, (int, float)) and not isinstance(value, bool)
-        },
-        "supporting_id_by_emotion": dict(
-            entry.get("supporting_id_by_emotion", {})
-        ),
-        "positive_eligible": bool(entry.get("positive_eligible", False)),
-        "semantic_dimensions": list(entry.get("semantic_dimensions", [])),
-        "lifecycle_state": "active",
-        "lifecycle_age": age,
-        "lifecycle_weight": weight,
-        "restored_from_memory": True,
-    }
-
-
-def restore_active_authoritative_groups(
-    previous_state,
-    current_step,
-    current_group_ids=(),
-):
-    """恢复尚未消费的权威证据，并应用有限的跨轮衰减。
-
-    同一组若在本轮作为新证据再次出现，由新证据版本负责评估，避免
-    新旧副本重复计权。普通社会评论不跨轮保留；它们应通过真实传播窗口
-    再次进入，而不是在个体记忆中无限存活。
-    """
-
-    step = _safe_step(current_step)
-    if step is None:
-        return []
-    excluded = {str(group_id) for group_id in current_group_ids if group_id}
-    restored = []
-    for group_id, entry in _memory_from_state(previous_state).items():
-        if group_id in excluded:
-            continue
-        if entry.get("source_kind") != "authoritative":
-            continue
-        if entry.get("emotion_consumed") is True:
-            continue
-        first_seen_step = _safe_step(entry.get("first_seen_step"))
-        if first_seen_step is None:
-            continue
-        age = step - first_seen_step
-        weight = LIFECYCLE_WEIGHTS.get(age, 0.0)
-        if age <= 0 or weight <= 0:
-            continue
-        restored.append(_scaled_group(entry, age, weight))
-    return restored
 
 
 def update_evidence_memory(

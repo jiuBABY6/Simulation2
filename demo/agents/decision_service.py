@@ -252,9 +252,8 @@ def decide_agent(
     step = decision_input.context.step
     agent_id = decision_input.agent_id
 
-    # 2026/10/18，新增功能：状态证据消融只改变认知请求的评论输入。
-    # 行为门控、转发候选和原创表达仍使用完整个人可见评论，从而严格
-    # 区分“评论不可见”和“评论可见但不能直接改变内部状态”。
+    # 内部状态判断使用限流后的证据视图；行为门控、转发候选和原创表达
+    # 仍使用完整个人可见评论，避免认知边界改变实际可见范围。
     state_evidence_view = build_state_evidence_view(
         visible_comments,
         event_context,

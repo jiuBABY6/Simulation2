@@ -47,7 +47,6 @@ from simulation.propagation_tracking import (
 from simulation.options import (
     get_simulation_options,
     uses_evidence_based_emotions,
-    uses_neighbor_feedback,
 )
 
 
@@ -125,11 +124,6 @@ def build_agent_views(
         social_network,
         settings.visible_comment_count,
     )
-    if not uses_neighbor_feedback(event_context):
-        # 2026/10/18，新增功能：网络消融只关闭邻居表达注入，固定网络
-        # 快照本身仍保留，公共评论补足全部可见配额，便于和完整机制对照。
-        neighbor_count = 0
-        public_count = settings.visible_comment_count
     agent_views = {}
     # 2026/10/19，修改功能：策略实验和历史复现都按Persona温和调整
     # 公共评论曝光概率。这里仍保留探索基线，不会把低偏好内容完全过滤。

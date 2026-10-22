@@ -307,10 +307,7 @@ def audit_scenario_isolation(
             "shared_exogenous_context"
         ):
             errors.append(f"第{step}轮仍包含已禁止的共享公众评论。")
-        if generation_mode not in {
-            "scenario_reactive_public",
-            "disabled_by_ablation",
-        }:
+        if generation_mode != "scenario_reactive_public":
             errors.append(
                 f"第{step}轮公众反应没有使用场景独立生成模式。"
             )

@@ -12,10 +12,8 @@ from agents.state_store import AgentStateStore
 from agents.batch_decision import run_batch_decision
 from application.runtime_config import load_project_runtime_config
 from simulation.event_context import load_event_context
-from simulation.event_state_updater import append_event_state_record
 from comments.incremental_generator import (
     load_incremental_history,
-    run_frozen_incremental_generation,
     run_incremental_generation,
 )
 from infrastructure.json_storage import append_jsonl_many, load_json, read_jsonl
@@ -27,7 +25,6 @@ from evaluation.metrics import run_round_metrics
 from agents.persona_repository import load_personas
 from domain.contracts import SimulationContext
 from simulation.state_manager import validate_simulation_state
-from simulation.options import freezes_incremental_public_comments
 
 
 # 2026/09/04 Demo性能基线，新增功能：为父进程提供稳定的单轮结果解析标记。
@@ -52,11 +49,6 @@ def load_successful_decisions(
         decisions_by_agent[record["agent_id"]] = record
 
     return [decisions_by_agent[key] for key in sorted(decisions_by_agent)]
-
-
-def has_successful_decision(event_id, step, history_file=None):
-    """兼容原有调用：判断指定时间步是否至少存在一个成功决策。"""
-    return bool(load_successful_decisions(event_id, step, history_file))
 
 
 # 2026/08/22 联调可靠性收尾：使用预期Agent数量判断本轮决策是否完整。
@@ -235,18 +227,10 @@ def run_one_simulation_step(
             paths.incremental_comment_file,
         )
         if incremental_record is None:
-            # 2026/10/18，新增功能：冻结公共语境时写入可审计空批次，
-            # 不调用DeepSeek；默认模式仍执行原有增量评论生成流程。
-            if freezes_incremental_public_comments(
-                event_context.to_mapping()
-            ):
-                incremental_record = run_frozen_incremental_generation()
-                incremental_generated = False
-            else:
-                incremental_record = run_incremental_generation(
-                    incremental_comment_count
-                )
-                incremental_generated = True
+            incremental_record = run_incremental_generation(
+                incremental_comment_count
+            )
+            incremental_generated = True
     incremental_duration = time.perf_counter() - incremental_start_time
 
     agent_start_time = time.perf_counter()
@@ -325,99 +309,6 @@ def run_one_simulation_step(
             "llm_requests": get_llm_performance_stats(),
         },
     }
-
-
-# 2026/08/22 系统重置与状态初始化 修改功能：跳过当前轮时单独检查状态，其余交由单轮入口检查。
-def run_multi_round_simulation(
-    future_event_states,
-    run_current_step=True,
-    max_agents=None,
-    max_workers=None,
-    incremental_comment_count=None,
-    runtime_config=None,
-):
-    """运行当前时间步，并按照给定官方声明序列继续运行后续轮次。
-
-    参数：
-        future_event_states：后续轮次的官方声明列表。每项包含
-            official_statement 和 official_statement_status。
-        run_current_step：是否先运行event_state_history中的当前最新时间步。
-        max_agents：每轮最多参与决策的Agent数量。
-        max_workers：批量决策最大并发线程数。
-        incremental_comment_count：每轮新增候选评论数量。
-
-    返回：
-        按时间步排列的模拟结果列表。
-    """
-    runtime_config = runtime_config or load_project_runtime_config()
-    paths = runtime_config.paths
-    settings = runtime_config.simulation
-    max_agents = settings.max_agents if max_agents is None else max_agents
-    max_workers = settings.max_workers if max_workers is None else max_workers
-    incremental_comment_count = (
-        settings.incremental_comment_count
-        if incremental_comment_count is None
-        else incremental_comment_count
-    )
-    if not isinstance(future_event_states, list):
-        raise ValueError("future_event_states 必须是列表。")
-
-    event_input = load_json(paths.event_file)
-    results = []
-
-    if run_current_step:
-        results.append(
-            run_one_simulation_step(
-                max_agents,
-                max_workers,
-                incremental_comment_count,
-                runtime_config,
-            )
-        )
-    else:
-        validate_simulation_state(paths.state_dir, event_input.get("event_id"))
-        current_context = load_event_context(
-            paths.event_file,
-            paths.event_state_file,
-        )
-        current_step = current_context["current_state"]["step"]
-        expected_agent_count = len(
-            load_personas(paths.persona_dir, max_count=max_agents)
-        )
-        current_step_complete = has_complete_decisions(
-            current_context["event_id"],
-            current_step,
-            expected_agent_count,
-            paths.decision_history_file,
-        ) and has_round_metrics(
-            current_context["event_id"],
-            current_step,
-            paths.metrics_history_file,
-        )
-        if not current_step_complete:
-            raise ValueError("当前最新时间步尚未完成，不能直接追加下一轮状态。")
-
-    for state_input in future_event_states:
-        if not isinstance(state_input, dict):
-            raise ValueError("每个后续事件状态都必须是字典。")
-        append_event_state_record(
-            event_input=event_input,
-            official_statement=state_input.get("official_statement", ""),
-            official_statement_status=state_input.get(
-                "official_statement_status", "none"
-            ),
-            state_file=paths.event_state_file,
-        )
-        results.append(
-            run_one_simulation_step(
-                max_agents,
-                max_workers,
-                incremental_comment_count,
-                runtime_config,
-            )
-        )
-
-    return results
 
 
 def main():

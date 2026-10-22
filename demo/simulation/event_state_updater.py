@@ -175,16 +175,6 @@ def load_event_state_history(state_file=EVENT_STATE_FILE, event_id=None):
 
     normalized.sort(key=lambda item: (item["event_id"], item["step"]))
     return normalized
-
-
-def get_latest_event_state(state_file=EVENT_STATE_FILE, event_id=None):
-    """读取指定事件最新时间步的状态记录。"""
-    history = load_event_state_history(state_file, event_id)
-    if not history:
-        return None
-    return max(history, key=lambda item: item["step"])
-
-
 def is_valid_state_record(record):
     """检查单条记录是否包含完整的精简状态字段。"""
     if not isinstance(record, dict):

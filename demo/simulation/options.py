@@ -53,29 +53,6 @@ VALID_EXPRESSION_MODES = {EXPRESSION_AGENT_GENERATED}
 VALID_MEMORY_MODES = {MEMORY_BOUNDED_EVENT}
 VALID_EXPOSURE_MODES = {EXPOSURE_NETWORK_PERSONALIZED}
 
-# 2026/10/17，新增功能：消融实验使用独立、可审计的机制开关。
-# 默认值必须完整复现当前正式实验；只有事件输入显式配置 ``ablation``
-# 时才关闭某条反馈路径，避免实验代码通过注释或临时改常量污染主流程。
-INCREMENTAL_PUBLIC_LLM = "llm_incremental"
-INCREMENTAL_PUBLIC_FROZEN = "frozen_after_initial"
-VALID_INCREMENTAL_PUBLIC_COMMENT_MODES = {
-    INCREMENTAL_PUBLIC_LLM,
-    INCREMENTAL_PUBLIC_FROZEN,
-}
-STATE_EVIDENCE_ALL_VISIBLE = "all_visible"
-STATE_EVIDENCE_EXCLUDE_LLM_INCREMENTAL = "exclude_llm_incremental"
-VALID_STATE_COMMENT_EVIDENCE_MODES = {
-    STATE_EVIDENCE_ALL_VISIBLE,
-    STATE_EVIDENCE_EXCLUDE_LLM_INCREMENTAL,
-}
-DEFAULT_ABLATION_OPTIONS = {
-    "incremental_public_comment_mode": INCREMENTAL_PUBLIC_LLM,
-    "state_comment_evidence_mode": STATE_EVIDENCE_ALL_VISIBLE,
-    "neighbor_feedback_enabled": True,
-    "fixed_response_step": None,
-}
-
-
 # 2026/10/9，新增功能：集中校验事件级仿真开关，未配置事件继续使用原有行为。
 def normalize_simulation_options(event_input: dict | None) -> dict:
     """返回稳定的事件级配置，拒绝会造成运行歧义的非法值。"""
@@ -143,71 +120,6 @@ def normalize_simulation_options(event_input: dict | None) -> dict:
                 f"{sorted(allowed_values)}"
             )
         behavior_options[field_name] = value
-
-    raw_ablation = raw_options.get("ablation", {})
-    if raw_ablation is None:
-        raw_ablation = {}
-    if not isinstance(raw_ablation, dict):
-        raise ValueError("simulation_options.ablation 必须是 JSON 对象。")
-
-    incremental_public_comment_mode = str(
-        raw_ablation.get(
-            "incremental_public_comment_mode",
-            DEFAULT_ABLATION_OPTIONS["incremental_public_comment_mode"],
-        )
-    ).strip()
-    if (
-        incremental_public_comment_mode
-        not in VALID_INCREMENTAL_PUBLIC_COMMENT_MODES
-    ):
-        raise ValueError(
-            "simulation_options.ablation.incremental_public_comment_mode "
-            "只能是 llm_incremental 或 frozen_after_initial。"
-        )
-
-    state_comment_evidence_mode = str(
-        raw_ablation.get(
-            "state_comment_evidence_mode",
-            DEFAULT_ABLATION_OPTIONS["state_comment_evidence_mode"],
-        )
-    ).strip()
-    if state_comment_evidence_mode not in VALID_STATE_COMMENT_EVIDENCE_MODES:
-        raise ValueError(
-            "simulation_options.ablation.state_comment_evidence_mode "
-            "只能是 all_visible 或 exclude_llm_incremental。"
-        )
-
-    neighbor_feedback_enabled = raw_ablation.get(
-        "neighbor_feedback_enabled",
-        DEFAULT_ABLATION_OPTIONS["neighbor_feedback_enabled"],
-    )
-    if not isinstance(neighbor_feedback_enabled, bool):
-        raise ValueError(
-            "simulation_options.ablation.neighbor_feedback_enabled "
-            "必须是布尔值。"
-        )
-
-    fixed_response_step = raw_ablation.get(
-        "fixed_response_step",
-        DEFAULT_ABLATION_OPTIONS["fixed_response_step"],
-    )
-    if fixed_response_step is not None and (
-        isinstance(fixed_response_step, bool)
-        or not isinstance(fixed_response_step, int)
-        or fixed_response_step < 2
-    ):
-        raise ValueError(
-            "simulation_options.ablation.fixed_response_step "
-            "必须为空或大于等于2的整数。"
-        )
-    ablation_options = {
-        "incremental_public_comment_mode": (
-            incremental_public_comment_mode
-        ),
-        "state_comment_evidence_mode": state_comment_evidence_mode,
-        "neighbor_feedback_enabled": neighbor_feedback_enabled,
-        "fixed_response_step": fixed_response_step,
-    }
 
     incremental_comment_count = raw_options.get(
         "incremental_comment_count",
@@ -356,7 +268,6 @@ def normalize_simulation_options(event_input: dict | None) -> dict:
         "incremental_comment_count": incremental_comment_count,
         "active_opinion_window": active_opinion_window,
         "expression_window_rounds": expression_window_rounds,
-        "ablation": ablation_options,
         **behavior_options,
     }
     if visibility is not None:
@@ -395,52 +306,6 @@ def get_simulation_options(event_context: dict | None) -> dict:
     }.issubset(options):
         return normalize_simulation_options(event_context)
     return options
-
-
-def get_ablation_options(event_context: dict | None) -> dict:
-    """返回完整消融配置；旧事件自动得到不改变行为的默认值。"""
-
-    options = get_simulation_options(event_context)
-    ablation = options.get("ablation")
-    if not isinstance(ablation, dict):
-        return dict(DEFAULT_ABLATION_OPTIONS)
-    return {
-        key: ablation.get(key, default)
-        for key, default in DEFAULT_ABLATION_OPTIONS.items()
-    }
-
-
-def freezes_incremental_public_comments(event_context: dict | None) -> bool:
-    """判断第2轮以后是否冻结外部LLM公共评论。"""
-
-    return (
-        get_ablation_options(event_context).get(
-            "incremental_public_comment_mode"
-        )
-        == INCREMENTAL_PUBLIC_FROZEN
-    )
-
-
-def excludes_llm_incremental_from_state(event_context: dict | None) -> bool:
-    """判断外部增量评论是否只作表达素材、不进入内部状态判断。"""
-
-    return (
-        get_ablation_options(event_context).get(
-            "state_comment_evidence_mode"
-        )
-        == STATE_EVIDENCE_EXCLUDE_LLM_INCREMENTAL
-    )
-
-
-def uses_neighbor_feedback(event_context: dict | None) -> bool:
-    """判断个人可见视图是否保留邻居Agent表达。"""
-
-    return bool(
-        get_ablation_options(event_context).get(
-            "neighbor_feedback_enabled",
-            True,
-        )
-    )
 
 
 def uses_strategy_participation_gate(event_context: dict | None) -> bool:

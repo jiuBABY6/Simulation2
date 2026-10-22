@@ -32,16 +32,6 @@ def load_real_trend(event_id: str) -> dict[str, Any]:
     if payload.get("event_id") != normalized:
         raise ValueError(f"真实趋势文件名与 event_id 不一致：{path}")
     return payload
-
-
-def has_real_trend(event_id: str | None) -> bool:
-    try:
-        load_real_trend(str(event_id or ""))
-    except (OSError, ValueError):
-        return False
-    return True
-
-
 def list_real_trends() -> list[dict[str, Any]]:
     if not REAL_DATA_DIR.is_dir():
         return []

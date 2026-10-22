@@ -45,7 +45,6 @@ LLM解释既定状态、判断发言并生成原创表达
 | 文件 | 单一职责 |
 | --- | --- |
 | `main.py` | 回应方案对照实验统一入口 |
-| `ablation_runner.py` | 固定初始评论池、网络、第1轮状态和回应轮次后，对反馈链路进行受控消融 |
 | `project_config.py` | 路径、模型和运行参数 |
 | `experiment_runner.py` | 共享基线、动态进场、策略分叉和结果比较 |
 | `application/runtime_config.py` | 回应方案对照与历史复现共用的单轮执行参数 |
@@ -62,13 +61,13 @@ LLM解释既定状态、判断发言并生成原创表达
 | `agents/strategy_evidence_integrator.py` | 纯函数整合语义方向、Persona先验、状态惯性、独立传播根和递减边际，输出唯一相邻情绪状态与诊断 |
 | `agents/evidence_impact_router.py` | 根据评论目标、证据角色和信息来源，将证据作用分配到事件情绪、官方态度和公开参与通道 |
 | `agents/strategy_evidence_assimilation.py` | 纯函数管理权威证据的Persona渐进吸收、轮龄衰减、消费和有界记忆 |
-| `agents/strategy_evidence_lifecycle.py` | 纯函数管理每个Agent的权威证据吸收、递减、消费和有界记忆，不读文件、不解释文本 |
+| `agents/strategy_evidence_lifecycle.py` | 纯函数持久化已见证据组和已消费传播根，并执行过期裁剪与记忆上限控制 |
 | `agents/state_evidence.py` | 将完整个人可见评论转换为“最多2条邻居＋5条Persona相关公共评论”的状态证据视图，不改变行为与传播视图 |
 | `agents/decision_profile.py` | 将Persona与群体分位数转换为稳定决策画像，并按个体门槛生成情绪迟滞约束 |
 | `agents/evidence_appraisal.py` | 将客观证据与Persona主题、信息取向和状态惯性结合，分别生成情绪与官方态度的个体影响 |
 | `agents/official_attitude.py` | 按事实证据、过程回应、未解决关切和上一轮状态裁决个体官方态度 |
 | `simulation/` | 单轮运行、事件状态、个体语境曝光、传播、实验批次和状态隔离 |
-| `simulation/options.py` | 集中校验正式行为配置与默认关闭的消融开关 |
+| `simulation/options.py` | 集中校验事件级正式行为配置 |
 | `simulation/counterfactual_controls.py` | 规范化共享客观事实，生成共同输入/基线快照哈希并执行场景污染审计 |
 | `historical_replay/main.py` | 历史趋势复现入口 |
 | `historical_replay/public_context.py` | 逐轮公众语境校验，拒绝数值拟合目标 |
@@ -76,6 +75,26 @@ LLM解释既定状态、判断发言并生成原创表达
 | `historical_replay/run_manifest.py` | 保存输入、核心代码、模型、随机种子和Persona画像指纹 |
 | `evaluation/metrics.py` | Agent内部状态、实际表达、趋势和过程效果指标 |
 | `infrastructure/llm_service.py` | HTTP请求、JSON解析、重试和性能统计 |
+
+## 核心目录速查
+
+| 目录 | 当前职责 |
+| --- | --- |
+| `demo/` | 仿真入口、输入配置和实验编排 |
+| `demo/application/` | 两类实验共用的运行配置、场景状态、子进程执行和轮次结果服务 |
+| `demo/domain/` | 仿真上下文、决策输入输出和评论语义等共享数据对象 |
+| `demo/comments/` | 初始评论、增量评论、角度规划和评论池访问 |
+| `demo/agents/` | Persona读取、证据评估、状态裁决、发言门控和表达生成 |
+| `demo/simulation/` | 单轮执行、固定网络、传播、场景隔离和运行选项 |
+| `demo/evaluation/` | 逐轮与场景级指标 |
+| `demo/infrastructure/` | DeepSeek请求和其他基础设施 |
+| `demo/historical_replay/` | 历史事件仓库、时间线校验和连续回放 |
+| `demo/experiments/` | 不可覆盖的实验输入、状态和结果快照 |
+| `persona_pipeline/` | MongoDB数据清洗、分类、Persona和策略配置生成 |
+| `output/personas/` | 仿真只读加载的Agent Persona与`policy_config.json` |
+| `visualization/` | 历史复现、方案对照和共享网络的只读网页 |
+
+`demo/state/`只用于默认调试状态；正式实验必须使用批次目录中的独立状态。`demo/example/`只提供结构示例，不是正式输入。早期原型和外部参考工程不属于当前运行链路。
 
 ## 状态边界
 
@@ -106,15 +125,32 @@ LLM解释既定状态、判断发言并生成原创表达
 - `visualization/api_router.py` 负责 API 参数校验和三层服务分发；
 - `visualization/app.py` 是唯一 HTTP 入口，不包含业务指标计算。
 
-更完整的依赖方向和兼容边界见 `DECOUPLING_ARCHITECTURE.md`。
+## 依赖方向与解耦原则
+
+```text
+命令行或HTTP入口
+        ↓
+实验编排或API路由
+        ↓
+共享应用服务与领域服务
+        ↓
+文件、子进程、LLM等基础设施
+```
+
+- 上层可以依赖下层，下层不能反向导入某一种具体实验的顶层入口；
+- `demo/application/` 是方案对照与历史复现的共享应用层，历史复现不反向依赖 `experiment_runner.py`；
+- `demo/domain/contracts.py` 定义 `SimulationContext`、`AgentDecisionInput` 和 `AgentDecisionResult`，决策核心通过参数接收上下文，不自行定位仿真文件；
+- `project_config.py` 仍是兼容配置源，应用层通过运行配置对象逐步减少全局配置依赖；
+- 可视化共享层只提供只读数据和网络能力，`historical/` 与 `strategy/` 依赖共享层，共享层不反向导入业务层；
+- Persona流水线的清洗、策略汇总和DeepSeek JSON客户端分别位于 `text_processing.py`、`policy_builder.py` 和 `deepseek_json_client.py`；
+- 旧函数名和JSON/JSONL字段在兼容门面处保留，重构不能隐式改变实验口径。
+
+后续继续解耦时，应先迁移剩余全局配置和存储访问，再拆分超长编排函数；不要在同一个提交中同时调整模块边界与Agent业务机制。
 
 ## LLM与本地逻辑边界
 
 LLM负责事件角度、评论文本、历史首轮情绪初始化、历史既定状态解释和全局趋势判断。历史模式保留原有完整决策请求；回应方案对照拆成状态请求和按需原创表达请求：状态请求不包含发言意愿、动作或文本，行为门控与原创/转发选择由本地代码独立完成，只有选择原创时才调用表达生成。本地代码还负责证据边界校验、根传播链去重、时间/深度衰减、兜底、进场规则、指标公式和结果存储；这些约束不设置群体比例或拟合目标。所有网络请求经过 `infrastructure/llm_service.py`。
 
-## 消融依赖边界
-
-消融入口只编排实验副本，不直接实现决策规则。外部增量评论冻结位于 `comments/incremental_generator.py`，内部状态证据筛选位于 `agents/state_evidence.py`，邻居反馈开关由 `agents/batch_decision.py` 应用。三者通过 `simulation/options.py` 的事件级配置解耦，默认值完整保留正式流程。详细实验矩阵见 `ABLATION_EXPERIMENT.md`。
 ## 2026/10/19 六项现实机制的模块边界
 
 本轮改造没有再建立一套平行决策系统，而是在现有分层上增加四个单一职责组件：

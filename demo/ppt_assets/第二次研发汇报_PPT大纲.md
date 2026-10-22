@@ -611,7 +611,7 @@ Agent 的公开表达会成为下一轮其他人的信息环境
 **技术依据**
 
 - `demo/docs/ARCHITECTURE.md`
-- `demo/docs/FILE_DIRECTORY_GUIDE.md`
+- `demo/docs/ARCHITECTURE.md`
 
 ---
 

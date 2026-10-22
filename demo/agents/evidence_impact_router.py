@@ -11,12 +11,6 @@
 from __future__ import annotations
 
 
-IMPACT_CHANNELS = (
-    "event_emotion",
-    "official_attitude",
-    "participation",
-)
-
 # 目标权重描述“该话题与哪个状态有关”，不描述证据真伪或最终结论。
 # 对官方过程的批评主要进入官方态度；公共讨论热度主要进入参与通道。
 TARGET_CHANNEL_WEIGHTS = {

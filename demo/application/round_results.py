@@ -165,11 +165,6 @@ def summarize_comment_quality(quality_records: list[dict]) -> dict:
                 for record in quality_records
             }
         ),
-        "frozen_steps": [
-            record["step"]
-            for record in quality_records
-            if record.get("generation_mode") == "disabled_by_ablation"
-        ],
         "llm_comment_count": sum(
             record["llm_comment_count"] for record in quality_records
         ),
@@ -255,8 +250,7 @@ def load_round_result(
             "official_attitude_diagnostics",
             {},
         ),
-        # 2026/10/18，新增功能：消融结果必须保留邻居曝光诊断，才能
-        # 验证“关闭邻居反馈”确实生效，而不是仅依赖配置名称推断。
+        # 邻居曝光诊断用于核对社交网络是否实际向Agent提供了邻居表达。
         "neighbor_exposure_diagnostics": round_metrics.get(
             "neighbor_exposure_diagnostics",
             {},

@@ -195,15 +195,3 @@ def load_all_comments(
     if len(comment_ids) != len(set(comment_ids)):
         raise ValueError("初始评论和增量评论中存在重复的 comment_id。")
     return comments
-
-
-def get_comment_by_id(comments, comment_id):
-    """根据 comment_id 查询评论；找不到时返回 None。"""
-    if not isinstance(comments, list):
-        raise ValueError("comments 必须是评论列表。")
-
-    target_id = str(comment_id).strip()
-    for comment in comments:
-        if isinstance(comment, dict) and comment.get("comment_id") == target_id:
-            return comment
-    return None
