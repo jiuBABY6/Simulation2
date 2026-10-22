@@ -24,20 +24,7 @@ from visualization.config import (
     PORTAL_DIR,
     STRATEGY_STATIC_DIR,
 )
-from visualization.historical.service import (
-    build_comparison as build_historical_comparison,
-    load_dashboard as load_historical_dashboard,
-    load_reference_for_request,
-)
-from visualization.historical.real_trend_repository import list_real_trends
-from visualization.shared.experiment_catalog import list_experiments
-from visualization.shared.network.service import (
-    build_comment_cascade,
-    build_comment_catalog,
-    build_network_view,
-    build_report_summary,
-)
-from visualization.strategy.service import load_dashboard as load_strategy_dashboard
+from visualization.api_router import API_PATHS, dispatch_api
 
 
 class VisualizationHandler(BaseHTTPRequestHandler):
@@ -78,76 +65,10 @@ class VisualizationHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
         try:
-            if parsed.path == "/api/catalog":
-                mode = parse_qs(parsed.query).get("mode", [""])[0] or None
+            if parsed.path in API_PATHS:
                 self._send_json(
-                    {"experiments": list_experiments(mode=mode)}
+                    dispatch_api(parsed.path, parse_qs(parsed.query))
                 )
-                return
-            if parsed.path == "/api/historical/real-trends":
-                self._send_json({"real_trends": list_real_trends()})
-                return
-            if parsed.path == "/api/historical/real-trend":
-                query = parse_qs(parsed.query)
-                self._send_json(
-                    load_reference_for_request(
-                        experiment_id=query.get("experiment_id", [""])[0],
-                        event_id=query.get("event_id", [""])[0],
-                    )
-                )
-                return
-            if parsed.path in {
-                "/api/historical/dashboard",
-                "/api/historical/comparison",
-            }:
-                experiment_id = parse_qs(parsed.query).get(
-                    "experiment_id", [""]
-                )[0]
-                if not experiment_id:
-                    raise ValueError("缺少 experiment_id")
-                if parsed.path == "/api/historical/dashboard":
-                    self._send_json(load_historical_dashboard(experiment_id))
-                else:
-                    self._send_json(build_historical_comparison(experiment_id))
-                return
-            if parsed.path == "/api/strategy/dashboard":
-                experiment_id = parse_qs(parsed.query).get(
-                    "experiment_id", [""]
-                )[0]
-                if not experiment_id:
-                    raise ValueError("缺少 experiment_id")
-                self._send_json(load_strategy_dashboard(experiment_id))
-                return
-            if parsed.path in {
-                "/api/network/report",
-                "/api/network/view",
-                "/api/network/comments",
-                "/api/network/cascade",
-            }:
-                query = parse_qs(parsed.query)
-                experiment_id = query.get("experiment_id", [""])[0]
-                if not experiment_id:
-                    raise ValueError("缺少 experiment_id")
-                scenario_id = query.get("scenario", [""])[0] or None
-                if parsed.path == "/api/network/report":
-                    self._send_json(build_report_summary(experiment_id))
-                elif parsed.path == "/api/network/view":
-                    raw_step = query.get("step", [""])[0]
-                    step = int(raw_step) if raw_step else None
-                    self._send_json(
-                        build_network_view(experiment_id, scenario_id, step)
-                    )
-                elif parsed.path == "/api/network/comments":
-                    self._send_json(
-                        build_comment_catalog(experiment_id, scenario_id)
-                    )
-                else:
-                    comment_id = query.get("comment_id", [""])[0]
-                    self._send_json(
-                        build_comment_cascade(
-                            experiment_id, scenario_id, comment_id
-                        )
-                    )
                 return
             if parsed.path in {"/", "/index.html"}:
                 self._serve_static(PORTAL_DIR, "index.html")

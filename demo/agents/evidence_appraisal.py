@@ -1,7 +1,8 @@
-"""历史复现中面向单个 Persona 的证据影响评估。
+"""面向单个 Persona 的证据影响评估。
 
 客观证据强度由 ``simulation.evidence_policy`` 负责；本模块仅计算同一证据
-对当前 Agent 的个人影响。
+对当前 Agent 的个人影响。历史复现与回应方案对照可提供不同的证据
+语义，但共享相同的个体影响计算，避免两条路径重复维护权重规则。
 
 2026/10/14，修改功能：证据亲和度改为目标相关的加权组合，并恢复传播
 边权的有限作用。避免 ``max`` 规则把不同 Persona 压缩成相近响应，同时
@@ -9,6 +10,8 @@
 """
 
 from __future__ import annotations
+
+from agents.evidence_impact_router import route_evidence_impact
 
 
 _STRENGTH_BASE = {
@@ -190,16 +193,34 @@ def appraise_evidence_for_persona(
                 raw_network_weight,
                 bool,
             ):
-                network_modifier = 0.85 + 0.15 * _bounded_rate(
-                    raw_network_weight,
-                    0.5,
+                normalized_network_weight = (
+                    _bounded_rate(raw_network_weight, 0.5)
+                    if 0.0 <= float(raw_network_weight) <= 1.0
+                    else float(raw_network_weight)
+                    / (1.0 + float(raw_network_weight))
                 )
+                # 2026/10/19，修改功能：归一化权重只对社会评论提供
+                # ±15%的个体调节，不替代事实证据。旧实验只有原始权重
+                # 时使用有界映射，避免再次把所有大于1的权重截成相同值。
+                network_modifier = 0.85 + 0.30 * normalized_network_weight
                 emotion_score *= network_modifier
                 attitude_score *= network_modifier
 
+        # 2026/10/16，修改功能：策略实验可以把“官方确认了已知事实”
+        # 保留为态度证据，同时显式禁止它再次推动事件情绪。两个通道
+        # 分别处理，避免重复事实被当作新的负面刺激。
+        emotion_transition_eligible = (
+            item.get("emotion_transition_eligible") is not False
+        )
+        if not emotion_transition_eligible:
+            emotion_score = 0.0
         emotion_score = min(1.0, emotion_score)
         attitude_score = min(1.0, attitude_score)
         item["evidence_target"] = target
+        # 2026/10/20，修改功能：个人影响分数描述“能否注意和处理证据”，
+        # 通道路由描述“证据应影响哪一种状态”。二者分离，避免对官方
+        # 过程的质疑被直接当成对原始事件情绪的负面强化。
+        impact_routing = route_evidence_impact(item)
         item["personal_impact"] = {
             "topic_interest": round(topic_interest, 6),
             "orientation_affinity": round(affinity, 6),
@@ -212,12 +233,23 @@ def appraise_evidence_for_persona(
             "official_attitude_change_threshold": round(
                 attitude_threshold, 6
             ),
-            "emotion_change_mode": _change_mode(
-                strength, emotion_score, emotion_threshold
+            "emotion_change_mode": (
+                _change_mode(strength, emotion_score, emotion_threshold)
+                if emotion_transition_eligible
+                else "hold_only"
             ),
             "official_attitude_change_mode": _change_mode(
                 strength, attitude_score, attitude_threshold
             ),
+            "impact_channels": {
+                channel: impact_routing[channel]
+                for channel in (
+                    "event_emotion",
+                    "official_attitude",
+                    "participation",
+                )
+            },
+            "impact_routing_reason": impact_routing["routing_reason"],
         }
         appraised.append(item)
     return appraised

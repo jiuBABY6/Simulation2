@@ -1,0 +1,768 @@
+{
+  "network_version": 1,
+  "network_seed": 2026,
+  "neighbors_per_agent": 5,
+  "propagation_decay_factor": 0.7,
+  "visibility": {
+    "neighbor_comment_count": 4,
+    "public_comment_count": 11
+  },
+  "nodes": [
+    {
+      "agent_id": "agent_1237698584",
+      "influence_weight": 1.345,
+      "normalized_influence_weight": 0.055249
+    },
+    {
+      "agent_id": "agent_1244589914",
+      "influence_weight": 2.025,
+      "normalized_influence_weight": 0.80663
+    },
+    {
+      "agent_id": "agent_1259110474",
+      "influence_weight": 2.172,
+      "normalized_influence_weight": 0.969061
+    },
+    {
+      "agent_id": "agent_1266321801",
+      "influence_weight": 2.166,
+      "normalized_influence_weight": 0.962431
+    },
+    {
+      "agent_id": "agent_1298535315",
+      "influence_weight": 2.009,
+      "normalized_influence_weight": 0.78895
+    },
+    {
+      "agent_id": "agent_1373558345",
+      "influence_weight": 1.905,
+      "normalized_influence_weight": 0.674033
+    },
+    {
+      "agent_id": "agent_1430015461",
+      "influence_weight": 1.333,
+      "normalized_influence_weight": 0.041989
+    },
+    {
+      "agent_id": "agent_1442246695",
+      "influence_weight": 1.986,
+      "normalized_influence_weight": 0.763536
+    },
+    {
+      "agent_id": "agent_1497151510",
+      "influence_weight": 1.854,
+      "normalized_influence_weight": 0.61768
+    },
+    {
+      "agent_id": "agent_1640016932",
+      "influence_weight": 2.068,
+      "normalized_influence_weight": 0.854144
+    },
+    {
+      "agent_id": "agent_1644114654",
+      "influence_weight": 2.137,
+      "normalized_influence_weight": 0.930387
+    },
+    {
+      "agent_id": "agent_1699432410",
+      "influence_weight": 2.183,
+      "normalized_influence_weight": 0.981215
+    },
+    {
+      "agent_id": "agent_1711530911",
+      "influence_weight": 2.062,
+      "normalized_influence_weight": 0.847514
+    },
+    {
+      "agent_id": "agent_1726918143",
+      "influence_weight": 2.093,
+      "normalized_influence_weight": 0.881768
+    },
+    {
+      "agent_id": "agent_1738004582",
+      "influence_weight": 2.059,
+      "normalized_influence_weight": 0.844199
+    },
+    {
+      "agent_id": "agent_1784473157",
+      "influence_weight": 2.165,
+      "normalized_influence_weight": 0.961326
+    },
+    {
+      "agent_id": "agent_1820201245",
+      "influence_weight": 2.064,
+      "normalized_influence_weight": 0.849724
+    },
+    {
+      "agent_id": "agent_1862226395",
+      "influence_weight": 1.295,
+      "normalized_influence_weight": 0.0
+    },
+    {
+      "agent_id": "agent_1866405545",
+      "influence_weight": 1.976,
+      "normalized_influence_weight": 0.752486
+    },
+    {
+      "agent_id": "agent_1874361623",
+      "influence_weight": 1.983,
+      "normalized_influence_weight": 0.760221
+    },
+    {
+      "agent_id": "agent_1875293522",
+      "influence_weight": 1.969,
+      "normalized_influence_weight": 0.744751
+    },
+    {
+      "agent_id": "agent_1942473263",
+      "influence_weight": 1.989,
+      "normalized_influence_weight": 0.766851
+    },
+    {
+      "agent_id": "agent_1989660417",
+      "influence_weight": 2.102,
+      "normalized_influence_weight": 0.891713
+    },
+    {
+      "agent_id": "agent_2104922447",
+      "influence_weight": 1.898,
+      "normalized_influence_weight": 0.666298
+    },
+    {
+      "agent_id": "agent_2105807580",
+      "influence_weight": 2.027,
+      "normalized_influence_weight": 0.80884
+    },
+    {
+      "agent_id": "agent_2209621235",
+      "influence_weight": 1.905,
+      "normalized_influence_weight": 0.674033
+    },
+    {
+      "agent_id": "agent_2287365501",
+      "influence_weight": 2.049,
+      "normalized_influence_weight": 0.833149
+    },
+    {
+      "agent_id": "agent_2331621641",
+      "influence_weight": 2.0,
+      "normalized_influence_weight": 0.779006
+    },
+    {
+      "agent_id": "agent_2656274875",
+      "influence_weight": 2.194,
+      "normalized_influence_weight": 0.99337
+    },
+    {
+      "agent_id": "agent_2803301701",
+      "influence_weight": 2.2,
+      "normalized_influence_weight": 1.0
+    }
+  ],
+  "influence_weight_range": {
+    "minimum": 1.295,
+    "maximum": 2.2
+  },
+  "edges": [
+    {
+      "source_agent_id": "agent_1237698584",
+      "target_agent_id": "agent_1430015461"
+    },
+    {
+      "source_agent_id": "agent_1237698584",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_1237698584",
+      "target_agent_id": "agent_1726918143"
+    },
+    {
+      "source_agent_id": "agent_1237698584",
+      "target_agent_id": "agent_1738004582"
+    },
+    {
+      "source_agent_id": "agent_1237698584",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1244589914",
+      "target_agent_id": "agent_1259110474"
+    },
+    {
+      "source_agent_id": "agent_1244589914",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1244589914",
+      "target_agent_id": "agent_1644114654"
+    },
+    {
+      "source_agent_id": "agent_1244589914",
+      "target_agent_id": "agent_1989660417"
+    },
+    {
+      "source_agent_id": "agent_1244589914",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1259110474",
+      "target_agent_id": "agent_1726918143"
+    },
+    {
+      "source_agent_id": "agent_1259110474",
+      "target_agent_id": "agent_1738004582"
+    },
+    {
+      "source_agent_id": "agent_1259110474",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1259110474",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1259110474",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_1266321801",
+      "target_agent_id": "agent_1244589914"
+    },
+    {
+      "source_agent_id": "agent_1266321801",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1266321801",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1266321801",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_1266321801",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1298535315",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1298535315",
+      "target_agent_id": "agent_1989660417"
+    },
+    {
+      "source_agent_id": "agent_1298535315",
+      "target_agent_id": "agent_2209621235"
+    },
+    {
+      "source_agent_id": "agent_1298535315",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_1298535315",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1373558345",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1373558345",
+      "target_agent_id": "agent_1711530911"
+    },
+    {
+      "source_agent_id": "agent_1373558345",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1373558345",
+      "target_agent_id": "agent_1989660417"
+    },
+    {
+      "source_agent_id": "agent_1373558345",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_1430015461",
+      "target_agent_id": "agent_1711530911"
+    },
+    {
+      "source_agent_id": "agent_1430015461",
+      "target_agent_id": "agent_1784473157"
+    },
+    {
+      "source_agent_id": "agent_1430015461",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1430015461",
+      "target_agent_id": "agent_2287365501"
+    },
+    {
+      "source_agent_id": "agent_1430015461",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1442246695",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1442246695",
+      "target_agent_id": "agent_1644114654"
+    },
+    {
+      "source_agent_id": "agent_1442246695",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1442246695",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1442246695",
+      "target_agent_id": "agent_2287365501"
+    },
+    {
+      "source_agent_id": "agent_1497151510",
+      "target_agent_id": "agent_1244589914"
+    },
+    {
+      "source_agent_id": "agent_1497151510",
+      "target_agent_id": "agent_1644114654"
+    },
+    {
+      "source_agent_id": "agent_1497151510",
+      "target_agent_id": "agent_1726918143"
+    },
+    {
+      "source_agent_id": "agent_1497151510",
+      "target_agent_id": "agent_1738004582"
+    },
+    {
+      "source_agent_id": "agent_1497151510",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1640016932",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1640016932",
+      "target_agent_id": "agent_1942473263"
+    },
+    {
+      "source_agent_id": "agent_1640016932",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1640016932",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_1640016932",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1644114654",
+      "target_agent_id": "agent_1266321801"
+    },
+    {
+      "source_agent_id": "agent_1644114654",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1644114654",
+      "target_agent_id": "agent_1497151510"
+    },
+    {
+      "source_agent_id": "agent_1644114654",
+      "target_agent_id": "agent_1711530911"
+    },
+    {
+      "source_agent_id": "agent_1644114654",
+      "target_agent_id": "agent_2209621235"
+    },
+    {
+      "source_agent_id": "agent_1699432410",
+      "target_agent_id": "agent_1259110474"
+    },
+    {
+      "source_agent_id": "agent_1699432410",
+      "target_agent_id": "agent_1640016932"
+    },
+    {
+      "source_agent_id": "agent_1699432410",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_1699432410",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1699432410",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_1711530911",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_1711530911",
+      "target_agent_id": "agent_1726918143"
+    },
+    {
+      "source_agent_id": "agent_1711530911",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1711530911",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1711530911",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_1726918143",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1726918143",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_1726918143",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1726918143",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1726918143",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1738004582",
+      "target_agent_id": "agent_1237698584"
+    },
+    {
+      "source_agent_id": "agent_1738004582",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1738004582",
+      "target_agent_id": "agent_1942473263"
+    },
+    {
+      "source_agent_id": "agent_1738004582",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1738004582",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1784473157",
+      "target_agent_id": "agent_1266321801"
+    },
+    {
+      "source_agent_id": "agent_1784473157",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1784473157",
+      "target_agent_id": "agent_1874361623"
+    },
+    {
+      "source_agent_id": "agent_1784473157",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1784473157",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_1820201245",
+      "target_agent_id": "agent_1237698584"
+    },
+    {
+      "source_agent_id": "agent_1820201245",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1820201245",
+      "target_agent_id": "agent_1430015461"
+    },
+    {
+      "source_agent_id": "agent_1820201245",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1820201245",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_1862226395",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1862226395",
+      "target_agent_id": "agent_1644114654"
+    },
+    {
+      "source_agent_id": "agent_1862226395",
+      "target_agent_id": "agent_1738004582"
+    },
+    {
+      "source_agent_id": "agent_1862226395",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1862226395",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_1866405545",
+      "target_agent_id": "agent_1244589914"
+    },
+    {
+      "source_agent_id": "agent_1866405545",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1866405545",
+      "target_agent_id": "agent_1497151510"
+    },
+    {
+      "source_agent_id": "agent_1866405545",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1866405545",
+      "target_agent_id": "agent_2209621235"
+    },
+    {
+      "source_agent_id": "agent_1874361623",
+      "target_agent_id": "agent_1244589914"
+    },
+    {
+      "source_agent_id": "agent_1874361623",
+      "target_agent_id": "agent_1259110474"
+    },
+    {
+      "source_agent_id": "agent_1874361623",
+      "target_agent_id": "agent_1640016932"
+    },
+    {
+      "source_agent_id": "agent_1874361623",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_1874361623",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_1875293522",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_1875293522",
+      "target_agent_id": "agent_1784473157"
+    },
+    {
+      "source_agent_id": "agent_1875293522",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1875293522",
+      "target_agent_id": "agent_2209621235"
+    },
+    {
+      "source_agent_id": "agent_1875293522",
+      "target_agent_id": "agent_2287365501"
+    },
+    {
+      "source_agent_id": "agent_1942473263",
+      "target_agent_id": "agent_1640016932"
+    },
+    {
+      "source_agent_id": "agent_1942473263",
+      "target_agent_id": "agent_1784473157"
+    },
+    {
+      "source_agent_id": "agent_1942473263",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_1942473263",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_1942473263",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_1989660417",
+      "target_agent_id": "agent_1237698584"
+    },
+    {
+      "source_agent_id": "agent_1989660417",
+      "target_agent_id": "agent_1298535315"
+    },
+    {
+      "source_agent_id": "agent_1989660417",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_1989660417",
+      "target_agent_id": "agent_1497151510"
+    },
+    {
+      "source_agent_id": "agent_1989660417",
+      "target_agent_id": "agent_1942473263"
+    },
+    {
+      "source_agent_id": "agent_2104922447",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_2104922447",
+      "target_agent_id": "agent_1640016932"
+    },
+    {
+      "source_agent_id": "agent_2104922447",
+      "target_agent_id": "agent_1875293522"
+    },
+    {
+      "source_agent_id": "agent_2104922447",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_2104922447",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_2105807580",
+      "target_agent_id": "agent_1738004582"
+    },
+    {
+      "source_agent_id": "agent_2105807580",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_2105807580",
+      "target_agent_id": "agent_1875293522"
+    },
+    {
+      "source_agent_id": "agent_2105807580",
+      "target_agent_id": "agent_2104922447"
+    },
+    {
+      "source_agent_id": "agent_2105807580",
+      "target_agent_id": "agent_2803301701"
+    },
+    {
+      "source_agent_id": "agent_2209621235",
+      "target_agent_id": "agent_1237698584"
+    },
+    {
+      "source_agent_id": "agent_2209621235",
+      "target_agent_id": "agent_1266321801"
+    },
+    {
+      "source_agent_id": "agent_2209621235",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_2209621235",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_2209621235",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_2287365501",
+      "target_agent_id": "agent_1726918143"
+    },
+    {
+      "source_agent_id": "agent_2287365501",
+      "target_agent_id": "agent_1784473157"
+    },
+    {
+      "source_agent_id": "agent_2287365501",
+      "target_agent_id": "agent_1874361623"
+    },
+    {
+      "source_agent_id": "agent_2287365501",
+      "target_agent_id": "agent_1942473263"
+    },
+    {
+      "source_agent_id": "agent_2287365501",
+      "target_agent_id": "agent_2656274875"
+    },
+    {
+      "source_agent_id": "agent_2331621641",
+      "target_agent_id": "agent_1259110474"
+    },
+    {
+      "source_agent_id": "agent_2331621641",
+      "target_agent_id": "agent_1373558345"
+    },
+    {
+      "source_agent_id": "agent_2331621641",
+      "target_agent_id": "agent_1442246695"
+    },
+    {
+      "source_agent_id": "agent_2331621641",
+      "target_agent_id": "agent_1874361623"
+    },
+    {
+      "source_agent_id": "agent_2331621641",
+      "target_agent_id": "agent_1875293522"
+    },
+    {
+      "source_agent_id": "agent_2656274875",
+      "target_agent_id": "agent_1237698584"
+    },
+    {
+      "source_agent_id": "agent_2656274875",
+      "target_agent_id": "agent_1259110474"
+    },
+    {
+      "source_agent_id": "agent_2656274875",
+      "target_agent_id": "agent_1644114654"
+    },
+    {
+      "source_agent_id": "agent_2656274875",
+      "target_agent_id": "agent_2105807580"
+    },
+    {
+      "source_agent_id": "agent_2656274875",
+      "target_agent_id": "agent_2331621641"
+    },
+    {
+      "source_agent_id": "agent_2803301701",
+      "target_agent_id": "agent_1430015461"
+    },
+    {
+      "source_agent_id": "agent_2803301701",
+      "target_agent_id": "agent_1820201245"
+    },
+    {
+      "source_agent_id": "agent_2803301701",
+      "target_agent_id": "agent_1862226395"
+    },
+    {
+      "source_agent_id": "agent_2803301701",
+      "target_agent_id": "agent_1866405545"
+    },
+    {
+      "source_agent_id": "agent_2803301701",
+      "target_agent_id": "agent_2331621641"
+    }
+  ]
+}

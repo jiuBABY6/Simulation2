@@ -37,7 +37,7 @@
 | `events` | 用户输入的事件正文和标签 |
 | `official_response_plans` | 进场规则及四种官方声明 |
 | `experiments` | 实验运行状态、结果状态、总体比较和性能 |
-| `experiment_scenarios` | 不回应及四个回应场景的结果 |
+| `experiment_scenarios` | 一组不回应基线及三个回应方案的结果 |
 | `simulation_rounds` | 各场景每轮指标 |
 | `social_networks` | 实验共享的网络参数 |
 | `social_network_nodes` | Agent编号和影响力权重 |

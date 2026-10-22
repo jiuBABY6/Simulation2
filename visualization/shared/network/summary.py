@@ -68,7 +68,11 @@ def build_report_summary(experiment_id: str) -> dict[str, Any]:
         default=0,
     )
     default_scenario = str(scenarios[0]["scenario_id"]) if scenarios else ""
-    mode_text = "历史复现" if adapter.mode == HISTORICAL_MODE else "五策略实验"
+    mode_text = (
+        "历史复现"
+        if adapter.mode == HISTORICAL_MODE
+        else "回应方案对照实验"
+    )
     findings = [
         f"{mode_text}使用 {len(network.get('nodes', []))} 个 Agent、"
         f"{len(network.get('edges', []))} 条固定关注边。",

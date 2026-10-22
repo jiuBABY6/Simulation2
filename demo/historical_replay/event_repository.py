@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from runtime_paths import ACTIVE_EVENT_FILE, EVENTS_DIR
+if __package__:
+    from .runtime_paths import ACTIVE_EVENT_FILE, EVENTS_DIR
+else:  # pragma: no cover - 保留直接脚本启动方式
+    from runtime_paths import ACTIVE_EVENT_FILE, EVENTS_DIR
 
 
 def _normalize_event_id(event_id: str) -> str:

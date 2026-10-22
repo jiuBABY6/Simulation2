@@ -6,32 +6,24 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from visualization.shared.experiment_adapter import ExperimentAdapter
+from visualization.shared.artifact_io import (
+    load_json_object,
+    load_jsonl_objects,
+)
 
 
 def load_json(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError(f"JSON 文件不是对象：{path}")
-    return data
+    """兼容旧调用；统一读取器负责校验。"""
+    return load_json_object(path)
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
-    records: list[dict[str, Any]] = []
-    for line_number, line in enumerate(
-        path.read_text(encoding="utf-8").splitlines(), start=1
-    ):
-        if not line.strip():
-            continue
-        record = json.loads(line)
-        if not isinstance(record, dict):
-            raise ValueError(f"JSONL 第 {line_number} 行不是对象：{path}")
-        records.append(record)
-    return records
+    """兼容旧调用；统一读取器负责行级校验。"""
+    return load_jsonl_objects(path)
 
 
 def load_events(

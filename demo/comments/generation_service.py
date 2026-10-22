@@ -8,6 +8,7 @@ import json
 import re
 
 from comments.angle_planner import validate_comment_tasks
+from domain.comment_semantics import normalize_comment_semantics
 from infrastructure.json_storage import load_json
 from infrastructure.llm_service import call_deepseek_json
 from project_config import (
@@ -248,6 +249,11 @@ def normalize_comments(
             "faction": faction,
             "orientation": orientation,
             "stance": stance,
+            # 2026/10/19，新增功能：模型可在同一次评论生成中返回语义
+            # 字段；缺失或非法值由统一契约保守补全，不额外调用LLM。
+            "reaction_target": item.get("reaction_target"),
+            "evidence_role": item.get("evidence_role"),
+            "claim_id": item.get("claim_id"),
         }
         if task_map:
             task = task_map[task_id]
@@ -274,7 +280,13 @@ def normalize_comments(
                 if task.get(field):
                     comment[field] = task[field]
             accepted_task_ids.add(task_id)
-        normalized.append(comment)
+        normalized.append(
+            normalize_comment_semantics(
+                comment,
+                default_information_source="public",
+                default_provenance="llm_generated",
+            )
+        )
         used_texts.add(text)
 
     return normalized

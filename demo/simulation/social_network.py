@@ -166,6 +166,23 @@ def validate_social_network(snapshot, expected_agent_ids=None):
     if expected_agent_ids is not None and node_ids != set(expected_agent_ids):
         raise ValueError("社交网络节点与本轮参与决策的Agent不一致。")
 
+    # 2026/10/19，新增功能：原始影响力继续用于网络展示和传播排序，
+    # 同时保存0到1的相对权重供认知层使用。不能直接截断原始1～2.2
+    # 权重，否则大多数Agent在决策阶段都会变成相同的1.0。
+    raw_weights = [node["influence_weight"] for node in normalized_nodes]
+    minimum_weight = min(raw_weights)
+    maximum_weight = max(raw_weights)
+    span = maximum_weight - minimum_weight
+    for node in normalized_nodes:
+        node["normalized_influence_weight"] = round(
+            (
+                (node["influence_weight"] - minimum_weight) / span
+                if span > 0
+                else 0.5
+            ),
+            6,
+        )
+
     normalized_edges = []
     edge_keys = set()
     for edge in edges:
@@ -229,6 +246,10 @@ def validate_social_network(snapshot, expected_agent_ids=None):
             "public_comment_count": public_comment_count,
         },
         "nodes": normalized_nodes,
+        "influence_weight_range": {
+            "minimum": minimum_weight,
+            "maximum": maximum_weight,
+        },
         "edges": normalized_edges,
     }
 
@@ -250,6 +271,29 @@ def get_influence_weight(snapshot, agent_id):
         if node["agent_id"] == agent_id:
             return node["influence_weight"]
     return 1.0
+
+
+def get_normalized_influence_weight(snapshot, agent_id):
+    """返回认知层使用的0到1相对影响力，兼容缺少新字段的旧快照。"""
+
+    nodes = snapshot.get("nodes", [])
+    for node in nodes:
+        if node.get("agent_id") != agent_id:
+            continue
+        value = node.get("normalized_influence_weight")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return max(0.0, min(1.0, float(value)))
+        break
+    weights = [
+        float(node.get("influence_weight"))
+        for node in nodes
+        if isinstance(node.get("influence_weight"), (int, float))
+        and not isinstance(node.get("influence_weight"), bool)
+    ]
+    raw = get_influence_weight(snapshot, agent_id)
+    if not weights or max(weights) == min(weights):
+        return 0.5
+    return max(0.0, min(1.0, (raw - min(weights)) / (max(weights) - min(weights))))
 
 
 # 2026/9/5，社交网络传播第二阶段A，新增功能：统一读取网络快照中的传播衰减系数。

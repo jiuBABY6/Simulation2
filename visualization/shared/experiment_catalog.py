@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
-from visualization.config import EXPERIMENTS_DIR
-from visualization.historical.real_trend_repository import has_real_trend
+from visualization.config import EXPERIMENTS_DIR, REAL_DATA_DIR
+from visualization.shared.artifact_io import load_json_object
+from visualization.shared.event_resources import has_event_json_resource
 
 
 STRATEGY_MODE = "strategy_comparison"
@@ -26,13 +26,6 @@ def resolve_experiment_dir(experiment_id: str) -> Path:
     if candidate.parent != root or not candidate.is_dir():
         raise FileNotFoundError(f"找不到实验目录：{normalized}")
     return candidate
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError(f"JSON 文件不是对象：{path}")
-    return data
 
 
 def _detect_result(experiment_dir: Path) -> tuple[str, Path] | None:
@@ -86,7 +79,8 @@ def _capabilities(
             if str(item.get("strategy", "")).strip()
         ]
     real_trend_compatible = (
-        mode == HISTORICAL_MODE and has_real_trend(result.get("event_id"))
+        mode == HISTORICAL_MODE
+        and has_event_json_resource(REAL_DATA_DIR, result.get("event_id"))
     )
     return {
         "network": network_file.is_file(),
@@ -109,7 +103,7 @@ def describe_experiment(experiment_id: str) -> dict[str, Any]:
     if detected is None:
         raise ValueError(f"无法识别实验类型：{experiment_id}")
     mode, result_path = detected
-    result = _read_json(result_path)
+    result = load_json_object(result_path)
     if mode == HISTORICAL_MODE:
         step_count = int(result.get("step_count") or len(result.get("rounds", [])))
         scenario_count = 1
@@ -126,7 +120,11 @@ def describe_experiment(experiment_id: str) -> dict[str, Any]:
         "experiment_id": str(result.get("experiment_id") or experiment_dir.name),
         "event_id": result.get("event_id"),
         "mode": mode,
-        "mode_label": "五策略推演" if mode == STRATEGY_MODE else "历史数据复现",
+        "mode_label": (
+            "回应方案对照推演"
+            if mode == STRATEGY_MODE
+            else "历史数据复现"
+        ),
         "status": result.get("status"),
         "step_count": step_count,
         "scenario_count": scenario_count,
@@ -150,7 +148,7 @@ def list_experiments(
             continue
         try:
             item = describe_experiment(experiment_dir.name)
-        except (OSError, ValueError, json.JSONDecodeError):
+        except (OSError, ValueError):
             continue
         if mode and item["mode"] != mode:
             continue

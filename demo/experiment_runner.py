@@ -1,19 +1,40 @@
-"""运行并比较四种官方内容策略。
+"""运行并比较三种官方回应方案与一组不回应基线。
 
-本模块只负责编排实验。四种内容策略使用相同的动态进场规则和独立状态目录，
-具体评论生成、Agent 决策和指标统计继续由 simulation/runner.py 完成。
+本模块只负责编排实验。三种可配置回应方案与不回应基线使用相同的动态进场规则
+和独立状态目录，具体评论生成、Agent 决策和指标统计继续由
+simulation/runner.py 完成。
 """
 
-import json
-import os
-import subprocess
-import sys
 import time
 from pathlib import Path
 
+from application.round_results import (
+    calculate_scenario_propagation_summary as _calculate_propagation_summary,
+    extract_policy_metrics as _extract_policy_metrics,
+    load_round_result as _load_round_result,
+    load_step_comment_quality as _load_step_comment_quality,
+    load_step_metrics as _load_step_metrics,
+    summarize_comment_quality as _summarize_comment_quality,
+)
+from application.error_summary import (
+    summarize_scenario_error as _summarize_scenario_error,
+)
+from application.runtime_config import DEFAULT_SIMULATION_RUNTIME
+from application.scenario_state import (
+    prepare_scenario_state as _prepare_scenario_state,
+)
+from application.step_executor import (
+    SimulationStepRequest,
+    SubprocessSimulationStepExecutor,
+    parse_simulation_step_result as _parse_simulation_step_result,
+)
 from simulation.event_state_updater import append_event_state_record
 from agents.persona_repository import load_personas
-from infrastructure.json_storage import load_json, read_jsonl, save_json
+from infrastructure.json_storage import (
+    load_json,
+    read_jsonl,
+    save_json,
+)
 from infrastructure.llm_service import merge_llm_performance_stats
 from evaluation.metrics import (
     calculate_control_net_effect,
@@ -22,37 +43,37 @@ from evaluation.metrics import (
     calculate_negative_peak_and_area,
     calculate_rebound_rate,
 )
-from evaluation.propagation_metrics import (
-    calculate_propagation_metrics,
-    load_propagation_events,
-)
 from project_config import (
     DEMO_DIR,
     OFFICIAL_RESPONSE_FILE,
     SOCIAL_NETWORK_CONFIG_FILE,
 )
 from simulation.social_network import build_fixed_social_network
-from simulation.state_manager import (
-    initialize_simulation_state,
-    initialize_state_from_snapshot,
+from simulation.options import get_ablation_options, get_simulation_options
+from simulation.counterfactual_controls import (
+    CounterfactualIsolationError,
+    audit_cross_scenario_controls,
+    audit_scenario_isolation,
+    build_scenario_input_sha256,
+    build_shared_input_manifest,
+    build_state_snapshot_manifest,
+    objective_state_fields,
 )
 
 
-# 修改下面这些参数即可调整 Demo 实验规模。
-# MAX_STEPS = 5
-# MAX_AGENTS = 30
-# MAX_WORKERS = 5
-# INCREMENTAL_COMMENT_COUNT = 20
+# 回应方案对照与历史复现共用的单轮参数集中在 application/runtime_config.py。
 MAX_STEPS = 10
-MAX_AGENTS = 30
-MAX_WORKERS = 5
-INCREMENTAL_COMMENT_COUNT = 20
-RANDOM_SEED = 2026
+MAX_AGENTS = DEFAULT_SIMULATION_RUNTIME.max_agents
+MAX_WORKERS = DEFAULT_SIMULATION_RUNTIME.max_workers
+# 2026/10/19，修改功能：回应方案对照减少每轮外生LLM评论；历史复现
+# 仍读取共享运行配置中的 incremental_comment_count=20。两条路径通过
+# 显式配置字段分离，避免修改全局常量时意外改变历史实验。
+INCREMENTAL_COMMENT_COUNT = (
+    DEFAULT_SIMULATION_RUNTIME.strategy_incremental_comment_count
+)
+RANDOM_SEED = DEFAULT_SIMULATION_RUNTIME.random_seed
 # 2026/08/25 第八次联调问题修复，修改功能：提高评论生成多样性，减少确定性重复文本。
-COMMENT_TEMPERATURE = 0.5
-
-# 2026/09/04 Demo性能基线，新增功能：识别单轮子进程返回的结构化性能结果。
-SIMULATION_STEP_RESULT_PREFIX = "SIMULATION_STEP_RESULT="
+COMMENT_TEMPERATURE = DEFAULT_SIMULATION_RUNTIME.comment_temperature
 
 # 官方回应的触发阈值。
 NEGATIVE_RATE_THRESHOLD = 0.5
@@ -63,18 +84,22 @@ ENTRY_STRATEGIES = (
     "global_worsening",
     "combined_policy",
 )
-# 2026/08/23 内容策略对照，新增功能：明确当前 Demo 必须提供的四种人工内容策略。
-CONTENT_STRATEGY_IDS = (
-    "fact_report",
-    "empathy",
-    "rumor_clarification",
-    "handling_progress",
-)
+# 2026/10/16，修改功能：实验固定比较三个用户自定义回应方案，
+# 但不限定方案名称和内容类型。不回应基线由系统单独补充。
+RESPONSE_PLAN_COUNT = 3
 OFFICIAL_STATEMENT_STATUSES = (
     "clear",
     "incomplete",
     "conflict",
 )
+OFFICIAL_EVIDENCE_DIMENSIONS = {
+    "verified_fact",
+    "completed_action",
+    "accountability",
+    "empathy",
+    "unresolved_process",
+    "rumor_control",
+}
 # 2026/08/23 内容策略对照，新增功能：保留不发布官方声明的独立实验基线。
 NO_RESPONSE_SCENARIO = {
     "strategy_id": "no_response",
@@ -85,19 +110,8 @@ NO_RESPONSE_SCENARIO = {
 
 
 def parse_simulation_step_result(output):
-    """从子进程标准输出中提取最后一个带标记的单轮结果。"""
-    for line in reversed(str(output).splitlines()):
-        if not line.startswith(SIMULATION_STEP_RESULT_PREFIX):
-            continue
-        payload = line[len(SIMULATION_STEP_RESULT_PREFIX):]
-        try:
-            result = json.loads(payload)
-        except json.JSONDecodeError as error:
-            raise ValueError("单轮子进程返回的性能结果不是合法JSON。") from error
-        if not isinstance(result, dict):
-            raise ValueError("单轮子进程返回的结果必须是JSON对象。")
-        return result
-    raise ValueError("单轮子进程没有返回带标记的结构化结果。")
+    """兼容旧调用；实现已下沉到共享应用层。"""
+    return _parse_simulation_step_result(output)
 
 
 def summarize_step_performance(step_results):
@@ -202,6 +216,8 @@ def build_experiment_performance(
 
 # 2026/08/23 内容策略对照，新增功能：严格校验人工维护的官方内容策略输入。
 # 2026/08/27 第十二次联调修复，修改功能：校验连续未改善动态进场配置。
+# 2026/10/16，修改功能：取消四种固定类型的编号约束，仅校验
+# “三个唯一、完整、可执行的回应方案”，使新事件可直接替换方案。
 def validate_official_response_options(options, event_id):
     """校验事件编号、动态进场规则和内容策略字段。"""
     if not isinstance(options, dict):
@@ -236,8 +252,14 @@ def validate_official_response_options(options, event_id):
         )
 
     raw_strategies = options.get("content_strategies")
-    if not isinstance(raw_strategies, list) or not raw_strategies:
-        raise ValueError("content_strategies 必须是非空数组。")
+    if (
+        not isinstance(raw_strategies, list)
+        or len(raw_strategies) != RESPONSE_PLAN_COUNT
+    ):
+        raise ValueError(
+            "content_strategies 必须恰好包含 "
+            f"{RESPONSE_PLAN_COUNT} 个回应方案。"
+        )
 
     strategies = []
     strategy_ids = set()
@@ -249,6 +271,7 @@ def validate_official_response_options(options, event_id):
         strategy_name = str(item.get("strategy_name", "")).strip()
         statement = str(item.get("official_statement", "")).strip()
         statement_status = item.get("official_statement_status")
+        raw_dimensions = item.get("evidence_dimensions", {})
         if (
             not strategy_id
             or Path(strategy_id).name != strategy_id
@@ -265,6 +288,18 @@ def validate_official_response_options(options, event_id):
             raise ValueError(
                 f"内容策略 {strategy_id} 的 official_statement_status 不合法。"
             )
+        if not isinstance(raw_dimensions, dict):
+            raise ValueError(
+                f"内容策略 {strategy_id} 的 evidence_dimensions 必须是对象。"
+            )
+        unknown_dimensions = set(raw_dimensions) - OFFICIAL_EVIDENCE_DIMENSIONS
+        if unknown_dimensions or any(
+            not isinstance(value, bool) for value in raw_dimensions.values()
+        ):
+            raise ValueError(
+                f"内容策略 {strategy_id} 的 evidence_dimensions 不合法："
+                f"{sorted(unknown_dimensions)}"
+            )
 
         strategy_ids.add(strategy_id)
         strategies.append(
@@ -273,16 +308,11 @@ def validate_official_response_options(options, event_id):
                 "strategy_name": strategy_name,
                 "official_statement": statement,
                 "official_statement_status": statement_status,
+                "evidence_dimensions": {
+                    key: bool(raw_dimensions.get(key, False))
+                    for key in sorted(OFFICIAL_EVIDENCE_DIMENSIONS)
+                },
             }
-        )
-
-    expected_ids = set(CONTENT_STRATEGY_IDS)
-    if strategy_ids != expected_ids:
-        missing_ids = sorted(expected_ids - strategy_ids)
-        extra_ids = sorted(strategy_ids - expected_ids)
-        raise ValueError(
-            "内容策略必须完整包含当前四种策略："
-            f"缺少 {missing_ids}，多余 {extra_ids}。"
         )
 
     return {
@@ -312,53 +342,11 @@ def load_official_response_options(response_file, event_id):
 def extract_policy_metrics(round_metrics, negative_rate_basis="agent_internal"):
     """提取策略指标，并显式记录负面率的观测对象和分母。
 
-    五策略继续使用 ``agent_internal``，保持既有进场和策略比较语义；历史
+    回应方案对照继续使用 ``agent_internal``，保持进场和方案比较语义；历史
     趋势复现显式传入 ``agent_expression``，用 Agent 实际发表的评论与真实
-    评论比较。通过参数隔离两类实验，避免历史口径修正悄然改变五策略。
+    评论比较。通过参数隔离两类实验，避免历史口径修正悄然改变回应方案对照。
     """
-    try:
-        attitude_summary = round_metrics["official_attitude_distribution"]
-        attitude = attitude_summary["distribution"]
-        if negative_rate_basis == "agent_internal":
-            negative_summary = round_metrics["agent_negative_emotion"]
-            negative_rate = negative_summary["negative_rate"]
-            negative_count = negative_summary["negative_count"]
-            negative_denominator = negative_summary["agent_count"]
-            expression_summary = round_metrics.get(
-                "agent_expression_distribution", {}
-            )
-        elif negative_rate_basis == "agent_expression":
-            expression_summary = round_metrics["agent_expression_distribution"]
-            negative_item = expression_summary["distribution"]["negative"]
-            negative_rate = negative_item["rate"]
-            negative_count = negative_item["count"]
-            negative_denominator = expression_summary[
-                "classified_expression_count"
-            ]
-        else:
-            raise ValueError(
-                "negative_rate_basis 只能是 agent_internal 或 "
-                "agent_expression。"
-            )
-        return {
-            "negative_rate": negative_rate,
-            "negative_count": negative_count,
-            "negative_denominator": negative_denominator,
-            "negative_rate_basis": negative_rate_basis,
-            "expression_count": expression_summary.get("expression_count"),
-            "silent_agent_count": expression_summary.get(
-                "silent_agent_count"
-            ),
-            "question_rate": attitude["question"]["rate"],
-            "accept_rate": attitude["accept"]["rate"],
-            "official_attitude_applicable_count": attitude_summary.get(
-                "applicable_agent_count",
-                attitude_summary.get("agent_count", 0),
-            ),
-            "global_trend": round_metrics["global_trend"]["trend_direction"],
-        }
-    except (KeyError, TypeError) as error:
-        raise ValueError("指标结果缺少实验策略所需字段。") from error
+    return _extract_policy_metrics(round_metrics, negative_rate_basis)
 
 
 # 2026/08/27 第十二次联调修复，新增功能：计算第1轮基线之后连续没有明显改善的轮数。
@@ -481,29 +469,14 @@ def prepare_scenario_state(
     baseline_state_dir=None,
     initial_state_context=None,
 ):
-    """为一个实验策略创建初始状态，必要时复用共享基线快照。"""
-    scenario_dir = Path(experiment_dir) / strategy_name
-    state_dir = scenario_dir / "state"
-    if scenario_dir.exists():
-        raise FileExistsError(f"实验策略目录已经存在：{scenario_dir}")
-
-    if baseline_state_dir is None:
-        initial_event_input = {"event_id": event_id}
-        if initial_state_context is not None:
-            if not isinstance(initial_state_context, dict):
-                raise ValueError("initial_state_context 必须是 JSON 对象。")
-            initial_event_input.update(initial_state_context)
-        initialize_simulation_state(
-            state_dir=state_dir,
-            event_input=initial_event_input,
-        )
-    else:
-        initialize_state_from_snapshot(
-            source_state_dir=baseline_state_dir,
-            state_dir=state_dir,
-            event_id=event_id,
-        )
-    return scenario_dir, state_dir
+    """兼容旧调用；共享状态编排由应用层统一实现。"""
+    return _prepare_scenario_state(
+        experiment_dir,
+        strategy_name,
+        event_id,
+        baseline_state_dir,
+        initial_state_context,
+    )
 
 
 # 2026/9/5，社交网络传播，新增功能：实验开始前生成五个策略共同使用的固定网络快照。
@@ -529,207 +502,49 @@ def run_simulation_step(
     social_network_file=None,
     incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
 ):
-    """使用指定状态、事件和评论池运行一个时间步并返回性能结果。"""
-    environment = os.environ.copy()
-    environment["SIMULATION_STATE_DIR"] = str(Path(state_dir).resolve())
-    environment["SIMULATION_EVENT_FILE"] = str(Path(event_file).resolve())
-    environment["SIMULATION_COMMENT_POOL_FILE"] = str(
-        Path(comment_pool_file).resolve()
+    """兼容旧调用；由可替换的单轮执行器封装子进程协议。"""
+    request = SimulationStepRequest(
+        state_dir=Path(state_dir),
+        event_file=Path(event_file),
+        comment_pool_file=Path(comment_pool_file),
+        social_network_file=(
+            Path(social_network_file) if social_network_file is not None else None
+        ),
+        incremental_comment_count=incremental_comment_count,
+        max_agents=MAX_AGENTS,
+        max_workers=MAX_WORKERS,
+        random_seed=RANDOM_SEED,
+        comment_temperature=COMMENT_TEMPERATURE,
+        demo_dir=DEMO_DIR,
     )
-    if social_network_file is not None:
-        # 2026/9/5，社交网络传播，修改功能：场景子进程统一读取实验根目录的只读网络快照。
-        environment["SIMULATION_SOCIAL_NETWORK_FILE"] = str(
-            Path(social_network_file).resolve()
-        )
-    environment["SIMULATION_RANDOM_SEED"] = str(RANDOM_SEED)
-    environment["SIMULATION_COMMENT_TEMPERATURE"] = str(COMMENT_TEMPERATURE)
-    # 2026/08/22 联调可靠性收尾：统一子进程输出编码，避免中文错误信息出现乱码。
-    environment["PYTHONIOENCODING"] = "utf-8"
-
-    # 2026/09/05 代码结构重构，修改功能：以包模块方式启动迁移后的仿真运行器。
-    if (
-        isinstance(incremental_comment_count, bool)
-        or not isinstance(incremental_comment_count, int)
-        or incremental_comment_count < 1
-    ):
-        raise ValueError("incremental_comment_count 必须是正整数。")
-    command = [
-        sys.executable,
-        "-m",
-        "simulation.runner",
-        "--max-agents",
-        str(MAX_AGENTS),
-        "--workers",
-        str(MAX_WORKERS),
-        "--incremental-comments",
-        str(incremental_comment_count),
-    ]
-    process = subprocess.run(
-        command,
-        cwd=str(DEMO_DIR),
-        env=environment,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    if process.returncode != 0:
-        # 2026/08/24 增量评论稳定补齐，修改功能：失败时同时保留评论过滤日志和异常栈。
-        output_parts = []
-        if process.stdout.strip():
-            output_parts.append(f"标准输出：\n{process.stdout.strip()}")
-        if process.stderr.strip():
-            output_parts.append(f"异常输出：\n{process.stderr.strip()}")
-        message = "\n\n".join(output_parts) or "子进程未返回错误信息。"
-        raise RuntimeError(f"场景时间步运行失败：{message}")
-
-    # 2026/09/04 Demo性能基线，修改功能：解析子进程结果供基线、场景和实验三级汇总。
-    return parse_simulation_step_result(process.stdout)
+    return SubprocessSimulationStepExecutor().run(request)
 
 
 # 2026/08/26 第九次联调问题修复，新增功能：提取适合控制台显示的简短场景错误。
 def summarize_scenario_error(error, max_length=160):
-    """返回单行错误摘要，完整异常仍由实验结果文件保存。"""
-    message = str(error)
-    if "HTTP 402" in message or "Insufficient Balance" in message:
-        return "DeepSeek HTTP 402：余额不足（Insufficient Balance）"
-
-    lines = [line.strip() for line in message.splitlines() if line.strip()]
-    summary = lines[-1] if lines else error.__class__.__name__
-    if len(summary) > max_length:
-        return f"{summary[:max_length]}……"
-    return summary
+    """兼容旧调用；控制台错误格式由共享应用层统一维护。"""
+    return _summarize_scenario_error(error, max_length)
 
 
 def load_step_metrics(metrics_file, event_id, step):
-    """读取指定事件和时间步的正式指标记录。"""
-    matches = [
-        record
-        for record in read_jsonl(metrics_file)
-        if record.get("event_id") == event_id
-        and record.get("step") == step
-        and not record.get("is_example")
-    ]
-    if not matches:
-        raise ValueError(f"找不到事件 {event_id} 第 {step} 轮的指标。")
-    return matches[-1]
+    """兼容旧调用；从共享结果读取器加载指标。"""
+    return _load_step_metrics(metrics_file, event_id, step)
 
 
 # 2026/08/24 增量评论稳定补齐，新增功能：读取指定轮次的评论来源统计和数据质量状态。
 # 2026/09/04 增量评论生成架构优化，修改功能：向场景结果传递首轮请求、统一补齐和生成波次统计。
 # 2026/09/04 评论质量与耗时平衡，修改功能：传递质量目标和自适应救援请求统计。
 def load_step_comment_quality(incremental_file, event_id, step):
-    """从增量评论历史中提取场景结果需要的质量摘要。"""
-    matches = [
-        record
-        for record in read_jsonl(incremental_file)
-        if record.get("event_id") == event_id and record.get("step") == step
-    ]
-    if not matches:
-        raise ValueError(f"找不到事件 {event_id} 第 {step} 轮的增量评论。")
-    record = matches[-1]
-    fallback_count = record.get("fallback_count", 0)
-    history_fallback_count = record.get(
-        "history_fallback_count",
-        fallback_count,
-    )
-    emergency_fallback_count = record.get("emergency_fallback_count", 0)
-    return {
-        "step": step,
-        "quality_status": record.get("quality_status", "normal"),
-        "comment_count": record.get("comment_count", 0),
-        "llm_comment_count": record.get(
-            "llm_comment_count",
-            record.get("comment_count", 0) - fallback_count,
-        ),
-        "history_fallback_count": history_fallback_count,
-        "emergency_fallback_count": emergency_fallback_count,
-        "fallback_count": fallback_count,
-        "generation_attempts": record.get("generation_attempts", 0),
-        "initial_request_count": record.get("initial_request_count", 0),
-        "refill_request_count": record.get("refill_request_count", 0),
-        "rescue_request_count": record.get("rescue_request_count", 0),
-        "generation_wave_count": record.get("generation_wave_count", 0),
-        "quality_target_count": record.get("quality_target_count", 0),
-        "model_returned_comment_count": record.get(
-            "model_returned_comment_count",
-            0,
-        ),
-        "rejection_counts": record.get("rejection_counts", {}),
-        "validation_errors": record.get("validation_errors", []),
-        "emotion_coverage": record.get(
-            "emotion_coverage",
-            {"status": "not_required"},
-        ),
-    }
+    """兼容旧调用；从共享结果读取器加载评论质量。"""
+    return _load_step_comment_quality(incremental_file, event_id, step)
 
 
 # 2026/08/24 增量评论稳定补齐，新增功能：汇总一个实验场景全部轮次的评论数据质量。
 # 2026/09/04 增量评论生成架构优化，修改功能：汇总业务层评论请求数，便于和性能基线直接比较。
 # 2026/09/04 评论质量与耗时平衡，修改功能：汇总自适应救援请求数量。
 def summarize_comment_quality(quality_records):
-    """汇总兜底数量，并按 emergency、degraded、normal 的优先级定级。"""
-    statuses = {record["quality_status"] for record in quality_records}
-    if "emergency" in statuses:
-        quality_status = "emergency"
-    elif "degraded" in statuses:
-        quality_status = "degraded"
-    else:
-        quality_status = "normal"
-    coverage_statuses = {
-        record.get("emotion_coverage", {}).get("status", "not_required")
-        for record in quality_records
-    }
-    if "incomplete" in coverage_statuses:
-        emotion_coverage_status = "incomplete"
-    elif "complete" in coverage_statuses:
-        emotion_coverage_status = "complete"
-    else:
-        emotion_coverage_status = "not_required"
-    return {
-        "quality_status": quality_status,
-        "llm_comment_count": sum(
-            record["llm_comment_count"] for record in quality_records
-        ),
-        "history_fallback_count": sum(
-            record["history_fallback_count"] for record in quality_records
-        ),
-        "emergency_fallback_count": sum(
-            record["emergency_fallback_count"] for record in quality_records
-        ),
-        "fallback_count": sum(
-            record["fallback_count"] for record in quality_records
-        ),
-        "generation_attempts": sum(
-            record.get("generation_attempts", 0)
-            for record in quality_records
-        ),
-        "initial_request_count": sum(
-            record.get("initial_request_count", 0)
-            for record in quality_records
-        ),
-        "refill_request_count": sum(
-            record.get("refill_request_count", 0)
-            for record in quality_records
-        ),
-        "rescue_request_count": sum(
-            record.get("rescue_request_count", 0)
-            for record in quality_records
-        ),
-        "warning_steps": [
-            record["step"]
-            for record in quality_records
-            if record["quality_status"] != "normal"
-        ],
-        # 2026/10/9，新增功能：单独汇总情绪覆盖，避免与兜底质量状态混为一谈。
-        "emotion_coverage_status": emotion_coverage_status,
-        "emotion_coverage_warning_steps": [
-            record["step"]
-            for record in quality_records
-            if record.get("emotion_coverage", {}).get("status")
-            == "incomplete"
-        ],
-    }
+    """兼容旧调用；评论质量汇总由共享结果服务完成。"""
+    return _summarize_comment_quality(quality_records)
 
 
 # 2026/08/25 第八次联调问题修复，新增功能：统一读取共享基线和独立场景的单轮结果。
@@ -739,45 +554,19 @@ def load_round_result(
     step,
     negative_rate_basis="agent_internal",
 ):
-    """读取一个时间步的策略指标，并在增量轮次附加评论质量。"""
-    metrics_file = Path(state_dir) / "metrics_history.jsonl"
-    incremental_file = Path(state_dir) / "incremental_comment_history.jsonl"
-    round_metrics = load_step_metrics(metrics_file, event_id, step)
-    round_result = {
-        "step": step,
-        "policy_metrics": extract_policy_metrics(
-            round_metrics,
-            negative_rate_basis=negative_rate_basis,
-        ),
-        # 2026/9/5，社交网络传播第二阶段A，新增功能：场景逐轮结果附带传播指标。
-        "propagation_metrics": round_metrics.get("propagation_metrics", {}),
-    }
-    comment_quality = None
-    if step > 1:
-        comment_quality = load_step_comment_quality(
-            incremental_file,
-            event_id,
-            step,
-        )
-        round_result["comment_generation"] = comment_quality
-    return round_result, comment_quality
+    """兼容旧调用；共享结果服务保持返回结构不变。"""
+    return _load_round_result(
+        state_dir,
+        event_id,
+        step,
+        negative_rate_basis=negative_rate_basis,
+    )
 
 
 # 2026/9/5，社交网络传播第二阶段A，新增功能：汇总一个场景的累计传播覆盖和深度。
 def calculate_scenario_propagation_summary(state_dir, event_id):
-    """读取场景传播历史，并按实际参与Agent数计算累计传播指标。"""
-    state_path = Path(state_dir)
-    decision_records = read_jsonl(state_path / "decision_history.jsonl")
-    agent_ids = {
-        record.get("agent_id")
-        for record in decision_records
-        if record.get("event_id") == event_id and record.get("agent_id")
-    }
-    events = load_propagation_events(
-        state_path / "propagation_history.jsonl",
-        event_id,
-    )
-    return calculate_propagation_metrics(events, len(agent_ids))
+    """兼容旧调用；传播汇总由共享结果服务完成。"""
+    return _calculate_propagation_summary(state_dir, event_id)
 
 
 # 2026/08/27 舆情指标计算扩充，新增功能：汇总单个场景的恢复、反弹和负面过程指标。
@@ -876,14 +665,34 @@ def run_shared_pre_entry_baseline(
     social_network_file=None,
     stagnation_rounds=0,
     improvement_tolerance=0.05,
+    incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
+    shared_input_manifest=None,
 ):
     """在无声明状态下运行到首次触发进场，并返回可复制的状态快照。"""
     # 2026/09/04 Demo性能基线，新增功能：记录共享基线墙钟耗时和每个实际执行时间步的性能。
     baseline_start_time = time.perf_counter()
+    shared_input_manifest = shared_input_manifest or {
+        "shared_input_sha256": None,
+        "objective_fact_timeline": [],
+    }
+    objective_timeline = shared_input_manifest.get(
+        "objective_fact_timeline", []
+    )
+    initial_state_context = {
+        **objective_state_fields(objective_timeline, 1),
+        # 2026/10/20，新增功能：进场前状态明确属于共同基线；场景
+        # 分叉后会换成各自scenario_id，但共同输入哈希保持不变。
+        "scenario_id": "_shared_baseline",
+    }
+    if shared_input_manifest.get("shared_input_sha256"):
+        initial_state_context["shared_input_sha256"] = (
+            shared_input_manifest["shared_input_sha256"]
+        )
     _, state_dir = prepare_scenario_state(
         experiment_dir,
         "_shared_baseline",
         event_input["event_id"],
+        initial_state_context=initial_state_context,
     )
     state_file = state_dir / "event_state_history.json"
     rounds = []
@@ -892,6 +701,16 @@ def run_shared_pre_entry_baseline(
     entry_reason = None
     stagnant_round_count = 0
     step_results = []
+    fixed_response_step = get_ablation_options(event_input).get(
+        "fixed_response_step"
+    )
+    if (
+        fixed_response_step is not None
+        and fixed_response_step > MAX_STEPS
+    ):
+        raise ValueError(
+            "消融实验固定官方投入轮次不能大于最大仿真轮数。"
+        )
 
     for step in range(1, MAX_STEPS + 1):
         step_result = run_simulation_step(
@@ -899,6 +718,7 @@ def run_shared_pre_entry_baseline(
             event_file,
             comment_pool_file,
             social_network_file,
+            incremental_comment_count,
         )
         step_results.append(step_result)
         round_result, comment_quality = load_round_result(
@@ -912,6 +732,25 @@ def run_shared_pre_entry_baseline(
 
         if step == MAX_STEPS:
             break
+        if fixed_response_step is not None:
+            # 2026/10/18，新增功能：消融组必须在同一轮投入通告，
+            # 避免反馈机制改变动态触发时间后破坏因果可比性。
+            if step + 1 == fixed_response_step:
+                response_step = fixed_response_step
+                entry_reason = "ablation_fixed_step"
+                break
+            append_event_state_record(
+                event_input=event_input,
+                official_statement="",
+                official_statement_status="none",
+                **objective_state_fields(objective_timeline, step + 1),
+                scenario_id="_shared_baseline",
+                shared_input_sha256=shared_input_manifest.get(
+                    "shared_input_sha256"
+                ),
+                state_file=state_file,
+            )
+            continue
         entry_decision = evaluate_response_entry(
             entry_strategy,
             round_result["policy_metrics"],
@@ -930,6 +769,11 @@ def run_shared_pre_entry_baseline(
             event_input=event_input,
             official_statement="",
             official_statement_status="none",
+            **objective_state_fields(objective_timeline, step + 1),
+            scenario_id="_shared_baseline",
+            shared_input_sha256=shared_input_manifest.get(
+                "shared_input_sha256"
+            ),
             state_file=state_file,
         )
 
@@ -963,6 +807,9 @@ def run_one_content_strategy(
     comment_pool_file,
     shared_baseline,
     social_network_file=None,
+    incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
+    shared_input_manifest=None,
+    baseline_snapshot_manifest=None,
 ):
     """复制共享基线，并从动态进场后的第一轮继续运行内容策略。"""
     # 2026/09/04 Demo性能基线，新增功能：记录单个策略自身执行的墙钟耗时和分轮性能。
@@ -982,12 +829,37 @@ def run_one_content_strategy(
             "official_statement_status": content_strategy[
                 "official_statement_status"
             ],
+            "official_evidence_dimensions": content_strategy.get(
+                "evidence_dimensions", {}
+            ),
         }
         if is_response_scenario
         else {
             "official_statement": "",
             "official_statement_status": "none",
+            "official_evidence_dimensions": {},
         }
+    )
+    # 2026/10/20，修改功能：每个方案从共同快照独立生成通告后的公众
+    # 反应。共同输入只包含事件、初始评论、网络和客观事实时间线。
+    shared_input_manifest = shared_input_manifest or build_shared_input_manifest(
+        event_input,
+        event_file,
+        comment_pool_file,
+        social_network_file,
+    )
+    baseline_snapshot_manifest = (
+        baseline_snapshot_manifest
+        or build_state_snapshot_manifest(shared_baseline["state_dir"])
+    )
+    shared_input_sha256 = shared_input_manifest["shared_input_sha256"]
+    objective_timeline = shared_input_manifest.get(
+        "objective_fact_timeline", []
+    )
+    scenario_input_sha256 = build_scenario_input_sha256(
+        shared_input_sha256,
+        strategy_id,
+        active_response,
     )
     response_records = []
     rounds = list(shared_baseline["rounds"])
@@ -1007,6 +879,7 @@ def run_one_content_strategy(
             "strategy": strategy_id,
             "strategy_name": content_strategy["strategy_name"],
             "entry_strategy": entry_strategy,
+            "ablation_config": get_ablation_options(event_input),
             "status": "not_run",
             "reason": "official_response_not_triggered",
             "entry_triggered": False,
@@ -1025,6 +898,19 @@ def run_one_content_strategy(
             ],
             "state_dir": str(state_dir),
             "performance": performance,
+            "counterfactual_controls": {
+                "shared_input_sha256": shared_input_sha256,
+                "pre_entry_snapshot_sha256": baseline_snapshot_manifest[
+                    "snapshot_sha256"
+                ],
+                "scenario_input_sha256": scenario_input_sha256,
+                "isolation_audit": {
+                    "status": "not_applicable",
+                    "checked_from_step": None,
+                    "error_count": 0,
+                    "errors": [],
+                },
+            },
         }
         save_json(scenario_dir / "scenario_result.json", result)
         return result
@@ -1046,6 +932,12 @@ def run_one_content_strategy(
             official_statement_status=active_response[
                 "official_statement_status"
             ],
+            official_evidence_dimensions=active_response.get(
+                "official_evidence_dimensions"
+            ),
+            **objective_state_fields(objective_timeline, response_step),
+            scenario_id=strategy_id,
+            shared_input_sha256=shared_input_sha256,
             state_file=state_file,
         )
 
@@ -1055,6 +947,7 @@ def run_one_content_strategy(
             event_file,
             comment_pool_file,
             social_network_file,
+            incremental_comment_count,
         )
         step_results.append(step_result)
         round_result, comment_quality = load_round_result(
@@ -1076,6 +969,12 @@ def run_one_content_strategy(
             official_statement_status=active_response[
                 "official_statement_status"
             ],
+            official_evidence_dimensions=active_response.get(
+                "official_evidence_dimensions"
+            ),
+            **objective_state_fields(objective_timeline, step + 1),
+            scenario_id=strategy_id,
+            shared_input_sha256=shared_input_sha256,
             state_file=state_file,
         )
 
@@ -1090,10 +989,20 @@ def run_one_content_strategy(
         time.perf_counter() - strategy_start_time,
         3,
     )
+    isolation_audit = audit_scenario_isolation(
+        state_dir=state_dir,
+        event_id=event_input["event_id"],
+        scenario_id=strategy_id,
+        response_step=response_step,
+        shared_input_sha256=shared_input_sha256,
+        objective_fact_timeline=objective_timeline,
+        expected_response=active_response,
+    )
     result = {
         "strategy": strategy_id,
         "strategy_name": content_strategy["strategy_name"],
         "entry_strategy": entry_strategy,
+        "ablation_config": get_ablation_options(event_input),
         "status": "success",
         "entry_triggered": entry_triggered,
         "entry_reason": entry_reason,
@@ -1110,6 +1019,14 @@ def run_one_content_strategy(
         "shared_baseline_completed_step": shared_baseline["completed_step"],
         "state_dir": str(state_dir),
         "performance": performance,
+        "counterfactual_controls": {
+            "shared_input_sha256": shared_input_sha256,
+            "pre_entry_snapshot_sha256": baseline_snapshot_manifest[
+                "snapshot_sha256"
+            ],
+            "scenario_input_sha256": scenario_input_sha256,
+            "isolation_audit": isolation_audit,
+        },
     }
     save_json(scenario_dir / "scenario_result.json", result)
     return result
@@ -1267,6 +1184,9 @@ def run_experiment(
         )
 
     event_input = load_json(event_file)
+    incremental_comment_count = get_simulation_options(event_input)[
+        "incremental_comment_count"
+    ]
     response_options = load_official_response_options(
         official_response_file,
         event_input["event_id"],
@@ -1275,8 +1195,16 @@ def run_experiment(
 
     # 2026/9/5，社交网络传播，新增功能：先固化网络，再让共享基线和全部策略读取同一文件。
     social_network_file = prepare_experiment_social_network(experiment_dir)
+    # 2026/10/20，新增功能：共同输入只包含不会被回应方案改变的内容。
+    # SHA-256 在任何场景运行前生成，后续写入每个状态和评论批次供审计。
+    shared_input_manifest = build_shared_input_manifest(
+        event_input,
+        event_file,
+        comment_pool_file,
+        social_network_file,
+    )
 
-    # 2026/08/23 内容策略对照，修改功能：先运行不回应基线，再运行四个官方内容场景。
+    # 2026/10/16 回应方案对照：先运行不回应基线，再运行三个用户配置的回应方案。
     scenarios = [(NO_RESPONSE_SCENARIO, "no_response")]
     scenarios.extend(
         (content_strategy, entry_strategy)
@@ -1300,6 +1228,8 @@ def run_experiment(
             improvement_tolerance=response_options[
                 "negative_rate_improvement_tolerance"
             ],
+            incremental_comment_count=incremental_comment_count,
+            shared_input_manifest=shared_input_manifest,
         )
         if shared_baseline["entry_triggered"]:
             print(
@@ -1321,6 +1251,11 @@ def run_experiment(
         )
 
     strategy_results = []
+    baseline_snapshot_manifest = (
+        build_state_snapshot_manifest(shared_baseline["state_dir"])
+        if shared_baseline is not None
+        else None
+    )
     for content_strategy, scenario_entry_strategy in scenarios:
         strategy_id = content_strategy["strategy_id"]
         print(
@@ -1340,6 +1275,9 @@ def run_experiment(
                 comment_pool_file,
                 shared_baseline,
                 social_network_file,
+                incremental_comment_count,
+                shared_input_manifest=shared_input_manifest,
+                baseline_snapshot_manifest=baseline_snapshot_manifest,
             )
             if result.get("status") == "not_run":
                 print(
@@ -1363,11 +1301,24 @@ def run_experiment(
                     ),
                 },
             }
+            if isinstance(error, CounterfactualIsolationError):
+                result["failure_type"] = "isolation_audit"
             # 2026/08/22 系统重置与状态初始化，新增功能：失败策略也保存统一的场景结果文件。
             scenario_dir = experiment_dir / strategy_id
             scenario_dir.mkdir(parents=True, exist_ok=True)
             save_json(scenario_dir / "scenario_result.json", result)
         strategy_results.append(result)
+
+    # 2026/10/20，新增功能：各场景完成后统一验证状态目录、共同输入
+    # 哈希和场景干预指纹，发现跨场景数据污染时实验不再标记为完成。
+    cross_scenario_audit = None
+    try:
+        cross_scenario_audit = audit_cross_scenario_controls(strategy_results)
+    except RuntimeError as error:
+        cross_scenario_audit = {
+            "status": "failed",
+            "error": str(error),
+        }
 
     # 2026/08/27 舆情指标计算扩充，新增功能：场景全部完成后计算相对不回应基线的净效果。
     attach_control_net_effect_metrics(strategy_results, experiment_dir)
@@ -1385,7 +1336,16 @@ def run_experiment(
     entry_triggered = bool(
         shared_baseline and shared_baseline.get("entry_triggered")
     )
-    if failed_count:
+    isolation_failed = (
+        cross_scenario_audit.get("status") == "failed"
+        or any(
+            result.get("failure_type") == "isolation_audit"
+            for result in strategy_results
+        )
+    )
+    if isolation_failed:
+        experiment_status = "failed_isolation_audit"
+    elif failed_count:
         experiment_status = "partial_failed" if success_count else "failed"
     elif not_run_count:
         experiment_status = "completed_no_entry"
@@ -1394,7 +1354,11 @@ def run_experiment(
     else:
         experiment_status = "failed"
 
-    if baseline_error or (entry_triggered and failed_count == len(strategy_results)):
+    if isolation_failed:
+        comparison_status = "failed"
+    elif baseline_error or (
+        entry_triggered and failed_count == len(strategy_results)
+    ):
         comparison_status = "failed"
     elif not entry_triggered:
         comparison_status = "not_evaluable"
@@ -1436,6 +1400,38 @@ def run_experiment(
         "strategy_results": strategy_results,
         "comparison": comparison,
         "performance": performance,
+        # 2026/10/19，新增功能：结果显式保存规范化后的运行选项，避免
+        # 事件文件未填写默认值时无法还原实际增量评论数量。
+        "simulation_options": get_simulation_options(event_input),
+        # 2026/10/18，新增功能：正式结果携带完整消融开关；默认运行也
+        # 明确记录为完整机制，避免后续只凭目录名猜测实验条件。
+        "ablation_config": get_ablation_options(event_input),
+        # 2026/10/20，修改功能：共享的是客观输入，不再共享不回应
+        # 场景生成的公众评论。公众反应和Agent表达在各方案内独立演化。
+        "counterfactual_controls": {
+            "version": shared_input_manifest["version"],
+            "shared_input_sha256": shared_input_manifest[
+                "shared_input_sha256"
+            ],
+            "components": shared_input_manifest["components"],
+            "objective_fact_timeline_sha256": shared_input_manifest[
+                "components"
+            ]["objective_fact_timeline_sha256"],
+            "objective_fact_steps": [
+                item["step"]
+                for item in shared_input_manifest[
+                    "objective_fact_timeline"
+                ]
+            ],
+            "pre_entry_snapshot_sha256": (
+                baseline_snapshot_manifest["snapshot_sha256"]
+                if baseline_snapshot_manifest is not None
+                else None
+            ),
+            "public_reactions_shared": False,
+            "scenario_reactions_independent": True,
+            "cross_scenario_audit": cross_scenario_audit,
+        },
     }
     if shared_baseline is not None:
         experiment_result["shared_baseline"] = {

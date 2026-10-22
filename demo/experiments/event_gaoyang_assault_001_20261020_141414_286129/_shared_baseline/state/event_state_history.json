@@ -1,0 +1,10 @@
+[
+  {
+    "event_id": "event_gaoyang_assault_001",
+    "step": 1,
+    "official_statement": "",
+    "official_statement_status": "none",
+    "scenario_id": "_shared_baseline",
+    "shared_input_sha256": "1d11f71eb4f988566a182b22a7fe4199aa22253e78a1ad2882dfb010e29bf7c0"
+  }
+]

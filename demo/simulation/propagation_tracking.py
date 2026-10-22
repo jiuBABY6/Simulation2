@@ -217,8 +217,14 @@ def build_propagation_events(agent_views, decision_results):
                         "target_agent_id": target_agent_id,
                         "propagation_depth": source.get("propagation_depth"),
                         "influence_weight": source.get("influence_weight"),
+                        "normalized_influence_weight": source.get(
+                            "normalized_influence_weight"
+                        ),
                         "decay_factor": source.get("decay_factor"),
                         "effective_weight": source.get("effective_weight"),
+                        "normalized_effective_weight": source.get(
+                            "normalized_effective_weight"
+                        ),
                         "was_selected": was_selected,
                         "resulting_expression_id": (
                             resulting_expression_id if was_selected else None

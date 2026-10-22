@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 VISUALIZATION_DIR = Path(__file__).resolve().parents[1]
@@ -14,10 +15,13 @@ from visualization.historical.real_trend_repository import (
     load_real_trend,
     real_trend_path,
 )
+from visualization.api_router import API_PATHS, dispatch_api
+from visualization.shared.artifact_io import load_json_object, load_jsonl_objects
 from visualization.shared.experiment_catalog import (
     describe_experiment,
     resolve_experiment_dir,
 )
+from visualization.shared.event_resources import resolve_event_json_path
 from visualization.shared.network.service import (
     build_comment_cascade,
     build_comment_catalog,
@@ -45,9 +49,26 @@ def _experiment_exists(experiment_id: str) -> bool:
 
 
 class ExperimentCatalogTests(unittest.TestCase):
+    def test_api_router_rejects_unknown_and_missing_parameters(self) -> None:
+        self.assertIn("/api/network/view", API_PATHS)
+        with self.assertRaises(LookupError):
+            dispatch_api("/api/unknown", {})
+        with self.assertRaisesRegex(ValueError, "experiment_id"):
+            dispatch_api("/api/strategy/dashboard", {})
+
+    def test_shared_artifact_reader_validates_top_level_types(self) -> None:
+        with patch.object(Path, "read_text", return_value='{"value": 1}'):
+            self.assertEqual(load_json_object(Path("object.json"))["value"], 1)
+        with patch.object(
+            Path, "read_text", return_value='{"value": 1}\n\n'
+        ):
+            self.assertEqual(len(load_jsonl_objects(Path("records.jsonl"))), 1)
+
     def test_rejects_path_traversal(self) -> None:
         with self.assertRaisesRegex(ValueError, "实验编号不合法"):
             resolve_experiment_dir("../outside")
+        with self.assertRaisesRegex(ValueError, "event_id 不合法"):
+            resolve_event_json_path(Path("real_trends"), "../outside")
 
     # 2026/10/12，修改功能：历史页面默认公开 Agent 实际表达主口径，
     # 三种评论池口径继续作为环境诊断项。
@@ -81,12 +102,12 @@ class ExperimentCatalogTests(unittest.TestCase):
 
     def test_real_trends_are_stored_by_event_id(self) -> None:
         beiguo = load_real_trend(
-            "event_beiguo_xiantianxia_crash_20260920_001"
+            "event_beiguo_xiantianxia_crash_20260920_002"
         )
         huxinyu = load_real_trend("event_huxinyu_2022_001")
 
-        self.assertEqual(beiguo["stage_count"], 2)
-        self.assertEqual(beiguo["source"]["file"], "北国先(1).xlsx")
+        self.assertEqual(beiguo["stage_count"], 3)
+        self.assertEqual(beiguo["source"]["file"], "北国先[1].xlsx")
         self.assertEqual(huxinyu["stage_count"], 8)
         self.assertEqual(huxinyu["source"]["file"], "example.xlsx")
         with self.assertRaisesRegex(ValueError, "event_id 不合法"):
@@ -226,11 +247,17 @@ class UnifiedNetworkReportTests(unittest.TestCase):
         self.assertIn('id="metric-groups"', html)
         self.assertIn('id="round-table"', html)
         self.assertIn('id="round-quality-table"', html)
+        self.assertIn('id="agent-emotion-chart"', html)
+        self.assertIn('id="agent-expression-chart"', html)
+        self.assertIn('id="official-attitude-chart"', html)
         self.assertIn('id="performance-summary"', html)
         self.assertIn("official-guide", script)
         self.assertIn("official-group-marker", script)
         self.assertIn("negative_area_reduction", script)
         self.assertIn("renderMetricDetail", script)
+        self.assertIn("renderRoundDiagnostics", script)
+        self.assertIn("agent_emotion_distribution", script)
+        self.assertIn("official_attitude_distribution", script)
 
 
 if __name__ == "__main__":

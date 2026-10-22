@@ -22,22 +22,21 @@ from historical_replay.event_repository import (
 
 
 class HistoricalEventRepositoryTests(unittest.TestCase):
-    def test_active_event_is_archived_beiguo_event(self) -> None:
+    def test_active_event_resolves_to_a_complete_event(self) -> None:
         event_id = get_active_event_id()
         resolved = resolve_event_files(event_id)
 
-        self.assertEqual(
-            event_id, "event_beiguo_xiantianxia_crash_20260920_001"
-        )
+        self.assertEqual(resolved["event_id"], event_id)
         self.assertTrue(Path(resolved["event_file"]).is_file())
         self.assertTrue(Path(resolved["timeline_file"]).is_file())
-        self.assertTrue(Path(resolved["real_trend_source"]).is_file())
+        self.assertTrue(Path(resolved["initial_opinion_file"]).is_file())
+        self.assertTrue(Path(resolved["public_context_file"]).is_file())
 
-    def test_both_historical_sources_are_listed(self) -> None:
+    def test_current_historical_sources_are_listed(self) -> None:
         events = {item["event_id"]: item for item in list_events()}
 
         self.assertIn(
-            "event_beiguo_xiantianxia_crash_20260920_001", events
+            "event_beiguo_xiantianxia_crash_20260920_002", events
         )
         self.assertIn("event_huxinyu_2022_001", events)
         # 2026/10/10，修改功能：主线历史回放要求所有事件具备初始条件
@@ -45,12 +44,12 @@ class HistoricalEventRepositoryTests(unittest.TestCase):
         self.assertTrue(events["event_huxinyu_2022_001"]["has_initial_opinion"])
         self.assertTrue(events["event_huxinyu_2022_001"]["has_public_context"])
         self.assertTrue(
-            events["event_beiguo_xiantianxia_crash_20260920_001"][
+            events["event_beiguo_xiantianxia_crash_20260920_002"][
                 "has_initial_opinion"
             ]
         )
         self.assertTrue(
-            events["event_beiguo_xiantianxia_crash_20260920_001"][
+            events["event_beiguo_xiantianxia_crash_20260920_002"][
                 "has_public_context"
             ]
         )
@@ -97,9 +96,9 @@ class HistoricalEventRepositoryTests(unittest.TestCase):
         self.assertEqual(simulation_periods[3], "2023.01.12-2023.01.27")
         self.assertEqual(simulation_periods[4], "2023.01.28-2023.01.29")
 
-    def test_manifest_hash_matches_archived_beiguo_source(self) -> None:
+    def test_manifest_hash_matches_current_beiguo_source(self) -> None:
         resolved = resolve_event_files(
-            "event_beiguo_xiantianxia_crash_20260920_001"
+            "event_beiguo_xiantianxia_crash_20260920_002"
         )
         manifest_path = Path(resolved["event_dir"]) / "event_manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -108,7 +107,7 @@ class HistoricalEventRepositoryTests(unittest.TestCase):
         ).hexdigest().upper()
 
         self.assertEqual(
-            manifest["real_trend_source_original_name"], "北国先(1).xlsx"
+            manifest["real_trend_source_original_name"], "北国先[1].xlsx"
         )
         self.assertEqual(manifest["real_trend_source_sha256"], digest)
 

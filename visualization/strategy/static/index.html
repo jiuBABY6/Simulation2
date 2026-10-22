@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>五策略实验可视化</title>
+  <title>回应方案对照实验可视化</title>
   <link rel="stylesheet" href="/strategy/styles.css">
 </head>
 <body>
   <header class="hero">
     <div>
-      <p class="eyebrow">FIVE-STRATEGY COMPARISON · READ ONLY</p>
-      <h1>五策略实验可视化</h1>
-      <p class="subtitle">比较不回应、事实通报、共情安抚、辟谣澄清和处置进展的逐轮结果</p>
+      <p class="eyebrow">RESPONSE PLAN COMPARISON · READ ONLY</p>
+      <h1>回应方案对照实验可视化</h1>
+      <p class="subtitle">比较三个可配置回应方案与一组不回应基线的逐轮结果</p>
       <p id="experiment-id" class="experiment-id">正在读取实验……</p>
     </div>
     <nav>
@@ -28,7 +28,7 @@
       <div class="panel-heading">
         <div>
           <p class="section-tag">趋势对照</p>
-          <h2>五种策略的逐轮负面情绪率</h2>
+          <h2>各回应方案的逐轮负面情绪率</h2>
           <p>仅展示实验原始指标，不重新计算、不调用大模型。</p>
         </div>
       </div>
@@ -94,12 +94,39 @@
         </label>
       </div>
       <div id="metric-groups" class="metric-groups"></div>
+      <div class="diagnostic-grid">
+        <article class="diagnostic-card">
+          <div class="diagnostic-heading">
+            <div><span>模拟内部状态</span><h3>Agent 情绪分布</h3></div>
+            <small>分母：全部 Agent</small>
+          </div>
+          <div id="agent-emotion-chart" class="distribution-chart"></div>
+          <div id="agent-emotion-legend" class="distribution-legend"></div>
+        </article>
+        <article class="diagnostic-card">
+          <div class="diagnostic-heading">
+            <div><span>实际公开表达</span><h3>Agent 实际表达情绪分布</h3></div>
+            <small>分母：本轮实际发言 Agent</small>
+          </div>
+          <div id="agent-expression-chart" class="distribution-chart"></div>
+          <div id="agent-expression-legend" class="distribution-legend"></div>
+        </article>
+        <article class="diagnostic-card diagnostic-wide">
+          <div class="diagnostic-heading">
+            <div><span>声明投入后</span><h3>Agent 对官方态度</h3></div>
+            <small>分母：官方态度适用 Agent；投入前显示为空缺</small>
+          </div>
+          <div id="official-attitude-chart" class="distribution-chart"></div>
+          <div id="official-attitude-legend" class="distribution-legend"></div>
+        </article>
+      </div>
       <h3 class="subheading">逐轮指标</h3>
       <div class="table-wrap round-table-wrap">
         <table class="round-table">
           <thead>
             <tr>
               <th>轮次</th><th>负面率</th><th>质疑率</th><th>接受率</th><th>态度适用人数</th><th>全局趋势</th>
+              <th>沉默</th><th>原创</th><th>转发</th><th>参与率</th><th>原创去重率</th>
               <th>曝光</th><th>触达人数</th><th>触达率</th><th>源Agent</th><th>传播评论</th>
               <th>继续传播</th><th>继续传播人数</th><th>继续传播率</th><th>最大深度</th><th>平均深度</th><th>有效权重</th>
             </tr>
@@ -149,7 +176,7 @@
     </section>
   </main>
 
-  <footer>五策略实验可视化 · 数据来自只读实验目录</footer>
+  <footer>回应方案对照实验可视化 · 数据来自只读实验目录</footer>
   <script src="/strategy/app.js"></script>
 </body>
 </html>

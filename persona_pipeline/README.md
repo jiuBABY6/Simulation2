@@ -1,6 +1,6 @@
 # Persona 构建流水线说明
 
-更新日期：2026-09-28
+更新日期：2026-10-15
 
 本目录用于把MongoDB中的微博用户与微博文本转换为当前仿真系统可读取的Agent Persona文件。最终结果写入项目根目录下的`output/personas`，五策略实验只读这些基础Persona，不会在仿真过程中覆盖它们。
 
@@ -37,7 +37,15 @@ DeepSeek补充五类评论派系偏好
 | `build_personas.py` | 是 | 读取MongoDB，清洗微博，分类主题、信息取向和情绪，生成基础Persona及全局规则 | `agent_*.json`、`policy_config.json`、`classification_progress.jsonl` |
 | `build_faction_preferences.py` | 是 | 读取已有Persona和对应用户微博，分类五种评论派系，将概率写回Persona | 更新`agent_*.json`、生成`faction_classification_progress.json` |
 | `emotion.py` | 否 | 汇总所有Persona的正面、中性和负面表达比例，计算P25、P50、P75 | 更新`policy_config.json`中的`emotion_quantiles` |
+| `text_processing.py` | 否 | 统一适配MongoDB文档结构、清洗文本并拆分转发内容与用户表达 | 无直接输出 |
+| `policy_builder.py` | 否 | 根据Persona集合计算全局分位数和候选规则 | 由构建与重建脚本调用 |
+| `deepseek_json_client.py` | 是 | 统一分类任务的认证、有限重试和JSON对象解析 | 无直接输出 |
+| `rebuild_policy_config.py` | 否 | 只使用现有有效Persona重新生成策略配置 | 备份并更新`policy_config.json` |
 | `requirements.txt` | 否 | Persona流水线的最小Python依赖 | `pymongo`、`requests` |
+
+文本适配和策略配置计算已经从主脚本中拆出。主脚本仍保留原有函数导出，
+现有直接运行命令、断点文件和输出结构不变；这些纯函数也可以独立测试，
+无需连接MongoDB或调用DeepSeek。
 
 ## 三、运行前准备
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +10,10 @@ from visualization.historical.opinion_metrics import (
     calculate_comment_distribution,
 )
 from visualization.shared.experiment_catalog import resolve_experiment_dir
+from visualization.shared.artifact_io import (
+    load_json_object,
+    load_jsonl_objects,
+)
 
 
 def _repair_mojibake(value: Any) -> Any:
@@ -35,17 +38,13 @@ def _repair_mojibake(value: Any) -> Any:
 
 
 def _read_json(path: Path) -> dict[str, Any]:
-    return _repair_mojibake(json.loads(path.read_text(encoding="utf-8")))
+    return load_json_object(path, transform=_repair_mojibake)
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
-    records = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            records.append(_repair_mojibake(json.loads(line)))
-    return records
+    return load_jsonl_objects(path, transform=_repair_mojibake)
 
 
 def _find_result_path(experiment_id: str) -> Path:

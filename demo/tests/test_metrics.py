@@ -16,6 +16,8 @@ from evaluation.metrics import (  # noqa: E402
     build_global_trend_prompt,
     calculate_attitude_diagnostics,
     calculate_expression_distribution,
+    calculate_neighbor_exposure_diagnostics,
+    calculate_strategy_state_diagnostics,
     validate_global_trend,
 )
 from experiment_runner import extract_policy_metrics  # noqa: E402
@@ -276,6 +278,106 @@ class AttitudeDiagnosticTests(unittest.TestCase):
         self.assertEqual(result["changed_agent_count"], 2)
         self.assertEqual(result["synchronized_transition_rate"], 0.666667)
         self.assertTrue(result["diagnostic_only"])
+
+
+class NeighborExposureDiagnosticTests(unittest.TestCase):
+    """邻居曝光不足必须可以从逐轮指标中直接识别。"""
+
+    def test_aggregates_effective_exposure_and_expression_ages(self):
+        records = [
+            {
+                "neighbor_target_count": 4,
+                "neighbor_visible_count": 4,
+                "unique_neighbor_root_count": 3,
+                "neighbor_expression_age_distribution": {"1": 3, "2": 1},
+            },
+            {
+                "neighbor_target_count": 4,
+                "neighbor_visible_count": 2,
+                "unique_neighbor_root_count": 2,
+                "neighbor_expression_age_distribution": {"1": 1, "3": 1},
+            },
+        ]
+
+        result = calculate_neighbor_exposure_diagnostics(records)
+
+        self.assertEqual(result["target_exposure_count"], 8)
+        self.assertEqual(result["effective_exposure_count"], 6)
+        self.assertEqual(result["effective_neighbor_exposure_rate"], 0.75)
+        self.assertEqual(result["full_target_agent_rate"], 0.5)
+        self.assertEqual(
+            result["expression_age_distribution"],
+            {"1": 4, "2": 1, "3": 1},
+        )
+
+
+class StrategyStateDiagnosticTests(unittest.TestCase):
+    """状态证据限流与有效证据门槛必须在逐轮指标中可审计。"""
+
+    def test_aggregates_public_retention_and_personal_sufficiency(self):
+        records = [
+            {
+                "decision": {
+                    "strategy_state_guard": {"guard_version": "v2"},
+                    "state_transition_diagnostics": {
+                        "state_change_basis": (
+                            "personally_sufficient_non_peer_evidence"
+                        ),
+                        "transition_reason": (
+                            "changed_after_directional_utility"
+                        ),
+                        "emotion_changed": True,
+                        "official_attitude_changed": False,
+                        "effective_non_peer_evidence_count": 2,
+                        "held_non_peer_evidence_count": 3,
+                        "directional_evidence_group_count": 4,
+                        "utility_margin": 0.12,
+                        "required_switch_margin": 0.06,
+                        "aggregated_directional_support": {
+                            "positive": 0.1,
+                            "neutral": 0.6,
+                            "negative": 0.2,
+                        },
+                        "evidence_lifecycle": {
+                            "new_group_count": 4,
+                            "restored_group_count": 1,
+                            "consumed_group_count": 1,
+                        },
+                    },
+                    "state_evidence_diagnostics": {
+                        "neighbor_visible_comment_count": 4,
+                        "neighbor_state_evidence_count": 2,
+                        "public_visible_comment_count": 11,
+                        "public_state_evidence_count": 5,
+                    },
+                }
+            }
+        ]
+
+        result = calculate_strategy_state_diagnostics(records)
+
+        self.assertEqual(result["public_visible_comment_count"], 11)
+        self.assertEqual(result["public_state_evidence_count"], 5)
+        self.assertEqual(
+            result["public_state_evidence_retention_rate"],
+            0.454545,
+        )
+        self.assertEqual(result["effective_non_peer_evidence_count"], 2)
+        self.assertEqual(result["held_non_peer_evidence_count"], 3)
+        self.assertEqual(result["directional_evidence_group_count"], 4)
+        self.assertEqual(result["average_utility_margin"], 0.12)
+        self.assertEqual(
+            result["lifecycle_restored_evidence_group_count"],
+            1,
+        )
+        self.assertEqual(
+            result["lifecycle_consumed_evidence_group_count"],
+            1,
+        )
+        self.assertEqual(
+            result["average_directional_support"]["neutral"],
+            0.6,
+        )
 
 
 if __name__ == "__main__":

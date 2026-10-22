@@ -10,10 +10,12 @@ import time
 
 from agents.state_store import AgentStateStore
 from agents.batch_decision import run_batch_decision
+from application.runtime_config import load_project_runtime_config
 from simulation.event_context import load_event_context
 from simulation.event_state_updater import append_event_state_record
 from comments.incremental_generator import (
     load_incremental_history,
+    run_frozen_incremental_generation,
     run_incremental_generation,
 )
 from infrastructure.json_storage import append_jsonl_many, load_json, read_jsonl
@@ -23,19 +25,9 @@ from infrastructure.llm_service import (
 )
 from evaluation.metrics import run_round_metrics
 from agents.persona_repository import load_personas
-from project_config import (
-    AGENT_STATE_FILE,
-    DECISION_HISTORY_FILE,
-    EVENT_FILE,
-    EVENT_STATE_FILE,
-    INCREMENTAL_COMMENT_COUNT,
-    INCREMENTAL_COMMENT_FILE,
-    MAX_AGENT_COUNT,
-    MAX_WORKERS,
-    METRICS_HISTORY_FILE,
-    STATE_DIR,
-)
+from domain.contracts import SimulationContext
 from simulation.state_manager import validate_simulation_state
+from simulation.options import freezes_incremental_public_comments
 
 
 # 2026/09/04 Demo性能基线，新增功能：为父进程提供稳定的单轮结果解析标记。
@@ -46,9 +38,11 @@ SIMULATION_STEP_RESULT_PREFIX = "SIMULATION_STEP_RESULT="
 def load_successful_decisions(
     event_id,
     step,
-    history_file=DECISION_HISTORY_FILE,
+    history_file=None,
 ):
     """读取指定事件和时间步的成功决策，并按Agent编号去重。"""
+    if history_file is None:
+        history_file = load_project_runtime_config().paths.decision_history_file
     decisions_by_agent = {}
     for record in read_jsonl(history_file):
         if record.get("event_id") != event_id or record.get("step") != step:
@@ -60,7 +54,7 @@ def load_successful_decisions(
     return [decisions_by_agent[key] for key in sorted(decisions_by_agent)]
 
 
-def has_successful_decision(event_id, step, history_file=DECISION_HISTORY_FILE):
+def has_successful_decision(event_id, step, history_file=None):
     """兼容原有调用：判断指定时间步是否至少存在一个成功决策。"""
     return bool(load_successful_decisions(event_id, step, history_file))
 
@@ -70,7 +64,7 @@ def has_complete_decisions(
     event_id,
     step,
     expected_agent_count,
-    history_file=DECISION_HISTORY_FILE,
+    history_file=None,
 ):
     """判断指定时间步是否已经保存全部Agent的成功决策。"""
     decisions = load_successful_decisions(event_id, step, history_file)
@@ -80,9 +74,11 @@ def has_complete_decisions(
 # 2026/08/22 联调可靠性收尾：恢复完整决策对应的缺失Agent状态，避免中断后留下半轮数据。
 def restore_missing_agent_states(
     decisions,
-    state_file=AGENT_STATE_FILE,
+    state_file=None,
 ):
     """根据完整决策补写缺失的Agent状态，已经存在的状态不会重复写入。"""
+    if state_file is None:
+        state_file = load_project_runtime_config().paths.agent_state_file
     existing_keys = {
         (record.get("event_id"), record.get("step"), record.get("agent_id"))
         for record in read_jsonl(state_file)
@@ -109,8 +105,10 @@ def restore_missing_agent_states(
     return missing_records
 
 
-def has_round_metrics(event_id, step, history_file=METRICS_HISTORY_FILE):
+def has_round_metrics(event_id, step, history_file=None):
     """判断指定事件和时间步是否已经保存舆情指标。"""
+    if history_file is None:
+        history_file = load_project_runtime_config().paths.metrics_history_file
     return any(
         record.get("event_id") == event_id and record.get("step") == step
         for record in read_jsonl(history_file)
@@ -121,21 +119,34 @@ def has_round_metrics(event_id, step, history_file=METRICS_HISTORY_FILE):
 def find_incremental_record(
     event_id,
     step,
-    history_file=INCREMENTAL_COMMENT_FILE,
+    history_file=None,
 ):
     """查找当前时间步已经生成的增量评论批次。"""
+    if history_file is None:
+        history_file = load_project_runtime_config().paths.incremental_comment_file
     for record in load_incremental_history(history_file):
         if record.get("event_id") == event_id and record.get("step") == step:
             return record
     return None
 
 
-def validate_step_order(event_id, step, expected_agent_count):
+def validate_step_order(
+    event_id,
+    step,
+    expected_agent_count,
+    runtime_config=None,
+):
     """检查当前时间步是否可以开始，并返回可复用的完整决策。"""
-    if has_round_metrics(event_id, step):
+    runtime_config = runtime_config or load_project_runtime_config()
+    paths = runtime_config.paths
+    if has_round_metrics(event_id, step, paths.metrics_history_file):
         raise ValueError(f"事件 {event_id} 的第 {step} 轮已经完成指标统计。")
 
-    saved_decisions = load_successful_decisions(event_id, step)
+    saved_decisions = load_successful_decisions(
+        event_id,
+        step,
+        paths.decision_history_file,
+    )
     if saved_decisions and len(saved_decisions) != expected_agent_count:
         raise ValueError(
             f"事件 {event_id} 的第 {step} 轮存在不完整决策："
@@ -147,8 +158,13 @@ def validate_step_order(event_id, step, expected_agent_count):
             event_id,
             step - 1,
             expected_agent_count,
+            paths.decision_history_file,
         )
-        or not has_round_metrics(event_id, step - 1)
+        or not has_round_metrics(
+            event_id,
+            step - 1,
+            paths.metrics_history_file,
+        )
     )
     if previous_step_incomplete:
         raise ValueError(
@@ -160,9 +176,10 @@ def validate_step_order(event_id, step, expected_agent_count):
 
 # 2026/08/22 系统重置与状态初始化 修改功能：每轮开始前严格检查当前状态目录。
 def run_one_simulation_step(
-    max_agents=MAX_AGENT_COUNT,
-    max_workers=MAX_WORKERS,
-    incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
+    max_agents=None,
+    max_workers=None,
+    incremental_comment_count=None,
+    runtime_config=None,
 ):
     """执行当前最新时间步的增量评论、Agent决策和指标统计。
 
@@ -174,15 +191,29 @@ def run_one_simulation_step(
     返回：
         当前时间步的执行结果摘要。
     """
+    runtime_config = runtime_config or load_project_runtime_config()
+    paths = runtime_config.paths
+    settings = runtime_config.simulation
+    max_agents = settings.max_agents if max_agents is None else max_agents
+    max_workers = settings.max_workers if max_workers is None else max_workers
+    incremental_comment_count = (
+        settings.incremental_comment_count
+        if incremental_comment_count is None
+        else incremental_comment_count
+    )
     # 2026/09/04 Demo性能基线，新增功能：单独统计本轮评论生成、Agent决策、指标计算和LLM调用。
     reset_llm_performance_stats()
     step_start_time = time.perf_counter()
-    event_input = load_json(EVENT_FILE)
-    validate_simulation_state(STATE_DIR, event_input.get("event_id"))
-    event_context = load_event_context(EVENT_FILE, EVENT_STATE_FILE)
-    event_id = event_context["event_id"]
-    step = event_context["current_state"]["step"]
-    expected_agent_count = len(load_personas(max_count=max_agents))
+    event_input = load_json(paths.event_file)
+    validate_simulation_state(paths.state_dir, event_input.get("event_id"))
+    event_context = SimulationContext.from_mapping(
+        load_event_context(paths.event_file, paths.event_state_file)
+    )
+    event_id = event_context.event_id
+    step = event_context.step
+    expected_agent_count = len(
+        load_personas(paths.persona_dir, max_count=max_agents)
+    )
     if expected_agent_count == 0:
         raise RuntimeError("没有可用于本轮决策的Persona。")
 
@@ -191,18 +222,31 @@ def run_one_simulation_step(
         event_id,
         step,
         expected_agent_count,
+        runtime_config,
     )
 
     incremental_record = None
     incremental_generated = False
     incremental_start_time = time.perf_counter()
     if step > 1:
-        incremental_record = find_incremental_record(event_id, step)
+        incremental_record = find_incremental_record(
+            event_id,
+            step,
+            paths.incremental_comment_file,
+        )
         if incremental_record is None:
-            incremental_record = run_incremental_generation(
-                incremental_comment_count
-            )
-            incremental_generated = True
+            # 2026/10/18，新增功能：冻结公共语境时写入可审计空批次，
+            # 不调用DeepSeek；默认模式仍执行原有增量评论生成流程。
+            if freezes_incremental_public_comments(
+                event_context.to_mapping()
+            ):
+                incremental_record = run_frozen_incremental_generation()
+                incremental_generated = False
+            else:
+                incremental_record = run_incremental_generation(
+                    incremental_comment_count
+                )
+                incremental_generated = True
     incremental_duration = time.perf_counter() - incremental_start_time
 
     agent_start_time = time.perf_counter()
@@ -217,6 +261,8 @@ def run_one_simulation_step(
         decisions = run_batch_decision(
             max_count=max_agents,
             max_workers=max_workers,
+            simulation_context=event_context,
+            runtime_config=runtime_config,
         )
 
     # 联调修改：任一Agent失败时停止本轮，避免使用不完整数据计算指标 2026/08/21 19：06
@@ -236,7 +282,7 @@ def run_one_simulation_step(
             f"{failed_details}"
         )
 
-    restore_missing_agent_states(decisions)
+    restore_missing_agent_states(decisions, paths.agent_state_file)
     success_count = len(decisions)
     agent_duration = time.perf_counter() - agent_start_time
 
@@ -253,6 +299,11 @@ def run_one_simulation_step(
             else 0
         ),
         "incremental_generated": incremental_generated,
+        "incremental_generation_mode": (
+            incremental_record.get("generation_mode", "llm_incremental")
+            if incremental_record
+            else "initial_pool"
+        ),
         "agent_decision_count": len(decisions),
         "decisions_reused": decisions_reused,
         "success_count": success_count,
@@ -280,9 +331,10 @@ def run_one_simulation_step(
 def run_multi_round_simulation(
     future_event_states,
     run_current_step=True,
-    max_agents=MAX_AGENT_COUNT,
-    max_workers=MAX_WORKERS,
-    incremental_comment_count=INCREMENTAL_COMMENT_COUNT,
+    max_agents=None,
+    max_workers=None,
+    incremental_comment_count=None,
+    runtime_config=None,
 ):
     """运行当前时间步，并按照给定官方声明序列继续运行后续轮次。
 
@@ -297,10 +349,20 @@ def run_multi_round_simulation(
     返回：
         按时间步排列的模拟结果列表。
     """
+    runtime_config = runtime_config or load_project_runtime_config()
+    paths = runtime_config.paths
+    settings = runtime_config.simulation
+    max_agents = settings.max_agents if max_agents is None else max_agents
+    max_workers = settings.max_workers if max_workers is None else max_workers
+    incremental_comment_count = (
+        settings.incremental_comment_count
+        if incremental_comment_count is None
+        else incremental_comment_count
+    )
     if not isinstance(future_event_states, list):
         raise ValueError("future_event_states 必须是列表。")
 
-    event_input = load_json(EVENT_FILE)
+    event_input = load_json(paths.event_file)
     results = []
 
     if run_current_step:
@@ -309,18 +371,29 @@ def run_multi_round_simulation(
                 max_agents,
                 max_workers,
                 incremental_comment_count,
+                runtime_config,
             )
         )
     else:
-        validate_simulation_state(STATE_DIR, event_input.get("event_id"))
-        current_context = load_event_context(EVENT_FILE, EVENT_STATE_FILE)
+        validate_simulation_state(paths.state_dir, event_input.get("event_id"))
+        current_context = load_event_context(
+            paths.event_file,
+            paths.event_state_file,
+        )
         current_step = current_context["current_state"]["step"]
-        expected_agent_count = len(load_personas(max_count=max_agents))
+        expected_agent_count = len(
+            load_personas(paths.persona_dir, max_count=max_agents)
+        )
         current_step_complete = has_complete_decisions(
             current_context["event_id"],
             current_step,
             expected_agent_count,
-        ) and has_round_metrics(current_context["event_id"], current_step)
+            paths.decision_history_file,
+        ) and has_round_metrics(
+            current_context["event_id"],
+            current_step,
+            paths.metrics_history_file,
+        )
         if not current_step_complete:
             raise ValueError("当前最新时间步尚未完成，不能直接追加下一轮状态。")
 
@@ -333,13 +406,14 @@ def run_multi_round_simulation(
             official_statement_status=state_input.get(
                 "official_statement_status", "none"
             ),
-            state_file=EVENT_STATE_FILE,
+            state_file=paths.event_state_file,
         )
         results.append(
             run_one_simulation_step(
                 max_agents,
                 max_workers,
                 incremental_comment_count,
+                runtime_config,
             )
         )
 
@@ -348,13 +422,22 @@ def run_multi_round_simulation(
 
 def main():
     """提供执行当前最新时间步的命令行入口。"""
+    runtime_config = load_project_runtime_config()
     parser = argparse.ArgumentParser(description="运行当前时间步的完整社会模拟")
-    parser.add_argument("--max-agents", type=int, default=MAX_AGENT_COUNT)
-    parser.add_argument("--workers", type=int, default=MAX_WORKERS)
+    parser.add_argument(
+        "--max-agents",
+        type=int,
+        default=runtime_config.simulation.max_agents,
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=runtime_config.simulation.max_workers,
+    )
     parser.add_argument(
         "--incremental-comments",
         type=int,
-        default=INCREMENTAL_COMMENT_COUNT,
+        default=runtime_config.simulation.incremental_comment_count,
     )
     args = parser.parse_args()
 
@@ -362,6 +445,7 @@ def main():
         max_agents=args.max_agents,
         max_workers=args.workers,
         incremental_comment_count=args.incremental_comments,
+        runtime_config=runtime_config,
     )
     print("当前时间步模拟完成。")
     print(json.dumps(result, ensure_ascii=False, indent=2))

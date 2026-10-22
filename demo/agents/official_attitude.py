@@ -1,4 +1,4 @@
-"""历史复现中单个 Agent 的官方态度裁决。
+"""单个 Agent 的官方态度裁决。
 
 本模块只处理个体证据，不调用 LLM、不读取文件，也不使用真实情绪比例。
 它把“是否接受事实结论”和“如何评价回应过程”拆成两个维度，再通过
@@ -10,20 +10,50 @@ Persona 门槛与上一轮状态迟滞生成兼容旧界面的 ``official_attitu
 
 from __future__ import annotations
 
+from domain.comment_semantics import normalize_evidence_semantics
+
 
 ATTITUDE_LEVELS = {"question": -1, "wait": 0, "accept": 1}
 
 _FACT_TARGETS = {
+    "official_claim",
     "fact_clarification",
     "event_outcome",
     "identity_confirmation",
     "forensic_result",
 }
 _PROCESS_TARGETS = {
+    "accountability",
     "official_response",
     "investigation_process",
     "process_accountability",
 }
+
+
+def _normalize_attitude_evidence(item):
+    """补齐态度证据语义，同时兼容改造前的内部证据对象。
+
+    旧版 ``official_attitude`` 单元测试和历史中间结果会直接保存
+    ``evidence_target``，但没有保存来源与证据角色。这里仅对这种“既没有
+    evidence_type、也没有语义来源”的内部证据做保守迁移；带有
+    ``simulated_comment`` 标识的公众评论仍会被识别为公众观点，不能因此
+    获得事实证明力。
+    """
+
+    legacy_item = dict(item)
+    target = str(legacy_item.get("evidence_target", ""))
+    is_bare_legacy = (
+        not legacy_item.get("evidence_type")
+        and not legacy_item.get("information_source_type")
+    )
+    if is_bare_legacy and target in _FACT_TARGETS:
+        legacy_item["information_source_type"] = "event"
+    if not legacy_item.get("evidence_role"):
+        if legacy_item.get("unresolved_concern") is True:
+            legacy_item["evidence_role"] = "question"
+        elif target in _FACT_TARGETS | _PROCESS_TARGETS:
+            legacy_item["evidence_role"] = "clarify"
+    return normalize_evidence_semantics(legacy_item)
 
 
 def _bounded(value, default=0.0):
@@ -80,20 +110,35 @@ def _split_channels(evidence_items):
 
     channels = {"claim": [], "process": [], "concern": []}
     for item in evidence_items:
-        if item.get("is_new_this_step") is not True:
-            continue
         if item.get("evidence_strength") == "background":
             continue
         target = str(item.get("evidence_target", ""))
+        role = str(item.get("evidence_role", "opinion"))
+        source_type = str(item.get("information_source_type", "public"))
         unresolved = item.get("unresolved_concern") is True
-        if target in _FACT_TARGETS:
+        authoritative = source_type in {
+            "official",
+            "event",
+            "media",
+            "expert",
+            "witness",
+        }
+        if (
+            target in _FACT_TARGETS
+            and role in {"support", "clarify"}
+            and authoritative
+        ):
             channels["claim"].append(item)
         # 2026/10/14，修改功能：未解决的过程关切不能同时被计作“官方
         # 已覆盖该问题”。否则同一条质疑会一边提高关切、一边虚增回应
         # 完整度，掩盖“接受事实结论但不满处置过程”的真实组合状态。
-        if target in _PROCESS_TARGETS and not unresolved:
+        if (
+            target in _PROCESS_TARGETS
+            and role in {"support", "clarify"}
+            and not unresolved
+        ):
             channels["process"].append(item)
-        if unresolved:
+        if unresolved or role in {"question", "contradict"}:
             channels["concern"].append(item)
     return channels
 
@@ -157,7 +202,11 @@ def _apply_hysteresis(
     if previous not in ATTITUDE_LEVELS or candidate == previous:
         return candidate, "initial_or_unchanged"
 
-    has_new_evidence = any(channels.values())
+    has_new_evidence = any(
+        item.get("is_new_this_step") is True
+        for items in channels.values()
+        for item in items
+    )
     if not has_new_evidence:
         return previous, "held_without_new_evidence"
 
@@ -238,6 +287,11 @@ def resolve_official_attitude(
         }
 
     previous_state = previous_state if isinstance(previous_state, dict) else {}
+    evidence_items = [
+        _normalize_attitude_evidence(item)
+        for item in evidence_items
+        if isinstance(item, dict)
+    ]
     orientation = profile.get("orientation", {})
     fact = _bounded(orientation.get("fact"), 1 / 3)
     questioning = _bounded(orientation.get("questioning"), 1 / 3)
@@ -305,7 +359,10 @@ def resolve_official_attitude(
         concern,
         profile,
         previous_state.get("process_evaluation"),
-        bool(channels["process"] or channels["concern"]),
+        any(
+            item.get("is_new_this_step") is True
+            for item in channels["process"] + channels["concern"]
+        ),
     )
     claim_position = {
         "accept": "accepted",
@@ -335,4 +392,10 @@ def resolve_official_attitude(
             evidence_for_result[selected]
         ),
         "statement_clarity": str(statement_status),
+        "active_evidence_count": sum(len(items) for items in channels.values()),
+        "new_evidence_count": sum(
+            item.get("is_new_this_step") is True
+            for items in channels.values()
+            for item in items
+        ),
     }

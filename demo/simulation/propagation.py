@@ -2,7 +2,7 @@
 
 本模块只负责三件事：
 1. 将事件、当前官方声明和当前可用评论组成公共黑板；
-2. 根据固定关系网络提取邻居上一轮表达；
+2. 根据固定关系网络提取邻居近期表达；
 3. 合并邻居传播与公共评论补充，构建Agent个人可见范围。
 
 本模块不读取或写入文件，不调用大模型，也不执行 Agent 决策。
@@ -11,12 +11,22 @@
 import hashlib
 import random
 
+from simulation.options import (
+    DEFAULT_STRATEGY_EXPRESSION_TIME_DECAY,
+    DEFAULT_STRATEGY_EXPRESSION_WINDOW_ROUNDS,
+)
+
 from simulation.social_network import (
     get_followed_agent_ids,
     get_influence_weight,
+    get_normalized_influence_weight,
     get_propagation_decay_factor,
 )
 from simulation.propagation_tracking import build_expression_id
+
+
+RECENT_EXPRESSION_WINDOW_ROUNDS = DEFAULT_STRATEGY_EXPRESSION_WINDOW_ROUNDS
+RECENT_EXPRESSION_TIME_DECAY = DEFAULT_STRATEGY_EXPRESSION_TIME_DECAY
 
 
 def filter_available_comments(comments, current_step):
@@ -271,22 +281,34 @@ def sample_visible_comments(
     return [comment.copy() for comment in selected_comments]
 
 
-# 2026/9/5，社交网络传播，新增功能：从决策历史提取邻居上一轮实际发表的评论。
-def extract_previous_agent_expressions(decision_records, event_id, step):
-    """返回上一轮各Agent的实际表达，以agent_id为键。"""
+# 2026/10/17，新增功能：策略实验可读取邻居最近多轮的实际表达。
+def extract_recent_agent_expressions(
+    decision_records,
+    event_id,
+    step,
+    window_rounds=RECENT_EXPRESSION_WINDOW_ROUNDS,
+):
+    """返回最近若干轮表达，以agent_id映射到按轮龄排序的列表。"""
+
     if not isinstance(decision_records, list):
         raise ValueError("decision_records 必须是列表。")
-    previous_step = step - 1
-    expressions = {}
-    if previous_step < 1:
-        return expressions
+    if (
+        isinstance(window_rounds, bool)
+        or not isinstance(window_rounds, int)
+        or window_rounds < 1
+    ):
+        raise ValueError("window_rounds 必须是正整数。")
 
+    expressions = {}
+    lower_step = max(1, step - window_rounds)
     for record in decision_records:
         if not isinstance(record, dict):
             continue
+        source_step = record.get("step")
         if (
             record.get("event_id") != event_id
-            or record.get("step") != previous_step
+            or not isinstance(source_step, int)
+            or not lower_step <= source_step < step
         ):
             continue
         if record.get("status") != "success" or not record.get("agent_id"):
@@ -299,6 +321,7 @@ def extract_previous_agent_expressions(decision_records, event_id, step):
             continue
         if not selected_comment.get("comment_id"):
             continue
+
         expression = selected_comment.copy()
         expression_id = expression.get("expression_id") or decision.get(
             "expression_id"
@@ -306,7 +329,7 @@ def extract_previous_agent_expressions(decision_records, event_id, step):
         if not expression_id:
             expression_id = build_expression_id(
                 event_id,
-                previous_step,
+                source_step,
                 record["agent_id"],
                 expression.get("comment_id"),
             )
@@ -325,8 +348,35 @@ def extract_previous_agent_expressions(decision_records, event_id, step):
         expression["expression_id"] = expression_id
         expression["propagation_depth"] = depth
         expression["root_expression_ids"] = list(dict.fromkeys(root_ids))
-        expressions[record["agent_id"]] = expression
+        expression["source_step"] = source_step
+        expression["expression_age"] = step - source_step
+        expressions.setdefault(record["agent_id"], []).append(expression)
+
+    for agent_expressions in expressions.values():
+        agent_expressions.sort(
+            key=lambda item: (
+                item.get("expression_age", window_rounds + 1),
+                str(item.get("expression_id", "")),
+            )
+        )
     return expressions
+
+
+# 2026/9/5，社交网络传播，新增功能：从决策历史提取邻居上一轮实际发表的评论。
+def extract_previous_agent_expressions(decision_records, event_id, step):
+    """兼容旧调用：只返回上一轮每名Agent的一条实际表达。"""
+
+    recent = extract_recent_agent_expressions(
+        decision_records,
+        event_id,
+        step,
+        window_rounds=1,
+    )
+    return {
+        agent_id: expressions[0]
+        for agent_id, expressions in recent.items()
+        if expressions
+    }
 
 
 # 2026/9/5，社交网络传播，新增功能：让高影响力Agent的表达拥有更高可见概率。
@@ -373,96 +423,153 @@ def sample_neighbor_comments(
     sample_count,
     random_seed,
 ):
-    """抽取当前Agent所关注邻居的上一轮表达，并标记传播来源。"""
+    """抽取关注邻居的近期表达，按轮龄、根链和时间衰减去重采样。"""
     followed_agent_ids = set(get_followed_agent_ids(social_network, agent_id))
     decay_factor = get_propagation_decay_factor(social_network)
-    comments_by_id = {}
+    temporal_decay_factor = RECENT_EXPRESSION_TIME_DECAY
+    recent_window_mode = any(
+        isinstance(value, list) for value in agent_expressions.values()
+    )
+    comments_by_root = {}
     for source_agent_id in sorted(followed_agent_ids):
-        source_comment = agent_expressions.get(source_agent_id)
-        if not isinstance(source_comment, dict):
-            continue
-        comment_id = str(source_comment.get("comment_id", "")).strip()
-        if not comment_id:
-            continue
+        source_value = agent_expressions.get(source_agent_id)
+        source_comments = (
+            source_value
+            if isinstance(source_value, list)
+            else [source_value]
+        )
+        for source_comment in source_comments:
+            if not isinstance(source_comment, dict):
+                continue
+            comment_id = str(source_comment.get("comment_id", "")).strip()
+            if not comment_id:
+                continue
 
-        influence_weight = get_influence_weight(
-            social_network,
-            source_agent_id,
-        )
-        source_depth = source_comment.get("propagation_depth", 0)
-        if (
-            isinstance(source_depth, bool)
-            or not isinstance(source_depth, int)
-            or source_depth < 0
-        ):
-            source_depth = 0
-        propagation_depth = source_depth + 1
-        effective_weight = calculate_decayed_propagation_weight(
-            influence_weight,
-            propagation_depth,
-            decay_factor,
-        )
-        source_expression_id = source_comment.get("expression_id") or (
-            build_expression_id(
-                event_id,
-                step - 1,
+            influence_weight = get_influence_weight(
+                social_network,
                 source_agent_id,
-                comment_id,
             )
-        )
-        root_expression_ids = source_comment.get(
-            "root_expression_ids", []
-        )
-        if not isinstance(root_expression_ids, list) or not root_expression_ids:
-            root_expression_ids = [source_expression_id]
-        root_expression_ids = [
-            item for item in root_expression_ids if item
-        ]
-        propagation_source = {
-            "source_agent_id": source_agent_id,
-            "source_expression_id": source_expression_id,
-            "root_expression_ids": root_expression_ids,
-            "source_depth": source_depth,
-            "propagation_depth": propagation_depth,
-            "influence_weight": influence_weight,
-            "decay_factor": decay_factor,
-            "effective_weight": effective_weight,
-        }
-        if comment_id not in comments_by_id:
-            propagated = source_comment.copy()
-            propagated["source_type"] = "neighbor_propagation"
-            propagated["original_introduced_step"] = source_comment.get(
-                "introduced_step"
+            normalized_influence_weight = get_normalized_influence_weight(
+                social_network,
+                source_agent_id,
             )
-            propagated["introduced_step"] = step
-            propagated["source_agent_ids"] = [source_agent_id]
-            propagated["source_expression_ids"] = [source_expression_id]
-            propagated["root_expression_ids"] = root_expression_ids.copy()
-            propagated["propagation_depth"] = propagation_depth
-            propagated["propagation_sources"] = [propagation_source]
-            propagated["propagation_weight"] = effective_weight
-            comments_by_id[comment_id] = propagated
-        else:
-            propagated = comments_by_id[comment_id]
-            propagated["source_agent_ids"].append(source_agent_id)
-            propagated["source_expression_ids"].append(source_expression_id)
-            propagated["root_expression_ids"] = list(
-                dict.fromkeys(
-                    [
-                        *propagated["root_expression_ids"],
-                        *root_expression_ids,
-                    ]
-                )
-            )
-            propagated["propagation_depth"] = min(
-                propagated["propagation_depth"],
+            source_depth = source_comment.get("propagation_depth", 0)
+            if (
+                isinstance(source_depth, bool)
+                or not isinstance(source_depth, int)
+                or source_depth < 0
+            ):
+                source_depth = 0
+            propagation_depth = source_depth + 1
+            expression_age = source_comment.get("expression_age", 1)
+            if (
+                isinstance(expression_age, bool)
+                or not isinstance(expression_age, int)
+                or expression_age < 1
+            ):
+                expression_age = 1
+            network_weight = calculate_decayed_propagation_weight(
+                influence_weight,
                 propagation_depth,
+                decay_factor,
             )
-            propagated["propagation_sources"].append(propagation_source)
-            propagated["propagation_weight"] = round(
-                propagated["propagation_weight"] + effective_weight,
+            time_weight = (
+                temporal_decay_factor ** (expression_age - 1)
+                if recent_window_mode
+                else 1.0
+            )
+            effective_weight = round(network_weight * time_weight, 6)
+            normalized_effective_weight = round(
+                normalized_influence_weight
+                * (float(decay_factor) ** max(0, propagation_depth - 1))
+                * time_weight,
                 6,
             )
+            source_expression_id = source_comment.get("expression_id") or (
+                build_expression_id(
+                    event_id,
+                    step - expression_age,
+                    source_agent_id,
+                    comment_id,
+                )
+            )
+            root_expression_ids = source_comment.get(
+                "root_expression_ids", []
+            )
+            if not isinstance(root_expression_ids, list) or not root_expression_ids:
+                root_expression_ids = [source_expression_id]
+            root_expression_ids = [item for item in root_expression_ids if item]
+            # 一条表达可能继承多个根；只要与已候选表达共享任一根，
+            # 就属于同一已曝光传播链，不能再次占用邻居曝光名额。
+            if recent_window_mode:
+                root_set = set(root_expression_ids)
+                root_key = next(
+                    (
+                        key
+                        for key, value in comments_by_root.items()
+                        if root_set.intersection(
+                            value.get("root_expression_ids", [])
+                        )
+                    ),
+                    str(root_expression_ids[0]),
+                )
+            else:
+                # 历史复现仍按上一轮评论编号合并，不因策略实验的
+                # 三轮根链去重改变既有条件化回放语义。
+                root_key = comment_id
+            propagation_source = {
+                "source_agent_id": source_agent_id,
+                "source_expression_id": source_expression_id,
+                "root_expression_ids": root_expression_ids,
+                "source_depth": source_depth,
+                "propagation_depth": propagation_depth,
+                "source_step": source_comment.get("source_step"),
+                "expression_age": expression_age,
+                "influence_weight": influence_weight,
+                "normalized_influence_weight": normalized_influence_weight,
+                "decay_factor": decay_factor,
+                "temporal_decay_factor": temporal_decay_factor,
+                "effective_weight": effective_weight,
+                "normalized_effective_weight": normalized_effective_weight,
+            }
+            existing = comments_by_root.get(root_key)
+            if existing is None or expression_age < existing["expression_age"]:
+                propagated = source_comment.copy()
+                propagated["source_type"] = "neighbor_propagation"
+                propagated["original_introduced_step"] = source_comment.get(
+                    "introduced_step"
+                )
+                propagated["introduced_step"] = step
+                propagated["source_agent_ids"] = [source_agent_id]
+                propagated["source_expression_ids"] = [source_expression_id]
+                propagated["root_expression_ids"] = root_expression_ids.copy()
+                propagated["propagation_depth"] = propagation_depth
+                propagated["propagation_sources"] = [propagation_source]
+                propagated["propagation_weight"] = effective_weight
+                propagated["normalized_propagation_weight"] = (
+                    normalized_effective_weight
+                )
+                propagated["expression_age"] = expression_age
+                comments_by_root[root_key] = propagated
+            elif expression_age == existing["expression_age"]:
+                existing["source_agent_ids"].append(source_agent_id)
+                existing["source_expression_ids"].append(source_expression_id)
+                existing["propagation_sources"].append(propagation_source)
+                existing["propagation_weight"] = round(
+                    existing["propagation_weight"] + effective_weight,
+                    6,
+                )
+                # 多名邻居传播同一根信息时使用概率并集式饱和合并，
+                # 保留重复曝光增强，同时确保认知权重不会超过1。
+                previous_normalized = float(
+                    existing.get("normalized_propagation_weight", 0.0)
+                )
+                existing["normalized_propagation_weight"] = round(
+                    1.0
+                    - (1.0 - previous_normalized)
+                    * (1.0 - normalized_effective_weight),
+                    6,
+                )
 
     random_generator = create_random_generator(
         agent_id,
@@ -470,11 +577,29 @@ def sample_neighbor_comments(
         step,
         random_seed,
     )
-    return weighted_sample_comments(
-        list(comments_by_id.values()),
-        min(sample_count, len(comments_by_id)),
-        random_generator,
-    )
+    # 优先补最近一轮邻居表达，仍不足时才依次使用更早轮次；所有
+    # 邻居层都用完后，调用方才会用公共评论补齐总可见数量。
+    selected = []
+    comments = list(comments_by_root.values())
+    for expression_age in sorted(
+        {item.get("expression_age", 1) for item in comments}
+    ):
+        remaining = sample_count - len(selected)
+        if remaining <= 0:
+            break
+        age_comments = [
+            item
+            for item in comments
+            if item.get("expression_age", 1) == expression_age
+        ]
+        selected.extend(
+            weighted_sample_comments(
+                age_comments,
+                min(remaining, len(age_comments)),
+                random_generator,
+            )
+        )
+    return selected
 
 
 # 2026/9/5，社交网络传播，新增功能：合并邻居传播评论与公共评论补充，形成个人可见范围。
@@ -605,6 +730,7 @@ def build_agent_blackboard_view(
         public_comment_ids = [
             item.get("comment_id") for item in visible_comments
         ]
+        neighbor_target_count = 0
     else:
         public_comment_count = (
             visible_count
@@ -628,12 +754,28 @@ def build_agent_blackboard_view(
                 include_comment_ids=True,
             )
         )
+        neighbor_target_count = min(neighbor_comment_count, visible_count)
 
     # 2026/08/25 第六次联调问题修复，新增功能：记录当前轮与历史评论的实际可见数量。
     current_step_visible_count = sum(
         comment.get("introduced_step") == public_blackboard["step"]
         for comment in visible_comments
     )
+
+    neighbor_id_set = set(neighbor_comment_ids)
+    neighbor_comments = [
+        item
+        for item in visible_comments
+        if item.get("comment_id") in neighbor_id_set
+    ]
+    neighbor_age_distribution = {}
+    neighbor_root_ids = set()
+    for comment in neighbor_comments:
+        age = str(comment.get("expression_age", 1))
+        neighbor_age_distribution[age] = (
+            neighbor_age_distribution.get(age, 0) + 1
+        )
+        neighbor_root_ids.update(comment.get("root_expression_ids", []))
 
     return {
         "agent_id": agent_id,
@@ -654,6 +796,16 @@ def build_agent_blackboard_view(
         ),
         "neighbor_visible_count": len(neighbor_comment_ids),
         "public_visible_count": len(public_comment_ids),
+        # 2026/10/17，新增功能：显式记录邻居曝光目标、实际填充率、
+        # 轮龄和去重后的根表达数量，便于判断社交网络是否真正生效。
+        "neighbor_target_count": neighbor_target_count,
+        "effective_neighbor_exposure_rate": (
+            round(len(neighbor_comment_ids) / neighbor_target_count, 6)
+            if neighbor_target_count
+            else None
+        ),
+        "neighbor_expression_age_distribution": neighbor_age_distribution,
+        "unique_neighbor_root_count": len(neighbor_root_ids),
         "visible_neighbor_comment_ids": neighbor_comment_ids,
         "visible_public_comment_ids": public_comment_ids,
         "public_sampling_method": (

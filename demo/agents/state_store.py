@@ -5,6 +5,7 @@ Persona 保存长期稳定特征；本模块只保存事件模拟过程中会变
 """
 
 from collections import Counter
+from copy import deepcopy
 
 from infrastructure.json_storage import append_jsonl_many, read_jsonl
 from project_config import AGENT_STATE_FILE
@@ -21,6 +22,15 @@ DEFAULT_AGENT_STATE = {
     "last_comment_id": None,
     # 2026/08/25 Agent个人评论历史，新增功能：保留上一条完整评论供后续汇总个人记忆。
     "last_comment": None,
+    # 2026/10/19，新增功能：回应方案使用有限证据生命周期。该字典只
+    # 保存权威证据和已消费传播根，不保存完整评论文本。
+    "strategy_evidence_memory": {},
+    # 2026/10/20，新增功能：保存权威证据剩余潜力和已吸收比例。该状态
+    # 最多保留三轮有效证据，不保存正文，也不改变离散情绪数据契约。
+    "strategy_evidence_assimilation": {},
+    # 2026/10/19，新增功能：官方事实接受、过程回应和未解决关切使用
+    # 独立记忆，避免沿用情绪证据“推动一次即消费”的生命周期。
+    "strategy_attitude_memory": {},
 }
 
 # 2026/08/25 Agent个人评论历史，新增功能：集中定义个人评论记忆需要保留的字段。
@@ -35,10 +45,14 @@ COMMENT_MEMORY_FIELDS = (
     "evidence_ids",
 )
 
+# 2026/10/16，新增功能：事件记忆只保留最近曝光编号，避免
+# 随轮次增长把全部历史重复塞回提示词。
+MAX_SEEN_COMMENT_MEMORY = 120
+
 
 def create_empty_agent_state():
     """创建一个不会被不同 Agent 共享引用的空状态。"""
-    return dict(DEFAULT_AGENT_STATE)
+    return deepcopy(DEFAULT_AGENT_STATE)
 
 
 # 2026/08/25 Agent个人评论历史，新增功能：从本轮决策提取可写入Agent状态的完整评论。
@@ -158,6 +172,7 @@ class AgentStateStore:
                 "consecutive_comment_rounds": 0,
                 "faction_counts": {},
                 "own_comment_history": [],
+                "seen_comment_ids": [],
             }
 
         states = [record.get("state", {}) for record in history]
@@ -168,7 +183,11 @@ class AgentStateStore:
             if state.get("last_comment_faction")
         ]
         own_comment_history = []
+        seen_comment_ids = []
         for record, state in zip(history, states):
+            for comment_id in state.get("visible_comment_ids", []):
+                if comment_id and comment_id not in seen_comment_ids:
+                    seen_comment_ids.append(comment_id)
             if state.get("will_comment") is not True:
                 continue
 
@@ -209,10 +228,18 @@ class AgentStateStore:
             ),
             "faction_counts": dict(Counter(factions)),
             "own_comment_history": own_comment_history,
+            "seen_comment_ids": seen_comment_ids[-MAX_SEEN_COMMENT_MEMORY:],
         }
 
     # 2026/08/25 Agent个人评论历史，修改功能：状态记录同时保存本轮完整评论记忆。
-    def build_state_record(self, event_id, step, agent_id, decision):
+    def build_state_record(
+        self,
+        event_id,
+        step,
+        agent_id,
+        decision,
+        decision_result=None,
+    ):
         """把一次 Agent 决策转换为统一的历史状态记录。"""
         will_comment = bool(decision.get("will_comment", False))
         last_comment = build_comment_memory(decision)
@@ -224,7 +251,12 @@ class AgentStateStore:
             "claim_position": decision.get("claim_position"),
             "process_evaluation": decision.get("process_evaluation"),
             "will_comment": will_comment,
-            "last_action": "comment" if will_comment else "wait",
+            # 2026/10/16，修改功能：新批次保存沉默/原创/转发
+            # 的真实动作；旧记录仍可用comment/wait兼容读取。
+            "last_action": decision.get(
+                "action_type",
+                "comment" if will_comment else "wait",
+            ),
             "last_comment_faction": (
                 decision.get("comment_faction") if will_comment else None
             ),
@@ -233,6 +265,34 @@ class AgentStateStore:
             ),
             "last_comment": last_comment,
         }
+        if isinstance(decision.get("strategy_evidence_memory"), dict):
+            state["strategy_evidence_memory"] = deepcopy(
+                decision["strategy_evidence_memory"]
+            )
+        if isinstance(
+            decision.get("strategy_evidence_assimilation"),
+            dict,
+        ):
+            state["strategy_evidence_assimilation"] = deepcopy(
+                decision["strategy_evidence_assimilation"]
+            )
+        if isinstance(decision.get("strategy_attitude_memory"), dict):
+            state["strategy_attitude_memory"] = deepcopy(
+                decision["strategy_attitude_memory"]
+            )
+        # 可见编号是环境曝光而非个人结论，由批量决策边界
+        # 传入后存入有界记忆，决策核心不直接读取任何状态文件。
+        if isinstance(decision_result, dict):
+            state["visible_comment_ids"] = list(
+                dict.fromkeys(
+                    comment_id
+                    for comment_id in decision_result.get(
+                        "visible_comment_ids",
+                        [],
+                    )
+                    if comment_id
+                )
+            )
         # 2026/10/12，历史复现发言决策：只在历史决策实际提供这些
         # 字段时保存，避免五策略状态契约出现无意义的空字段。
         for field in ("silence_reason", "participation_assessment"):
@@ -257,6 +317,7 @@ class AgentStateStore:
                     result["step"],
                     result["agent_id"],
                     result["decision"],
+                    result,
                 )
             )
         if records:

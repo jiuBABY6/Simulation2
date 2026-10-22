@@ -8,7 +8,7 @@
 
 | 类型 | 含义 |
 | --- | --- |
-| 当前核心 | 当前五策略实验或历史趋势复现会直接使用的代码、配置和数据 |
+| 当前核心 | 当前回应方案对照或历史趋势复现会直接使用的代码、配置和数据 |
 | 辅助工具 | 为画像构建、可视化、演示或开发提供支持，不属于主仿真入口 |
 | 运行产物 | 由程序生成的结果、状态、缓存或示例数据，通常不应作为业务代码修改 |
 | 历史/外部参考 | 早期原型、归档文档或外部参考工程，不是当前 Demo 的执行入口 |
@@ -19,7 +19,7 @@
 
 | 路径 | 类型 | 主要功能 | 使用说明 |
 | --- | --- | --- | --- |
-| `demo/` | 当前核心 | 舆情社会模拟 Demo 主体，包含五策略实验、历史复现、配置、状态、结果和文档 | 当前开发和运行的主要目录 |
+| `demo/` | 当前核心 | 舆情社会模拟 Demo 主体，包含回应方案对照、历史复现、配置、状态、结果和文档 | 当前开发和运行的主要目录 |
 | `comment/` | 历史原型 | 保留早期评论池、评分和分析原型 | 当前 Demo 不再依赖该目录，不作为正式入口 |
 | `persona_pipeline/` | 辅助工具 | 从原始社交数据构建 Persona、情绪阈值和派系偏好 | 画像重新生成时使用 |
 | `output/` | 当前核心数据 | 保存 Persona 构建结果和全局策略配置 | 当前 Agent 决策会读取 `output/personas` |
@@ -38,11 +38,11 @@
 
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
-| `main.py` | 当前核心 | 五策略实验总入口；准备初始评论池并调用实验调度器。正常运行命令为 `python demo\main.py` |
+| `main.py` | 当前核心 | 回应方案对照总入口；准备初始评论池并调用实验调度器。正常运行命令为 `python demo\main.py` |
 | `project_config.py` | 当前核心 | 集中定义项目路径、模型参数、Agent 数量、并发数、评论数量、重试次数、质量阈值和可见评论数量等配置 |
-| `experiment_runner.py` | 当前核心 | 五策略实验总调度器；运行共享进场前基线、判断官方动态进场、分流各策略、汇总质量与性能并比较策略结果 |
-| `event_example.json` | 当前核心输入 | 当前五策略实验的事件材料，包括 `event_id`、事件描述、标签和初始状态等 |
-| `official_response_options.json` | 当前核心输入 | 配置“不回应、事实通报、共情安抚、辟谣澄清、处置进展”等实验场景及官方声明内容、状态与进场规则 |
+| `experiment_runner.py` | 当前核心 | 回应方案对照总调度器；运行共享进场前基线、判断官方动态进场、分流各场景、汇总质量与性能并比较结果 |
+| `event_example.json` | 当前核心输入 | 当前回应方案对照的事件材料，包括 `event_id`、事件描述、标签和初始状态等 |
+| `official_response_options.json` | 当前核心输入 | 配置三个可自定义回应方案及官方声明内容、状态与统一进场规则；不回应基线由实验调度器补充 |
 | `comment_pool.json` | 运行产物 | 当前调试或最近一次准备得到的初始评论池；正式批次会复制独立快照 |
 
 注意：`event_example.json` 与 `official_response_options.json` 中的 `event_id` 必须一致。`project_config.py` 涉及模型访问配置，敏感凭据应通过安全配置方式管理，不应在文档、日志或提交记录中暴露。
@@ -65,21 +65,51 @@
 | `incremental_generator.py` | 当前核心 | 每轮生成增量评论；负责触发原因、并行首轮请求、补齐、质量救援、历史评论兜底、本地应急兜底和质量统计 |
 | `repository.py` | 当前核心 | 统一读取初始评论、增量评论和全部评论，并按 `comment_id` 查询评论 |
 
+### 3.3.1 `demo/application`：跨实验共享应用层
+
+| 文件 | 类型 | 主要功能 |
+| --- | --- | --- |
+| `runtime_config.py` | 当前核心 | 集中保存单轮参数，并把旧全局配置转换为可注入的路径、决策和仿真配置对象 |
+| `error_summary.py` | 当前核心 | 把完整异常整理成适合控制台显示的单行摘要 |
+| `scenario_state.py` | 当前核心 | 创建隔离场景状态，必要时从共享基线快照初始化 |
+| `step_executor.py` | 当前核心 | 封装仿真子进程、运行环境和结构化结果协议；用户中断时负责终止并回收当前子进程 |
+| `round_results.py` | 当前核心 | 读取轮次指标、评论质量和传播摘要，不包含具体实验规则 |
+
+两类实验都依赖该层。历史复现不再通过导入`experiment_runner.py`复用回应方案对照
+实现，避免一种业务模式依赖另一种业务模式的顶层编排器。
+
+### 3.3.2 `demo/domain`：跨模块数据契约
+
+| 文件 | 类型 | 主要功能 |
+| --- | --- | --- |
+| `contracts.py` | 当前核心 | 定义 `SimulationContext`、`AgentDecisionInput` 和 `AgentDecisionResult`，在编排器与Agent核心之间提供稳定输入输出边界 |
+
+领域契约不读取文件或环境变量。现有 JSON 字典只在入口和持久化边界转换，
+因此实验结果格式保持兼容。
+
 ### 3.4 `demo/agents`：Agent 感知与决策
 
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
 | `__init__.py` | 包文件 | 标记 Agent 决策领域包并说明模块边界 |
-| `decision_service.py` | 当前核心 | 调用 LLM 执行受约束决策；历史模式解释规则层既定状态、判断发言并接收原创表达，五策略保留原有情绪、态度判断和候选评论选择 |
-| `official_attitude.py` | 当前核心 | 历史模式按事实证据、过程回应、Persona门槛和上一轮状态裁决个体官方态度 |
-| `decision_engine.py` | 当前核心 | 构建事件、Persona、可见评论和历史摘要；校验状态、证据和历史原创表达；保留五策略候选评论评分与Top-K选择 |
-| `decision_profile.py` | 历史复现扩展 | 从Persona生成稳定决策画像；按个体门槛、上一轮状态、新增证据和效用边际裁决后续情绪转移 |
-| `evidence_appraisal.py` | 历史复现扩展 | 将证据客观强度与Persona主题、信息取向和上一轮状态结合，分别给出情绪与官方态度个体影响及变化资格 |
+| `decision_service.py` | 当前核心 | 串联状态LLM、本地行为门控、按需原创表达或转发，不读取仿真文件 |
+| `official_attitude.py` | 当前核心 | 按事实证据、过程回应、Persona门槛和上一轮状态裁决个体官方态度 |
+| `decision_engine.py` | 当前核心 | 构建事件、Persona、可见评论和历史摘要；统一校验状态、证据、原创表达和转发动作 |
+| `decision_profile.py` | 当前核心 | 从Persona生成稳定决策画像；按个体门槛、上一轮状态、新增证据和效用边际裁决后续情绪转移 |
+| `evidence_appraisal.py` | 当前核心 | 将证据客观强度与Persona主题、信息取向和上一轮状态结合，分别给出情绪与官方态度个体影响及变化资格 |
+| `evidence_impact_router.py` | 回应方案扩展 | 按评论目标、证据角色和现实来源分离事件情绪、官方态度和参与作用，防止把质疑官方等同于事件负面 |
+| `state_evidence.py` | 回应方案扩展 | 从完整可见评论中构建内部状态证据视图；消融过滤后保留最近一轮、根传播去重且最多2条邻居表达，以及按Persona相关性选择的最多5条独立公共评论；完整可见评论仍交给行为层 |
+| `strategy_state_transition.py` | 回应方案扩展 | 编排方向性情绪效用裁决、有限证据记忆、官方态度候选、紧凑证据目录和状态审计 |
+| `strategy_evidence_integrator.py` | 回应方案扩展 | 按通告语义维度、Persona先验、上一轮惯性和独立传播根递减整合证据，输出唯一相邻状态；不读文件、不调用LLM |
+| `strategy_evidence_assimilation.py` | 回应方案扩展 | 按Persona处理速度对权威证据进行最多三轮的渐进吸收、轮龄衰减、消费和有界记忆；不读文件、不调用LLM |
+| `strategy_evidence_lifecycle.py` | 兼容层 | 保留旧批次的权威证据消费标记和审计兼容；新状态变化强度由`strategy_evidence_assimilation.py`负责 |
+| `strategy_behavior.py` | 回应方案扩展 | 根据Persona、当轮信息、方向性证据相关度、状态效用张力和连续发言疲劳决定沉默、原创或转发，不改写内部状态 |
+| `strategy_expression.py` | 回应方案扩展 | 在原创动作确定后独立构造、校验三分类表达，不判断状态或发言资格 |
 | `historical_participation.py` | 历史复现扩展 | 根据相关新证据、状态变化、表达重复和连续发言疲劳评估公开表达必要性，不修改Agent内部状态 |
-| `batch_decision.py` | 当前核心 | 加载固定网络和邻居上一轮表达，为多个Agent构建个人可见信息，并发执行决策和保存来源数量 |
+| `batch_decision.py` | 当前核心 | 加载固定网络；回应方案读取邻居最近3轮表达、历史复现读取上一轮表达，并保存曝光诊断 |
 | `state_store.py` | 当前核心 | 维护 Agent 每轮状态、个人评论历史和情绪变化摘要，为后续轮次提供最近状态与个人经历 |
 | `persona_repository.py` | 当前核心 | 从 `output/personas` 加载 Persona 和指定数量的 Agent |
-| `rule_decision_demo.py` | 辅助工具 | 不调用 LLM 的规则版单 Agent 决策示例，用于本地理解和小范围调试，不是五策略实验主流程 |
+| `rule_decision_demo.py` | 辅助工具 | 不调用 LLM 的规则版单 Agent 决策示例，用于本地理解和小范围调试，不是回应方案对照主流程 |
 
 ### 3.5 `demo/simulation`：仿真运行与状态
 
@@ -91,13 +121,14 @@
 | `evidence_policy.py` | 历史复现扩展 | 统一历史更新、客观事件和官方通告的证据强度、新旧状态、稳定编号及正面资格；避免所有公开更新被默认升级为强证据 |
 | `event_state_updater.py` | 当前核心 | 追加、读取和校验事件状态历史，获取某事件的最新状态 |
 | `state_manager.py` | 当前核心 | 创建、复制、校验和重置仿真状态目录，防止不同实验场景相互污染 |
+| `counterfactual_controls.py` | 回应方案对照 | 规范化共享客观事实时间线，生成共同输入与进场前快照SHA-256，并检查通告后数据是否发生跨场景污染 |
 | `batch_manager.py` | 当前核心 | 生成实验批次 ID，创建批次目录并保存事件、官方策略和初始评论池快照 |
 | `runner.py` | 当前核心 | 执行单个时间步或多轮仿真；校验轮次顺序，串联增量评论、Agent 决策、状态更新和指标计算 |
-| `propagation.py` | 当前核心 | 构建公共黑板，按影响力抽取邻居上一轮表达；历史模式按Persona长期偏好加权抽取公共评论，五策略保持均匀抽样 |
+| `propagation.py` | 当前核心 | 按轮龄优先、根链去重、时间与传播深度衰减抽取近期邻居表达，再由公共评论补足个人视图 |
 | `social_network.py` | 当前核心 | 根据实际参与Agent构建和校验固定有向关系网络，计算影响力权重并查询关注邻居 |
 | `propagation_tracking.py` | 当前核心 | 为Agent实际表达补充谱系，构建邻居曝光事件并防重保存传播历史 |
 
-`demo/experiment_runner.py` 继续保留在根目录，作为五策略实验总调度器，负责共享基线、动态进场、场景分流、质量与性能汇总和策略比较。
+`demo/experiment_runner.py` 继续保留在根目录，作为回应方案对照总调度器，负责共享基线、动态进场、场景分流、质量与性能汇总和方案比较。
 
 ### 3.6 `demo/evaluation`：指标评估
 
@@ -127,8 +158,8 @@
 | `metrics_history.jsonl` | 展示每轮舆情指标的保存格式 |
 | `comment_pool_example.json` | 展示初始评论池的数据结构，不参与正式实验 |
 | `metrics_result_example.json` | 展示单轮指标和扩展效果指标的数据结构，不参与正式实验 |
-| `decision_result.json` | 保存规则版单 Agent 最近一次调试结果，不是五策略实验结果 |
-| `decision_result_llm.json` | 保存 LLM 版单 Agent 最近一次调试结果，不是五策略实验结果 |
+| `decision_result.json` | 保存规则版单 Agent 最近一次调试结果，不是回应方案对照结果 |
+| `decision_result_llm.json` | 保存 LLM 版单 Agent 最近一次调试结果，不是回应方案对照结果 |
 | `social_network_snapshot_example.json` | 展示网络节点、Agent影响力权重和有向关注边的数据结构 |
 | `propagation_history_example.jsonl` | 展示邻居曝光、表达谱系、传播层级、衰减权重和继续表达标记 |
 
@@ -140,13 +171,13 @@
 | --- | --- |
 | `.gitkeep` | 让空状态目录能够被 Git 保留 |
 
-直接调试核心模块时，默认状态文件会写入本目录。正式五策略实验主要使用 `demo/experiments/<experiment_id>/<scenario>/state`，避免不同场景共享运行中状态。
+直接调试核心模块时，默认状态文件会写入本目录。正式回应方案对照主要使用 `demo/experiments/<experiment_id>/<scenario>/state`，避免不同场景共享运行中状态。
 
 ### 3.10 `demo/experiments`：实验批次结果
 
 该目录是运行产物目录。每个 `<experiment_id>` 表示一个独立实验批次，不建议手工修改其中内容。
 
-#### 五策略实验批次
+#### 回应方案对照批次
 
 ```text
 demo/experiments/<experiment_id>/
@@ -157,20 +188,19 @@ demo/experiments/<experiment_id>/
 ├─ experiment_result.json
 ├─ _shared_baseline/state/
 ├─ no_response/
-├─ fact_report/
-├─ empathy/
-├─ rumor_clarification/
-└─ handling_progress/
+├─ response_plan_1/
+├─ response_plan_2/
+└─ response_plan_3/
 ```
 
 | 文件或目录 | 主要功能 |
 | --- | --- |
 | `event_input.json` | 本批次实际使用的事件输入快照 |
 | `official_response_options.json` | 本批次实际使用的官方策略快照 |
-| `comment_pool.json` | 五个场景共同使用的初始评论池快照 |
-| `social_network_snapshot.json` | 五个场景共同只读的固定社交网络与影响力权重快照 |
-| `experiment_result.json` | 批次总结果，包括完成状态、进场原因、策略比较、数据质量和性能统计 |
-| `_shared_baseline/state/` | 官方进场前的共享基线状态，保证五个场景从同一舆情条件分流 |
+| `comment_pool.json` | 三个回应方案与不回应基线共同使用的初始评论池快照 |
+| `social_network_snapshot.json` | 四个场景共同只读的固定社交网络与影响力权重快照 |
+| `experiment_result.json` | 批次总结果，包括完成状态、进场原因、策略比较、数据质量、性能统计，以及共同输入哈希和跨场景污染检查 |
+| `_shared_baseline/state/` | 官方进场前的共享基线状态，保证四个场景从同一舆情条件分流 |
 | `<scenario>/scenario_result.json` | 单个策略场景的轮次结果、最终指标、质量与性能摘要 |
 | `<scenario>/state/event_state_history.json` | 该场景每轮事件和官方声明状态 |
 | `<scenario>/state/agent_state_history.jsonl` | 该场景各 Agent 的状态历史 |
@@ -179,9 +209,11 @@ demo/experiments/<experiment_id>/
 | `<scenario>/state/metrics_history.jsonl` | 该场景每轮舆情指标 |
 | `<scenario>/state/propagation_history.jsonl` | 该场景逐轮邻居曝光、传播路径、层级、衰减权重和继续表达记录 |
 
+2026/10/20 起，四个场景只共享客观输入和进场前快照。通告投入后的公众评论与Agent表达分别写入各自场景目录；`experiment_result.json.counterfactual_controls` 用于证明共同输入一致，并检查是否误用了其他场景的运行数据。
+
 #### 历史复现批次
 
-历史回放批次包含输入快照、`historical_replay_result.json` 和 `historical_replay/state`。输入快照用于复现配置，状态目录保存逐轮决策、指标和传播数据。它不进行五策略比较，而是按真实时间线投入同期公众语境和官方信息。
+历史回放批次包含输入快照、`historical_replay_result.json` 和 `historical_replay/state`。输入快照用于复现配置，状态目录保存逐轮决策、指标和传播数据。它不进行回应方案比较，而是按真实时间线投入同期公众语境和官方信息。
 
 #### 其他文件
 
@@ -192,7 +224,7 @@ demo/experiments/<experiment_id>/
 
 ### 3.11 `demo/historical_replay`：历史趋势复现
 
-该模块与五策略实验隔离，但复用同一套 Persona、评论生成、Agent 决策和指标计算核心。
+该模块与回应方案对照隔离，但复用同一套 Persona、评论生成、Agent 决策和指标计算核心。
 
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
@@ -218,6 +250,7 @@ demo/experiments/<experiment_id>/
 | --- | --- |
 | `README.md` | 文档总入口和推荐阅读顺序 |
 | `FILE_DIRECTORY_GUIDE.md` | 本文；说明项目每个主要目录、文件的职责和使用边界 |
+| `PROJECT_HANDOFF_20261022.md` | 当前交接现场、验证边界、风险、下一步和Destination sentinel |
 | `PROJECT_STATUS.md` | 当前完成情况、主要问题和下一步唯一工作 |
 | `ARCHITECTURE.md` | 系统流程、模块边界和代码地图 |
 | `DATA_CONTRACT.md` | 事件、评论、状态、决策、指标和实验结果的字段契约 |
@@ -228,7 +261,7 @@ demo/experiments/<experiment_id>/
 | `GIT_WORKFLOW.md` | 从GitHub获取或更新项目、创建姓名分支、提交、推送和Pull Request的操作说明 |
 | `LLM_SERVICE.md` | 系统各处 LLM 调用点、用途和调用边界 |
 | `HISTORICAL_REPLAY.md` | 历史趋势复现模式的配置和运行说明 |
-| `VISUALIZATION.md` | 五策略、历史复现、人工真实趋势和传播追踪的统一网页展示说明 |
+| `VISUALIZATION.md` | 回应方案对照、历史复现、人工真实趋势和传播追踪的统一网页展示说明 |
 | `INTEGRATION_TEST_HISTORY.md` | 历次正式联调的日期、输入、结果、失败原因和修复记录 |
 | `detail.md` | 长期开发记录，保存方案演变、阶段成果、历史计划和扩展方向 |
 
@@ -258,7 +291,7 @@ demo/experiments/<experiment_id>/
 
 ### 3.13 `demo/ppt_assets`
 
-用于统一保存汇报所需的可编辑幻灯片、导出图片和相关视觉素材。当前目录为空，是预留的演示资产目录，不参与程序运行。
+用于统一保存汇报所需的可编辑幻灯片和大纲，不参与程序运行。当前保留第一次汇报`研发进展汇报.pptx`、当前第二次汇报`第二次研发成果汇报.pptx`、系统实现校正版以及第二次汇报大纲；这些文件属于交付材料，不按运行缓存清理。后续如需归档校正版，应先确认最终汇报文件已完整吸收其内容。
 
 ### 3.14 Python 字节码缓存
 
@@ -312,8 +345,11 @@ demo/experiments/<experiment_id>/
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
 | `app.py` | 辅助工具入口 | 唯一的本地 HTTP 服务入口，只负责分层路由、错误返回和静态资源托管 |
+| `api_router.py` | API路由 | 校验只读请求参数，并把请求分发到历史、回应方案对照或共享网络服务 |
 | `config.py` | 辅助工具配置 | 定义实验目录、真实数据源、处理结果和静态资源路径 |
-| `portal/` | 前端入口 | 提供“五策略实验/历史趋势复现”模式和实验批次选择 |
+| `portal/` | 前端入口 | 提供“回应方案对照/历史趋势复现”模式和实验批次选择 |
+| `shared/artifact_io.py` | 共享读取 | 统一读取和校验 JSON、JSONL 实验产物 |
+| `shared/event_resources.py` | 共享路径 | 校验事件资源编号并安全定位真实趋势文件；共享层不反向导入历史业务层 |
 | `shared/experiment_catalog.py` | 共享索引 | 自动识别已完成的两类实验，并报告页面所需能力 |
 | `shared/experiment_adapter.py` | 共享适配 | 把两类实验的场景、轮次、网络和传播文件转换为统一只读接口 |
 | `shared/network/repository.py` | 网络数据层 | 读取并验证网络快照、传播记录和决策记录 |
@@ -338,12 +374,12 @@ demo/experiments/<experiment_id>/
 | `historical/opinion_metrics.py` | 口径计算 | 统一当前轮、累计和活跃舆情的分母与三分类统计 |
 | `historical/static/` | 历史前端 | 展示真实趋势、模拟趋势、公开语境和官方时间线 |
 
-### 7.3 五策略实验层
+### 7.3 回应方案对照层
 
 | 文件 | 类型 | 主要功能 |
 | --- | --- | --- |
-| `strategy/service.py` | 五策略服务 | 只读整理五个场景的逐轮指标、最终状态、传播摘要和数据质量 |
-| `strategy/static/` | 五策略前端 | 展示五策略逐轮负面率、策略摘要和横向比较，并进入共享网络页面 |
+| `strategy/service.py` | 方案对照服务 | 只读整理四个场景的逐轮指标、最终状态、传播摘要和数据质量 |
+| `strategy/static/` | 方案对照前端 | 展示回应方案逐轮负面率、方案摘要和横向比较，并进入共享网络页面 |
 
 旧版 `data/real_trend.json`、`social_network_report/` 独立服务器、兼容转发模块和重复配置已删除。当前只保留 `python visualization\app.py` 这一服务入口。
 
@@ -402,13 +438,13 @@ demo/experiments/<experiment_id>/
 | `data/` | TrendSim 输入和输出数据 |
 | `__pycache__/` | Python 字节码缓存 |
 
-以上三个目录均不是当前五策略 Demo 的直接依赖。若要借鉴其中的社交网络、传播或存储能力，应通过新接口逐步接入，不能直接改写当前核心的数据结构。
+以上三个目录均不是当前回应方案对照 Demo 的直接依赖。若要借鉴其中的社交网络、传播或存储能力，应通过新接口逐步接入，不能直接改写当前核心的数据结构。
 
 ## 九、新成员快速判断表
 
 | 需要完成的工作 | 优先查看的文件 |
 | --- | --- |
-| 运行现有五策略实验 | `demo/docs/RUNBOOK.md`、`demo/main.py`、`demo/project_config.py` |
+| 运行现有回应方案对照 | `demo/docs/RUNBOOK.md`、`demo/main.py`、`demo/project_config.py` |
 | 更换事件和官方声明 | `demo/event_example.json`、`demo/official_response_options.json` |
 | 修改评论生成 | `demo/comments/angle_planner.py`、`demo/comments/generation_service.py`、`demo/comments/incremental_generator.py` |
 | 修改 Agent 决策 | `demo/agents/decision_service.py`、`demo/agents/decision_engine.py`、`demo/agents/state_store.py` |

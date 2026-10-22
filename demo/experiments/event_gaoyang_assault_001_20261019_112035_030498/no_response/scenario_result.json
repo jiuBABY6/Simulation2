@@ -1,0 +1,2750 @@
+{
+  "strategy": "no_response",
+  "strategy_name": "不回应",
+  "entry_strategy": "no_response",
+  "ablation_config": {
+    "incremental_public_comment_mode": "llm_incremental",
+    "state_comment_evidence_mode": "all_visible",
+    "neighbor_feedback_enabled": true,
+    "fixed_response_step": null
+  },
+  "status": "success",
+  "entry_triggered": true,
+  "entry_reason": "stagnation",
+  "comparison_eligible": true,
+  "official_responses": [],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 8,
+        "silent_agent_count": 22,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 0,
+        "reached_agent_count": 0,
+        "reach_rate": 0.0,
+        "source_agent_count": 0,
+        "propagated_comment_count": 0,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 0,
+        "average_propagation_depth": 0.0,
+        "total_effective_weight": 0
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 22,
+            "rate": 0.733333
+          },
+          "original": {
+            "count": 7,
+            "rate": 0.233333
+          },
+          "reshare": {
+            "count": 1,
+            "rate": 0.033333
+          }
+        },
+        "original_expression_count": 7,
+        "unique_original_expression_count": 7,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 8,
+        "silent_agent_count": 22,
+        "participation_rate": 0.266667,
+        "classified_expression_count": 8,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 5,
+            "rate": 0.625
+          },
+          "negative": {
+            "count": 3,
+            "rate": 0.375
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 0,
+        "effective_neighbor_exposure_rate": 0.0,
+        "full_target_agent_rate": 0.0,
+        "zero_exposure_agent_rate": 1.0,
+        "average_unique_root_count": 0.0,
+        "expression_age_distribution": {},
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 0,
+        "peer_transition_held_count": 0,
+        "average_peer_signal_strength": 0.0,
+        "average_peer_change_threshold": null,
+        "neighbor_visible_comment_count": 0,
+        "neighbor_state_evidence_count": 0,
+        "neighbor_state_evidence_retention_rate": null,
+        "public_visible_comment_count": 450,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.333333,
+        "effective_non_peer_evidence_count": 0,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 0,
+        "average_directional_evidence_group_count": 0.0,
+        "average_directional_support": {
+          "positive": 0.0,
+          "neutral": 0.0,
+          "negative": 0.0
+        },
+        "average_utility_margin": null,
+        "average_required_switch_margin": null,
+        "transition_basis_counts": {
+          "initial_state": 30
+        },
+        "transition_reason_counts": {
+          "llm_initialization_without_previous_state": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 15,
+        "silent_agent_count": 15,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 47,
+        "reached_agent_count": 26,
+        "reach_rate": 0.866667,
+        "source_agent_count": 8,
+        "propagated_comment_count": 8,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 93.024
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 15,
+            "rate": 0.5
+          },
+          "original": {
+            "count": 11,
+            "rate": 0.366667
+          },
+          "reshare": {
+            "count": 4,
+            "rate": 0.133333
+          }
+        },
+        "original_expression_count": 11,
+        "unique_original_expression_count": 11,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 15,
+        "silent_agent_count": 15,
+        "participation_rate": 0.5,
+        "classified_expression_count": 15,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 9,
+            "rate": 0.6
+          },
+          "negative": {
+            "count": 6,
+            "rate": 0.4
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 47,
+        "effective_neighbor_exposure_rate": 0.391667,
+        "full_target_agent_rate": 0.033333,
+        "zero_exposure_agent_rate": 0.133333,
+        "average_unique_root_count": 1.566667,
+        "expression_age_distribution": {
+          "1": 47
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 7,
+        "peer_transition_held_count": 19,
+        "average_peer_signal_strength": 0.184878,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 47,
+        "neighbor_state_evidence_count": 39,
+        "neighbor_state_evidence_retention_rate": 0.829787,
+        "public_visible_comment_count": 403,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.372208,
+        "effective_non_peer_evidence_count": 135,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 174,
+        "average_directional_evidence_group_count": 5.8,
+        "average_directional_support": {
+          "positive": 0.033884,
+          "neutral": 0.293347,
+          "negative": 0.305527
+        },
+        "average_utility_margin": -0.162151,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 2,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 27,
+        "rejection_counts": {
+          "重复文本": 7
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 7,
+            "negative": 12
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 13,
+        "silent_agent_count": 17,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 105,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 19,
+        "propagated_comment_count": 21,
+        "continued_propagation_count": 3,
+        "continued_agent_count": 3,
+        "continuation_rate": 0.028571,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 193.90376
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 17,
+            "rate": 0.566667
+          },
+          "original": {
+            "count": 10,
+            "rate": 0.333333
+          },
+          "reshare": {
+            "count": 3,
+            "rate": 0.1
+          }
+        },
+        "original_expression_count": 10,
+        "unique_original_expression_count": 10,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 13,
+        "silent_agent_count": 17,
+        "participation_rate": 0.433333,
+        "classified_expression_count": 13,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 6,
+            "rate": 0.461538
+          },
+          "negative": {
+            "count": 7,
+            "rate": 0.538462
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 105,
+        "effective_neighbor_exposure_rate": 0.875,
+        "full_target_agent_rate": 0.7,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 3.5,
+        "expression_age_distribution": {
+          "1": 74,
+          "2": 31
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 11,
+        "peer_transition_held_count": 17,
+        "average_peer_signal_strength": 0.213303,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 105,
+        "neighbor_state_evidence_count": 53,
+        "neighbor_state_evidence_retention_rate": 0.504762,
+        "public_visible_comment_count": 345,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.434783,
+        "effective_non_peer_evidence_count": 141,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 194,
+        "average_directional_evidence_group_count": 6.466667,
+        "average_directional_support": {
+          "positive": 0.018638,
+          "neutral": 0.277778,
+          "negative": 0.316997
+        },
+        "average_utility_margin": -0.158746,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 3,
+        "generation_mode": "llm_incremental",
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 12,
+        "history_fallback_count": 8,
+        "emergency_fallback_count": 0,
+        "fallback_count": 8,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 40,
+        "rejection_counts": {
+          "重复文本": 28
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 5,
+            "negative": 14
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 14,
+        "silent_agent_count": 16,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 118,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 22,
+        "propagated_comment_count": 29,
+        "continued_propagation_count": 3,
+        "continued_agent_count": 3,
+        "continuation_rate": 0.025424,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.169492,
+        "total_effective_weight": 184.417116
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "original": {
+            "count": 10,
+            "rate": 0.333333
+          },
+          "reshare": {
+            "count": 4,
+            "rate": 0.133333
+          }
+        },
+        "original_expression_count": 10,
+        "unique_original_expression_count": 10,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 14,
+        "silent_agent_count": 16,
+        "participation_rate": 0.466667,
+        "classified_expression_count": 14,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 9,
+            "rate": 0.642857
+          },
+          "negative": {
+            "count": 5,
+            "rate": 0.357143
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 116,
+        "effective_neighbor_exposure_rate": 0.966667,
+        "full_target_agent_rate": 0.933333,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 4.033333,
+        "expression_age_distribution": {
+          "1": 62,
+          "2": 50,
+          "3": 4
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 9,
+        "peer_transition_held_count": 19,
+        "average_peer_signal_strength": 0.202525,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 116,
+        "neighbor_state_evidence_count": 49,
+        "neighbor_state_evidence_retention_rate": 0.422414,
+        "public_visible_comment_count": 334,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.449102,
+        "effective_non_peer_evidence_count": 146,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 195,
+        "average_directional_evidence_group_count": 6.5,
+        "average_directional_support": {
+          "positive": 0.059998,
+          "neutral": 0.270021,
+          "negative": 0.307087
+        },
+        "average_utility_margin": -0.155892,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 28,
+          "held_by_personal_margin": 2
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 4,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 56,
+        "rejection_counts": {
+          "重复文本": 34,
+          "重复 task_id": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 2,
+            "neutral": 8,
+            "negative": 10
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 7,
+        "silent_agent_count": 23,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 117,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 23,
+        "propagated_comment_count": 30,
+        "continued_propagation_count": 1,
+        "continued_agent_count": 1,
+        "continuation_rate": 0.008547,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.179487,
+        "total_effective_weight": 182.531126
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 23,
+            "rate": 0.766667
+          },
+          "original": {
+            "count": 6,
+            "rate": 0.2
+          },
+          "reshare": {
+            "count": 1,
+            "rate": 0.033333
+          }
+        },
+        "original_expression_count": 6,
+        "unique_original_expression_count": 6,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 7,
+        "silent_agent_count": 23,
+        "participation_rate": 0.233333,
+        "classified_expression_count": 7,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 3,
+            "rate": 0.428571
+          },
+          "negative": {
+            "count": 4,
+            "rate": 0.571429
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 117,
+        "effective_neighbor_exposure_rate": 0.975,
+        "full_target_agent_rate": 0.933333,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 3.9,
+        "expression_age_distribution": {
+          "1": 63,
+          "2": 37,
+          "3": 17
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 5,
+        "peer_transition_held_count": 24,
+        "average_peer_signal_strength": 0.207675,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 117,
+        "neighbor_state_evidence_count": 50,
+        "neighbor_state_evidence_retention_rate": 0.42735,
+        "public_visible_comment_count": 333,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.45045,
+        "effective_non_peer_evidence_count": 143,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 193,
+        "average_directional_evidence_group_count": 6.433333,
+        "average_directional_support": {
+          "positive": 0.02722,
+          "neutral": 0.269785,
+          "negative": 0.289869
+        },
+        "average_utility_margin": -0.188453,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 29,
+          "held_by_personal_margin": 1
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 5,
+        "generation_mode": "llm_incremental",
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 16,
+        "history_fallback_count": 4,
+        "emergency_fallback_count": 0,
+        "fallback_count": 4,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 49,
+        "rejection_counts": {
+          "重复文本": 31,
+          "重复 task_id": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 8,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 11,
+        "silent_agent_count": 19,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 111,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 22,
+        "propagated_comment_count": 28,
+        "continued_propagation_count": 1,
+        "continued_agent_count": 1,
+        "continuation_rate": 0.009009,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.207207,
+        "total_effective_weight": 151.656561
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 19,
+            "rate": 0.633333
+          },
+          "original": {
+            "count": 6,
+            "rate": 0.2
+          },
+          "reshare": {
+            "count": 5,
+            "rate": 0.166667
+          }
+        },
+        "original_expression_count": 6,
+        "unique_original_expression_count": 6,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 11,
+        "silent_agent_count": 19,
+        "participation_rate": 0.366667,
+        "classified_expression_count": 11,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 3,
+            "rate": 0.272727
+          },
+          "negative": {
+            "count": 8,
+            "rate": 0.727273
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 111,
+        "effective_neighbor_exposure_rate": 0.925,
+        "full_target_agent_rate": 0.766667,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 3.7,
+        "expression_age_distribution": {
+          "1": 28,
+          "2": 55,
+          "3": 28
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 3,
+        "peer_transition_held_count": 17,
+        "average_peer_signal_strength": 0.137202,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 111,
+        "neighbor_state_evidence_count": 28,
+        "neighbor_state_evidence_retention_rate": 0.252252,
+        "public_visible_comment_count": 339,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.442478,
+        "effective_non_peer_evidence_count": 144,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 172,
+        "average_directional_evidence_group_count": 5.733333,
+        "average_directional_support": {
+          "positive": 0.0,
+          "neutral": 0.280243,
+          "negative": 0.29094
+        },
+        "average_utility_margin": -0.18842,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 6,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 17,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 27,
+        "rejection_counts": {
+          "重复文本": 10
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 7,
+        "silent_agent_count": 23,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 104,
+        "reached_agent_count": 29,
+        "reach_rate": 0.966667,
+        "source_agent_count": 19,
+        "propagated_comment_count": 30,
+        "continued_propagation_count": 1,
+        "continued_agent_count": 1,
+        "continuation_rate": 0.009615,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.153846,
+        "total_effective_weight": 159.39565
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 23,
+            "rate": 0.766667
+          },
+          "original": {
+            "count": 6,
+            "rate": 0.2
+          },
+          "reshare": {
+            "count": 1,
+            "rate": 0.033333
+          }
+        },
+        "original_expression_count": 6,
+        "unique_original_expression_count": 6,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 7,
+        "silent_agent_count": 23,
+        "participation_rate": 0.233333,
+        "classified_expression_count": 7,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 5,
+            "rate": 0.714286
+          },
+          "negative": {
+            "count": 2,
+            "rate": 0.285714
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 104,
+        "effective_neighbor_exposure_rate": 0.866667,
+        "full_target_agent_rate": 0.733333,
+        "zero_exposure_agent_rate": 0.033333,
+        "average_unique_root_count": 3.633333,
+        "expression_age_distribution": {
+          "1": 50,
+          "2": 25,
+          "3": 29
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 10,
+        "peer_transition_held_count": 15,
+        "average_peer_signal_strength": 0.193443,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 104,
+        "neighbor_state_evidence_count": 42,
+        "neighbor_state_evidence_retention_rate": 0.403846,
+        "public_visible_comment_count": 346,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.433526,
+        "effective_non_peer_evidence_count": 143,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 185,
+        "average_directional_evidence_group_count": 6.166667,
+        "average_directional_support": {
+          "positive": 0.0,
+          "neutral": 0.279738,
+          "negative": 0.309114
+        },
+        "average_utility_margin": -0.185514,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 7,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 22,
+        "rejection_counts": {
+          "重复文本": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 8,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 14,
+        "silent_agent_count": 16,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 91,
+        "reached_agent_count": 29,
+        "reach_rate": 0.966667,
+        "source_agent_count": 16,
+        "propagated_comment_count": 23,
+        "continued_propagation_count": 6,
+        "continued_agent_count": 6,
+        "continuation_rate": 0.065934,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.131868,
+        "total_effective_weight": 132.641379
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "original": {
+            "count": 12,
+            "rate": 0.4
+          },
+          "reshare": {
+            "count": 2,
+            "rate": 0.066667
+          }
+        },
+        "original_expression_count": 12,
+        "unique_original_expression_count": 12,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 14,
+        "silent_agent_count": 16,
+        "participation_rate": 0.466667,
+        "classified_expression_count": 14,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 7,
+            "rate": 0.5
+          },
+          "negative": {
+            "count": 7,
+            "rate": 0.5
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 91,
+        "effective_neighbor_exposure_rate": 0.758333,
+        "full_target_agent_rate": 0.466667,
+        "zero_exposure_agent_rate": 0.033333,
+        "average_unique_root_count": 3.2,
+        "expression_age_distribution": {
+          "1": 31,
+          "2": 46,
+          "3": 14
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 5,
+        "peer_transition_held_count": 16,
+        "average_peer_signal_strength": 0.149463,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 91,
+        "neighbor_state_evidence_count": 29,
+        "neighbor_state_evidence_retention_rate": 0.318681,
+        "public_visible_comment_count": 359,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.417827,
+        "effective_non_peer_evidence_count": 135,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 164,
+        "average_directional_evidence_group_count": 5.466667,
+        "average_directional_support": {
+          "positive": 0.0,
+          "neutral": 0.304148,
+          "negative": 0.263888
+        },
+        "average_utility_margin": -0.171226,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 8,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 25,
+        "rejection_counts": {
+          "重复文本": 5
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 10,
+            "negative": 10
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 9,
+      "policy_metrics": {
+        "negative_rate": 0.466667,
+        "negative_count": 14,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 8,
+        "silent_agent_count": 22,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 112,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 21,
+        "propagated_comment_count": 28,
+        "continued_propagation_count": 1,
+        "continued_agent_count": 1,
+        "continuation_rate": 0.008929,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.276786,
+        "total_effective_weight": 170.4158
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 22,
+            "rate": 0.733333
+          },
+          "original": {
+            "count": 4,
+            "rate": 0.133333
+          },
+          "reshare": {
+            "count": 4,
+            "rate": 0.133333
+          }
+        },
+        "original_expression_count": 4,
+        "unique_original_expression_count": 4,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 8,
+        "silent_agent_count": 22,
+        "participation_rate": 0.266667,
+        "classified_expression_count": 8,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 1,
+            "rate": 0.125
+          },
+          "neutral": {
+            "count": 3,
+            "rate": 0.375
+          },
+          "negative": {
+            "count": 4,
+            "rate": 0.5
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 16,
+            "rate": 0.533333
+          },
+          "negative": {
+            "count": 14,
+            "rate": 0.466667
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 109,
+        "effective_neighbor_exposure_rate": 0.908333,
+        "full_target_agent_rate": 0.7,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 3.7,
+        "expression_age_distribution": {
+          "2": 24,
+          "1": 63,
+          "3": 22
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 0,
+        "emotion_changed_rate": 0.0,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 11,
+        "peer_transition_held_count": 16,
+        "average_peer_signal_strength": 0.206225,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 109,
+        "neighbor_state_evidence_count": 50,
+        "neighbor_state_evidence_retention_rate": 0.458716,
+        "public_visible_comment_count": 341,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.439883,
+        "effective_non_peer_evidence_count": 141,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 191,
+        "average_directional_evidence_group_count": 6.366667,
+        "average_directional_support": {
+          "positive": 0.014302,
+          "neutral": 0.313617,
+          "negative": 0.276525
+        },
+        "average_utility_margin": -0.172316,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 30
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 30
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 9,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 19,
+        "history_fallback_count": 1,
+        "emergency_fallback_count": 0,
+        "fallback_count": 1,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 27,
+        "rejection_counts": {
+          "重复文本": 8
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 9,
+            "negative": 10
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 10,
+      "policy_metrics": {
+        "negative_rate": 0.5,
+        "negative_count": 15,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 18,
+        "silent_agent_count": 12,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 113,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 22,
+        "propagated_comment_count": 27,
+        "continued_propagation_count": 5,
+        "continued_agent_count": 5,
+        "continuation_rate": 0.044248,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.274336,
+        "total_effective_weight": 162.670402
+      },
+      "agent_action_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "silent": {
+            "count": 12,
+            "rate": 0.4
+          },
+          "original": {
+            "count": 12,
+            "rate": 0.4
+          },
+          "reshare": {
+            "count": 6,
+            "rate": 0.2
+          }
+        },
+        "original_expression_count": 12,
+        "unique_original_expression_count": 12,
+        "original_expression_uniqueness_rate": 1.0
+      },
+      "agent_expression_distribution": {
+        "agent_count": 30,
+        "expression_count": 18,
+        "silent_agent_count": 12,
+        "participation_rate": 0.6,
+        "classified_expression_count": 18,
+        "unclassified_expression_count": 0,
+        "distribution": {
+          "positive": {
+            "count": 1,
+            "rate": 0.055556
+          },
+          "neutral": {
+            "count": 9,
+            "rate": 0.5
+          },
+          "negative": {
+            "count": 8,
+            "rate": 0.444444
+          }
+        }
+      },
+      "agent_emotion_distribution": {
+        "agent_count": 30,
+        "distribution": {
+          "positive": {
+            "count": 0,
+            "rate": 0.0
+          },
+          "neutral": {
+            "count": 15,
+            "rate": 0.5
+          },
+          "negative": {
+            "count": 15,
+            "rate": 0.5
+          }
+        }
+      },
+      "official_attitude_distribution": {
+        "agent_count": 30,
+        "applicable_agent_count": 0,
+        "not_applicable_count": 30,
+        "distribution": {
+          "accept": {
+            "count": 0,
+            "rate": null
+          },
+          "wait": {
+            "count": 0,
+            "rate": null
+          },
+          "question": {
+            "count": 0,
+            "rate": null
+          }
+        }
+      },
+      "official_attitude_diagnostics": {
+        "applicable_agent_count": 0,
+        "largest_attitude_group_count": 0,
+        "largest_attitude_group_rate": null,
+        "normalized_attitude_entropy": null,
+        "changed_agent_count": 0,
+        "synchronized_transition_rate": null,
+        "claim_position_distribution": {
+          "accepted": {
+            "count": 0,
+            "rate": null
+          },
+          "unresolved": {
+            "count": 0,
+            "rate": null
+          },
+          "challenged": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "process_evaluation_distribution": {
+          "satisfied": {
+            "count": 0,
+            "rate": null
+          },
+          "partial": {
+            "count": 0,
+            "rate": null
+          },
+          "dissatisfied": {
+            "count": 0,
+            "rate": null
+          }
+        },
+        "diagnostic_only": true
+      },
+      "neighbor_exposure_diagnostics": {
+        "applicable_agent_count": 30,
+        "target_exposure_count": 120,
+        "effective_exposure_count": 110,
+        "effective_neighbor_exposure_rate": 0.916667,
+        "full_target_agent_rate": 0.733333,
+        "zero_exposure_agent_rate": 0.0,
+        "average_unique_root_count": 3.666667,
+        "expression_age_distribution": {
+          "2": 53,
+          "3": 14,
+          "1": 43
+        },
+        "diagnostic_only": true
+      },
+      "strategy_state_diagnostics": {
+        "applicable_agent_count": 30,
+        "emotion_changed_count": 1,
+        "emotion_changed_rate": 0.033333,
+        "official_attitude_changed_count": 0,
+        "official_attitude_changed_rate": 0.0,
+        "peer_transition_allowed_count": 2,
+        "peer_transition_held_count": 22,
+        "average_peer_signal_strength": 0.157718,
+        "average_peer_change_threshold": 0.238804,
+        "neighbor_visible_comment_count": 110,
+        "neighbor_state_evidence_count": 37,
+        "neighbor_state_evidence_retention_rate": 0.336364,
+        "public_visible_comment_count": 340,
+        "public_state_evidence_count": 150,
+        "public_state_evidence_retention_rate": 0.441176,
+        "effective_non_peer_evidence_count": 149,
+        "held_non_peer_evidence_count": 0,
+        "directional_evidence_group_count": 186,
+        "average_directional_evidence_group_count": 6.2,
+        "average_directional_support": {
+          "positive": 0.086939,
+          "neutral": 0.225554,
+          "negative": 0.316566
+        },
+        "average_utility_margin": -0.166909,
+        "average_required_switch_margin": 0.162387,
+        "transition_basis_counts": {
+          "held_by_directional_persona_utility": 29,
+          "changed_by_peer_directional_evidence": 1
+        },
+        "transition_reason_counts": {
+          "held_by_personal_utility": 27,
+          "held_by_personal_margin": 2,
+          "changed_after_directional_utility": 1
+        },
+        "official_transition_reason_counts": {
+          "no_official_statement": 30
+        },
+        "diagnostic_only": true
+      },
+      "comment_generation": {
+        "step": 10,
+        "generation_mode": "llm_incremental",
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 23,
+        "rejection_counts": {
+          "重复文本": 3
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 6,
+            "negative": 13
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.5,
+    "negative_count": 15,
+    "negative_denominator": 30,
+    "negative_rate_basis": "agent_internal",
+    "expression_count": 18,
+    "silent_agent_count": 12,
+    "question_rate": null,
+    "accept_rate": null,
+    "official_attitude_applicable_count": 0,
+    "global_trend": "stable"
+  },
+  "effect_metrics": {
+    "analysis_start_step": 4,
+    "final_negative_rate": 0.5,
+    "negative_peak_rate": 0.5,
+    "negative_peak_steps": [
+      10
+    ],
+    "negative_area": 4.700003,
+    "observed_step_count": 10,
+    "control_net_effect": null,
+    "baseline_step": 3,
+    "baseline_negative_agent_count": 14,
+    "recovered_agent_count": 0,
+    "emotion_recovery_rate": 0.0,
+    "effect_baseline_negative_rate": 0.466667,
+    "effect_start_step": null,
+    "effect_end_step": null,
+    "effect_duration": 0,
+    "rebound_agent_count": 0,
+    "rebound_rate": null
+  },
+  "comment_quality": {
+    "quality_status": "degraded",
+    "generation_modes": [
+      "llm_incremental"
+    ],
+    "frozen_steps": [],
+    "llm_comment_count": 164,
+    "history_fallback_count": 16,
+    "emergency_fallback_count": 0,
+    "fallback_count": 16,
+    "generation_attempts": 30,
+    "initial_request_count": 18,
+    "refill_request_count": 9,
+    "rescue_request_count": 3,
+    "warning_steps": [
+      3,
+      5
+    ],
+    "emotion_coverage_status": "not_required",
+    "emotion_coverage_warning_steps": []
+  },
+  "propagation_summary": {
+    "exposure_count": 918,
+    "reached_agent_count": 30,
+    "reach_rate": 1.0,
+    "source_agent_count": 26,
+    "propagated_comment_count": 87,
+    "continued_propagation_count": 21,
+    "continued_agent_count": 15,
+    "continuation_rate": 0.022876,
+    "max_propagation_depth": 2,
+    "average_propagation_depth": 1.167756,
+    "total_effective_weight": 1430.655794
+  },
+  "shared_baseline_completed_step": 3,
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_gaoyang_assault_001_20261019_112035_030498\\no_response\\state",
+  "performance": {
+    "executed_step_count": 7,
+    "stage_duration_seconds": {
+      "incremental_comment_generation": 70.967,
+      "agent_decision": 83.408,
+      "metrics": 9.013
+    },
+    "llm_requests": {
+      "logical_request_count": 301,
+      "http_attempt_count": 301,
+      "retry_count": 0,
+      "failed_request_count": 0,
+      "total_duration_seconds": 477.897,
+      "by_type": {
+        "comment_generation": {
+          "logical_request_count": 23,
+          "http_attempt_count": 23,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 99.646
+        },
+        "agent_decision": {
+          "logical_request_count": 210,
+          "http_attempt_count": 210,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 270.059
+        },
+        "agent_expression": {
+          "logical_request_count": 61,
+          "http_attempt_count": 61,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 99.695
+        },
+        "global_trend": {
+          "logical_request_count": 7,
+          "http_attempt_count": 7,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 8.497
+        }
+      }
+    },
+    "steps": [
+      {
+        "step": 4,
+        "total_duration_seconds": 31.801,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 18.519,
+          "agent_decision": 12.305,
+          "metrics": 0.884
+        },
+        "llm_requests": {
+          "logical_request_count": 45,
+          "http_attempt_count": 45,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 77.75,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 22.431
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 38.316
+            },
+            "agent_expression": {
+              "logical_request_count": 10,
+              "http_attempt_count": 10,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 16.166
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 0.837
+            }
+          }
+        }
+      },
+      {
+        "step": 5,
+        "total_duration_seconds": 27.861,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 15.642,
+          "agent_decision": 10.558,
+          "metrics": 1.565
+        },
+        "llm_requests": {
+          "logical_request_count": 41,
+          "http_attempt_count": 41,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 68.517,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 19.279
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 38.883
+            },
+            "agent_expression": {
+              "logical_request_count": 6,
+              "http_attempt_count": 6,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 8.853
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.502
+            }
+          }
+        }
+      },
+      {
+        "step": 6,
+        "total_duration_seconds": 19.233,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 7.782,
+          "agent_decision": 10.168,
+          "metrics": 1.162
+        },
+        "llm_requests": {
+          "logical_request_count": 41,
+          "http_attempt_count": 41,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 60.383,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 11.667
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 35.597
+            },
+            "agent_expression": {
+              "logical_request_count": 7,
+              "http_attempt_count": 7,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 12.014
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.104
+            }
+          }
+        }
+      },
+      {
+        "step": 7,
+        "total_duration_seconds": 19.838,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 5.972,
+          "agent_decision": 12.242,
+          "metrics": 1.479
+        },
+        "llm_requests": {
+          "logical_request_count": 40,
+          "http_attempt_count": 40,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 61.049,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 10.254
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 40.132
+            },
+            "agent_expression": {
+              "logical_request_count": 6,
+              "http_attempt_count": 6,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 9.259
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.404
+            }
+          }
+        }
+      },
+      {
+        "step": 8,
+        "total_duration_seconds": 23.035,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 7.15,
+          "agent_decision": 14.442,
+          "metrics": 1.28
+        },
+        "llm_requests": {
+          "logical_request_count": 48,
+          "http_attempt_count": 48,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 77.289,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 11.249
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 39.597
+            },
+            "agent_expression": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 25.241
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.202
+            }
+          }
+        }
+      },
+      {
+        "step": 9,
+        "total_duration_seconds": 19.944,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 8.92,
+          "agent_decision": 9.861,
+          "metrics": 0.968
+        },
+        "llm_requests": {
+          "logical_request_count": 38,
+          "http_attempt_count": 38,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 59.344,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 13.423
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 38.331
+            },
+            "agent_expression": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 6.706
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 0.884
+            }
+          }
+        }
+      },
+      {
+        "step": 10,
+        "total_duration_seconds": 22.714,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 6.982,
+          "agent_decision": 13.832,
+          "metrics": 1.675
+        },
+        "llm_requests": {
+          "logical_request_count": 48,
+          "http_attempt_count": 48,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 73.565,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 11.343
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 39.203
+            },
+            "agent_expression": {
+              "logical_request_count": 14,
+              "http_attempt_count": 14,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 21.456
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.564
+            }
+          }
+        }
+      }
+    ],
+    "duration_seconds": 167.574
+  }
+}

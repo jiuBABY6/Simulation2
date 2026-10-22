@@ -60,7 +60,7 @@ class InitialOpinionTests(unittest.TestCase):
     def test_event_repository_requires_historical_inputs(self) -> None:
         huxinyu = resolve_event_files(EVENT_ID)
         beiguo = resolve_event_files(
-            "event_beiguo_xiantianxia_crash_20260920_001"
+            "event_beiguo_xiantianxia_crash_20260920_002"
         )
 
         self.assertTrue(Path(huxinyu["initial_opinion_file"]).is_file())

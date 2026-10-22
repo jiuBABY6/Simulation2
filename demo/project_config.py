@@ -61,7 +61,7 @@ SINGLE_DECISION_RESULT_FILE = EXAMPLE_DIR / "decision_result.json"
 SINGLE_LLM_RESULT_FILE = EXAMPLE_DIR / "decision_result_llm.json"
 
 # 2026/09/06 GitHub推送安全处理，修改功能：从环境变量读取模型配置，避免提交本机密key。
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "API_KEY")
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash")
 DEEPSEEK_ENDPOINT = os.environ.get(
     "DEEPSEEK_ENDPOINT",
@@ -105,6 +105,10 @@ COMMENT_POOL_SIZE = 60
 # 2026/08/23 评论派系覆盖对齐，新增功能：配置初始评论池中每个派系的最低评论数量。
 COMMENT_POOL_MIN_FACTION_COUNT = 5
 INCREMENTAL_COMMENT_COUNT = 20
+# 2026/10/19，修改功能：回应方案实验中每轮外生LLM评论降为8条，
+# 避免20条外部评论长期压过7～17名实际发言Agent的内生表达。
+# 历史复现继续使用 INCREMENTAL_COMMENT_COUNT，不受此配置影响。
+STRATEGY_INCREMENTAL_COMMENT_COUNT = 8
 COMMENT_POOL_TEMPERATURE = float(
     os.environ.get("SIMULATION_COMMENT_TEMPERATURE", "0.7")
 )

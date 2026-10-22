@@ -1,24 +1,54 @@
-
+"""从 MongoDB 构建 Persona 和全局策略配置。"""
 
 from __future__ import annotations
 
 import argparse
-import html
 import json
 import os
-import re
-import time
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import requests
 from pymongo import MongoClient
+
+if __package__:  # 同时支持 ``python -m`` 与既有的直接脚本启动方式。
+    from .deepseek_json_client import (
+        DeepSeekBadRequestError,
+        DeepSeekJsonClient,
+        DeepSeekResponseFormatError,
+    )
+    from .policy_builder import build_global_policy_config
+    from .text_processing import (
+        REPOST_PLACEHOLDERS,
+        clean_weibo_text,
+        extract_user_record,
+        get_nested_value,
+        iterate_post_records,
+        normalize_user_id,
+        should_skip_post,
+        split_post_texts,
+    )
+else:  # pragma: no cover - 由直接脚本命令覆盖
+    from deepseek_json_client import (
+        DeepSeekBadRequestError,
+        DeepSeekJsonClient,
+        DeepSeekResponseFormatError,
+    )
+    from policy_builder import build_global_policy_config
+    from text_processing import (
+        REPOST_PLACEHOLDERS,
+        clean_weibo_text,
+        extract_user_record,
+        get_nested_value,
+        iterate_post_records,
+        normalize_user_id,
+        should_skip_post,
+        split_post_texts,
+    )
 
 
 TOPICS = ("社会事件", "新闻时事", "娱乐", "其他")
 ORIENTATIONS = ("fact", "opinion", "questioning")
 EMOTIONS = ("positive", "neutral", "negative")
-REPOST_PLACEHOLDERS = {"转发微博", "转发", "repost"}
 
 # ---------------------------------------------------------------------------
 # 项目配置
@@ -30,7 +60,7 @@ MONGODB_DATABASE = "weibo"
 USERS_COLLECTION = "user"
 POSTS_COLLECTION = "weibo"
 
-DEEPSEEK_API_KEY = "API_KEY"
+DEEPSEEK_API_KEY = ""
 DEEPSEEK_MODEL = "deepseek-v4-flash"
 DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions"
 
@@ -38,88 +68,6 @@ DEMO_USER_LIMIT = 0  # 设为 0 时处理 users 集合中的所有用户。
 CLASSIFICATION_BATCH_SIZE = 10
 MAX_TEXT_CHARS = 800
 OUTPUT_DIR = "output/personas"
-
-
-def clean_weibo_text(value):
-    """主要功能：清洗微博文本，将空值与“转发微博”占位符视为无效文本。"""
-    if not isinstance(value, str):
-        return ""
-    value = html.unescape(value)
-    value = re.sub(r"<[^>]+>", "", value)
-    value = re.sub(r"\s+", " ", value).strip()
-    if value.lower() in REPOST_PLACEHOLDERS:
-        return ""
-    return value
-
-
-def get_nested_value(doc, *keys, default=None):
-    # 主要功能：按照多层字段路径安全读取字典值。
-    value = doc
-    for key in keys:
-        if not isinstance(value, dict) or key not in value:
-            return default
-        value = value[key]
-    return value
-
-
-def extract_user_record(doc):
-    """主要功能：兼容平铺用户文档与包含 wb.user 的嵌套文档。"""
-    candidate = get_nested_value(doc, "wb", "user")
-    if isinstance(candidate, dict):
-        return candidate
-    candidate = doc.get("user")
-    if isinstance(candidate, dict) and "id" in candidate:
-        return candidate
-    return doc
-
-
-def iterate_post_records(doc):
-    """主要功能：兼容单条微博文档与 wb.weibo 列表存储结构。"""
-    candidates = (get_nested_value(doc, "wb", "weibo"), doc.get("weibo"))
-    for candidate in candidates:
-        if isinstance(candidate, list):
-            for post in candidate:
-                if isinstance(post, dict):
-                    yield post
-            return
-    yield doc
-
-
-def normalize_user_id(value):
-    # 主要功能：将用户 ID 统一转换为用于关联的字符串。
-    return str(value).strip() if value is not None else ""
-
-
-def split_post_texts(post):
-    """主要功能：拆分主题分类文本、用户自身表达文本和转发标记。"""
-    own_text = clean_weibo_text(post.get("text"))
-    retweet = post.get("retweet")
-    is_repost = isinstance(retweet, dict)
-
-    if not is_repost:
-        return own_text, own_text, False
-
-    original_text = clean_weibo_text(retweet.get("text"))
-    # 纯转发使用原微博正文判断主题；转发附言仍是用户自己的表达。
-    content_text = original_text or own_text
-    return content_text, own_text, True
-
-
-def should_skip_post(post):
-    """主要功能：判断微博正文为空或只是“转发微博”时，是否应整体跳过。"""
-    return not clean_weibo_text(post.get("text"))
-
-
-def calculate_quantile(values, q):
-    # 主要功能：使用线性插值计算数值列表的分位数。
-    if not values:
-        return None
-    ordered = sorted(values)
-    position = q * (len(ordered) - 1)
-    lower = int(position)
-    upper = min(lower + 1, len(ordered) - 1)
-    fraction = position - lower
-    return ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
 
 
 def calculate_rate(numerator, denominator):
@@ -180,14 +128,6 @@ def save_progress_records(progress_path, records):
         os.fsync(file.fileno())
 
 
-class DeepSeekBadRequestError(RuntimeError):
-    """主要功能：保存 DeepSeek 返回的 400 请求错误信息。"""
-
-
-class DeepSeekResponseFormatError(RuntimeError):
-    """主要功能：保存 DeepSeek 返回内容无法解析为有效 JSON 的错误信息。"""
-
-
 class DeepSeekTextClassifier:
     def __init__(self, api_key, model, endpoint, batch_size, max_chars):
         # 主要功能：初始化 DeepSeek 文本分类客户端的连接参数。
@@ -196,6 +136,10 @@ class DeepSeekTextClassifier:
         self.endpoint = endpoint
         self.batch_size = batch_size
         self.max_chars = max_chars
+        self.client = DeepSeekJsonClient(
+            api_key=api_key,
+            endpoint=endpoint,
+        )
 
     def classify_batch_texts(self, items):
         # 主要功能：批量调用 DeepSeek，获取微博主题、表达方式和情绪标签。
@@ -236,46 +180,29 @@ class DeepSeekTextClassifier:
                 {"role": "user", "content": prompt},
             ],
         }
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
-        last_error = None
-        for attempt in range(3):
-            try:
-                response = requests.post(self.endpoint, headers=headers, json=payload, timeout=90)
-                if response.status_code == 400:
-                    try:
-                        error_detail = json.dumps(response.json(), ensure_ascii=False)
-                    except ValueError:
-                        error_detail = response.text
-                    raise DeepSeekBadRequestError(error_detail[:1000])
-                response.raise_for_status()
-                content = response.json()["choices"][0]["message"]["content"].strip()
-                json_start = content.find("{")
-                if json_start < 0:
-                    raise ValueError("DeepSeek returned no JSON object.")
-                parsed, _ = json.JSONDecoder().raw_decode(content[json_start:])
-                if not isinstance(parsed, dict):
-                    raise ValueError("The first JSON value returned by DeepSeek is not an object.")
-                labels = {}
-                for item in parsed.get("items", []):
-                    item_id = str(item.get("id", ""))
-                    topic = item.get("topic")
-                    orientation = item.get("orientation")
-                    emotion = item.get("emotion")
-                    if item_id and topic in TOPICS and orientation in ORIENTATIONS and emotion in EMOTIONS:
-                        labels[item_id] = {
-                            "topic": topic,
-                            "orientation": orientation,
-                            "emotion": emotion,
-                        }
-                return labels
-            except DeepSeekBadRequestError:
-                raise
-            except (requests.RequestException, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-                last_error = exc
-                time.sleep(2**attempt)
-        if isinstance(last_error, (KeyError, TypeError, ValueError, json.JSONDecodeError)):
-            raise DeepSeekResponseFormatError(f"DeepSeek response cannot be parsed: {last_error}")
-        raise RuntimeError(f"DeepSeek classification failed after retries: {last_error}")
+        parsed = self.client.request_object(
+            payload,
+            format_error_prefix="DeepSeek response cannot be parsed",
+            request_error_prefix="DeepSeek classification failed after retries",
+        )
+        labels = {}
+        for item in parsed.get("items", []):
+            item_id = str(item.get("id", ""))
+            topic = item.get("topic")
+            orientation = item.get("orientation")
+            emotion = item.get("emotion")
+            if (
+                item_id
+                and topic in TOPICS
+                and orientation in ORIENTATIONS
+                and emotion in EMOTIONS
+            ):
+                labels[item_id] = {
+                    "topic": topic,
+                    "orientation": orientation,
+                    "emotion": emotion,
+                }
+        return labels
 
 
 def classify_all_texts(classifier, pending, task_name, progress_path, saved_labels, skipped_ids):
@@ -401,57 +328,6 @@ def build_user_persona(user, posts, content_labels, expression_labels):
             "total_posts": action_denominator,
             "topic_sample_count": content_sample_count,
             "expression_sample_count": expression_sample_count,
-        },
-    }
-
-
-def calculate_quantile_summary(values):
-    # 主要功能：计算一组数值的 P25、P50 和 P75。
-    return {"p25": calculate_quantile(values, 0.25), "p50": calculate_quantile(values, 0.50), "p75": calculate_quantile(values, 0.75)}
-
-
-def build_global_policy_config(personas):
-    # 主要功能：使用所有 Persona 计算全局分位数与候选决策规则。
-    topic_quantiles = {
-        topic: calculate_quantile_summary([persona["topic_preference"][topic] for persona in personas])
-        for topic in TOPICS
-    }
-    orientation_quantiles = {
-        f"{orientation}_rate": calculate_quantile_summary(
-            [persona["information_orientation"][f"{orientation}_rate"] for persona in personas]
-        )
-        for orientation in ORIENTATIONS
-    }
-    action_gaps = [
-        abs(persona["action_preference"]["repost_preference"] - persona["action_preference"]["original_preference"])
-        for persona in personas
-    ]
-    return {
-        "version": "policy_v0.1",
-        "reference_population_size": len(personas),
-        "band_definition": {
-            "low": "value < p25",
-            "medium": "p25 <= value < p75",
-            "high": "value >= p75",
-        },
-        "topic_quantiles": topic_quantiles,
-        "orientation_quantiles": orientation_quantiles,
-        "action_preference_rule": {
-            "strong_preference_gap": calculate_quantile(action_gaps, 0.75)
-        },
-        "candidate_rules": {
-            "emotion": {
-                "positive": ["neutral", "positive"],
-                "neutral": ["neutral"],
-                "negative": ["neutral", "negative"],
-            },
-            # 2026/08/25 第五次联调问题修复，修改功能：统一声明态度候选并显式区分无声明场景。
-            "official_statement": {
-                "none": {"default": ["not_applicable"]},
-                "clear": {"default": ["accept", "wait", "question"]},
-                "incomplete": {"default": ["accept", "wait", "question"]},
-                "conflict": {"default": ["accept", "wait", "question"]},
-            },
         },
     }
 

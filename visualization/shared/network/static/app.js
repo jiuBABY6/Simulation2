@@ -117,12 +117,12 @@ function renderSummary() {
   document.getElementById("acceptance-status").textContent =
     report.status === "completed" ? "通过" : report.status;
   document.getElementById("network-snapshot-note").textContent =
-    report.mode === "historical_replay" ? "历史路线固定网络" : "五策略共享同一快照";
+    report.mode === "historical_replay" ? "历史路线固定网络" : "回应方案共享同一快照";
   document.getElementById("findings-title").textContent =
     `${report.mode_label}传播数据闭环`;
   const businessLink = document.getElementById("business-link");
   const businessPath = report.mode === "historical_replay" ? "/historical/" : "/strategy/";
-  businessLink.textContent = report.mode === "historical_replay" ? "趋势复现" : "五策略对比";
+  businessLink.textContent = report.mode === "historical_replay" ? "趋势复现" : "回应方案对比";
   businessLink.href = `${businessPath}?experiment_id=${encodeURIComponent(report.experiment_id)}`;
 
   const duration = Number(performance.total_duration_seconds || 0);

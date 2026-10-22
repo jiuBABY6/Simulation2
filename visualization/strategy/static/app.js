@@ -144,7 +144,7 @@ function renderTrend(data) {
     const dots = points.map(point => `<circle cx="${x(point.step)}" cy="${y(point.rate)}" r="5"><title>${escapeHtml(strategy.scenario_name)} 第${point.step}轮 ${percent(point.rate)}</title></circle>`).join("");
     return `<g style="--series:${colors[index % colors.length]}"><polyline points="${polyline}" />${dots}</g>`;
   }).join("");
-  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="五策略负面情绪率趋势及官方公告投入轮次">${grid}${announcementGuides}${steps}${lines}</svg>`;
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="回应方案负面情绪率趋势及官方公告投入轮次">${grid}${announcementGuides}${steps}${lines}</svg>`;
   document.getElementById("trend-legend").innerHTML = data.strategies.map((strategy, index) => `
     <span><i style="background:${colors[index % colors.length]}"></i>${escapeHtml(strategy.scenario_name)}</span>`).join("")
     + `<span><i class="official-legend"></i>公告投入轮次（同轮公告合并展示）</span>`;
@@ -157,6 +157,126 @@ function renderTrend(data) {
         openDetails();
       }
     });
+  });
+}
+
+const diagnosticColors = {
+  positive: "#17a398",
+  neutral: "#3978d4",
+  negative: "#e64d63",
+  accept: "#17a398",
+  wait: "#f28a2b",
+  question: "#e64d63"
+};
+
+function distributionSegments(points) {
+  const segments = [];
+  let current = [];
+  points.forEach(point => {
+    if (point.rate === null) {
+      if (current.length) segments.push(current);
+      current = [];
+    } else {
+      current.push(point);
+    }
+  });
+  if (current.length) segments.push(current);
+  return segments;
+}
+
+// 2026/10/16，新增功能：用同一绘图器展示内部情绪、实际表达和
+// 官方态度，三张图共享轮次、百分比和公告标记口径，避免前端各自计算。
+function renderDistributionChart({ containerId, legendId, strategy, field, series }) {
+  const container = document.getElementById(containerId);
+  const legend = document.getElementById(legendId);
+  const rounds = strategy.rounds || [];
+  const width = 720, height = 315;
+  const margin = { left: 56, right: 22, top: 40, bottom: 48 };
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+  const maxStep = Math.max(1, ...rounds.map(item => Number(item.step) || 1));
+  const x = step => margin.left + (maxStep === 1 ? chartWidth / 2 : (step - 1) * chartWidth / (maxStep - 1));
+  const y = rate => margin.top + (1 - Math.max(0, Math.min(1, Number(rate)))) * chartHeight;
+  const grid = [0, .25, .5, .75, 1].map(rate => `
+    <line x1="${margin.left}" y1="${y(rate)}" x2="${width - margin.right}" y2="${y(rate)}" class="distribution-grid-line" />
+    <text x="${margin.left - 10}" y="${y(rate) + 4}" text-anchor="end">${Math.round(rate * 100)}%</text>`).join("");
+  const stepLabels = Array.from({ length: maxStep }, (_, index) => index + 1).map(step => `
+    <text x="${x(step)}" y="${height - 16}" text-anchor="middle">第${step}轮</text>`).join("");
+  const announcementSteps = [...new Set((strategy.official_responses || []).map(item => Number(item.step)).filter(Number.isFinite))];
+  const announcementGuides = announcementSteps.map(step => `
+    <g class="distribution-official-guide"><line x1="${x(step)}" y1="${margin.top - 12}" x2="${x(step)}" y2="${height - margin.bottom}" />
+    <text x="${x(step) + 5}" y="${margin.top - 17}">公告</text></g>`).join("");
+  let observedPointCount = 0;
+  const lines = series.map(item => {
+    const points = rounds.map(round => {
+      const summary = round[field] || {};
+      const value = summary.distribution?.[item.key];
+      const rawRate = value?.rate;
+      const rate = rawRate !== null
+        && rawRate !== undefined
+        && Number.isFinite(Number(rawRate))
+        ? Number(rawRate)
+        : null;
+      if (rate !== null) observedPointCount += 1;
+      return {
+        step: Number(round.step),
+        rate,
+        count: value?.count,
+        denominator: summary.applicable_agent_count
+          ?? summary.classified_expression_count
+          ?? summary.agent_count
+      };
+    });
+    const paths = distributionSegments(points).map(segment => {
+      const pathPoints = segment.map(point => `${x(point.step)},${y(point.rate)}`).join(" ");
+      return `<polyline points="${pathPoints}" />`;
+    }).join("");
+    const dots = points.filter(point => point.rate !== null).map(point => `
+      <circle cx="${x(point.step)}" cy="${y(point.rate)}" r="4.5">
+        <title>${item.label} · 第${point.step}轮：${percent(point.rate)}（${integerValue(point.count)}/${integerValue(point.denominator)}）</title>
+      </circle>`).join("");
+    return `<g class="distribution-series" style="--distribution-series:${diagnosticColors[item.key]}">${paths}${dots}</g>`;
+  }).join("");
+  if (!observedPointCount) {
+    container.innerHTML = '<div class="distribution-empty">该批次没有保存此项逐轮诊断数据</div>';
+    legend.innerHTML = "";
+    return;
+  }
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(series.map(item => item.label).join('、'))}逐轮分布">${grid}${announcementGuides}${stepLabels}${lines}</svg>`;
+  legend.innerHTML = series.map(item => `<span><i style="background:${diagnosticColors[item.key]}"></i>${escapeHtml(item.label)}</span>`).join("")
+    + (announcementSteps.length ? '<span><i class="diagnostic-official"></i>官方公告投入</span>' : "");
+}
+
+function renderRoundDiagnostics(strategy) {
+  const emotionSeries = [
+    { key: "positive", label: "积极" },
+    { key: "neutral", label: "中性" },
+    { key: "negative", label: "负面" }
+  ];
+  renderDistributionChart({
+    containerId: "agent-emotion-chart",
+    legendId: "agent-emotion-legend",
+    strategy,
+    field: "agent_emotion_distribution",
+    series: emotionSeries
+  });
+  renderDistributionChart({
+    containerId: "agent-expression-chart",
+    legendId: "agent-expression-legend",
+    strategy,
+    field: "agent_expression_distribution",
+    series: emotionSeries
+  });
+  renderDistributionChart({
+    containerId: "official-attitude-chart",
+    legendId: "official-attitude-legend",
+    strategy,
+    field: "official_attitude_distribution",
+    series: [
+      { key: "accept", label: "接受" },
+      { key: "wait", label: "观望" },
+      { key: "question", label: "质疑" }
+    ]
   });
 }
 
@@ -319,6 +439,7 @@ function renderMetricDetail(strategy) {
     metricGroup("场景LLM请求构成", requestTypeItems(performance.llm_requests))
   ];
   document.getElementById("metric-groups").innerHTML = groups.join("");
+  renderRoundDiagnostics(strategy);
   renderRoundTable(strategy);
   renderRoundQualityTable(strategy);
 }
@@ -327,11 +448,15 @@ function renderRoundTable(strategy) {
   document.getElementById("round-table").innerHTML = (strategy.rounds || []).map(round => {
     const policy = round.policy_metrics || {};
     const propagation = round.propagation_metrics || {};
-    const comments = round.comment_generation || {};
+    const actions = round.agent_action_distribution || {};
+    const expressions = round.agent_expression_distribution || {};
+    const actionDistribution = actions.distribution || {};
     return `<tr>
       <th>第${escapeHtml(round.step)}轮</th>
       <td>${percent(policy.negative_rate)}</td><td>${percent(policy.question_rate)}</td><td>${percent(policy.accept_rate)}</td>
       <td>${integerValue(policy.official_attitude_applicable_count)}</td><td>${escapeHtml(trendLabel(policy.global_trend))}</td>
+      <td>${integerValue(actionDistribution.silent?.count)}</td><td>${integerValue(actionDistribution.original?.count)}</td><td>${integerValue(actionDistribution.reshare?.count)}</td>
+      <td>${precisePercent(expressions.participation_rate)}</td><td>${precisePercent(actions.original_expression_uniqueness_rate)}</td>
       <td>${integerValue(propagation.exposure_count)}</td><td>${integerValue(propagation.reached_agent_count)}</td><td>${precisePercent(propagation.reach_rate)}</td>
       <td>${integerValue(propagation.source_agent_count)}</td><td>${integerValue(propagation.propagated_comment_count)}</td>
       <td>${integerValue(propagation.continued_propagation_count)}</td><td>${integerValue(propagation.continued_agent_count)}</td><td>${precisePercent(propagation.continuation_rate)}</td>
@@ -427,7 +552,7 @@ function renderStrategies(data) {
 
 async function initialize() {
   const experimentId = new URLSearchParams(window.location.search).get("experiment_id");
-  if (!experimentId) throw new Error("缺少 experiment_id，请从首页选择五策略实验。");
+  if (!experimentId) throw new Error("缺少 experiment_id，请从首页选择回应方案对照实验。");
   const query = encodeURIComponent(experimentId);
   const data = await getJson(`/api/strategy/dashboard?experiment_id=${query}`);
   document.getElementById("experiment-id").textContent = `${data.experiment_id} · event_id=${data.event_id || "—"}`;

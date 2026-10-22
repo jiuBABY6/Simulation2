@@ -38,6 +38,8 @@ demo/experiments/<event_id>_<timestamp>/
 - `propagation_history.jsonl`：邻居曝光、传播层级、衰减权重和是否继续表达；
 - `propagation_summary`：场景累计覆盖人数、继续传播次数和最大传播深度。
 
+回应方案新批次还应抽查逐轮`strategy_state_diagnostics`：`public_state_evidence_retention_rate`用于确认公共评论状态限流；`average_directional_support`、`average_utility_margin`和`average_required_switch_margin`用于判断证据方向是否真正进入Persona裁决；`directional_evidence_group_count`用于确认传播根去重后的有效证据数量；`assimilation_new_evidence_group_count`、`assimilation_restored_evidence_group_count`、`assimilation_expired_evidence_group_count`、`assimilation_consumed_evidence_group_count`和`average_authoritative_absorbed_fraction`用于核对权威证据是否按Persona在三轮内渐进吸收。决策中的`strategy_state_guard.guard_version`应为`strategy_directional_utility_v3`，`emotion_options`在第一轮以后应只有规则层裁决出的唯一相邻状态。`strategy_evidence_assimilation`可以出现在本地状态与完整审计中，但不得进入LLM提示词。`experiment_result.json.simulation_options.incremental_comment_count`默认应为8；历史复现的默认值仍为20。
+
 ## 历史趋势复现
 
 事件目录必须同时包含 `initial_opinion.json`、`public_context_timeline.json` 和官方时间线，然后直接运行：
@@ -45,6 +47,8 @@ demo/experiments/<event_id>_<timestamp>/
 ```powershell
 python demo\historical_replay\main.py --event-id <event_id>
 ```
+
+当前可运行事件可用`--list-events`查看。北国先天下新数据应使用`event_beiguo_xiantianxia_crash_20260920_002`；旧`001`只保留真实趋势快照和旧批次兼容，不再作为事件源运行。
 
 新批次根目录应同时包含 `initial_opinion.json`、`public_context_timeline.json` 和 `comment_pool.json`，且 `comment_pool.json.initialization.target_emotion_counts` 与 `actual_emotion_counts` 完全一致。第一轮作为历史初始条件，不计入MAE和峰值指标；第2轮以后不读取真实评论或真实情绪比例。
 
@@ -68,6 +72,7 @@ python demo\historical_replay\main.py --event-id <event_id>
 | `completed` | 应运行的策略均成功完成 |
 | `partial_failed` | 部分策略失败 |
 | `failed` | 所有策略失败或关键流程失败 |
+| `failed_isolation_audit` | 共同输入哈希、场景编号、状态目录或公众反应发现跨场景污染 |
 | `not_run` | 动态进场条件始终未触发，回应策略未实际运行 |
 | `normal` | 评论兜底未触发质量告警 |
 | `degraded` | 实验完成，但部分轮次历史兜底较多 |
@@ -83,10 +88,30 @@ python demo\historical_replay\main.py --event-id <event_id>
 
 ## 最小交接检查
 
-新成员首次接手时应依次完成：
+新成员首次接手时先执行[`PROJECT_HANDOFF_20261022.md`](./PROJECT_HANDOFF_20261022.md)中的Destination sentinel。哨兵匹配后，再依次完成：
 
-1. `python -m compileall -q demo`；
+1. 运行Demo、Persona和可视化离线测试；
 2. 校验两个输入JSON的`event_id`；
-3. 使用小规模参数完成一次运行；
+3. 在API Key有效且余额充足时使用小规模参数完成一次运行；
 4. 确认生成新实验目录且没有覆盖旧批次；
 5. 确认结果中包含策略状态、数据质量、传播摘要和性能摘要。
+## 2026/10/20 因果隔离机制运行后检查
+
+运行命令不变：
+
+```powershell
+python demo\main.py
+```
+
+新批次完成后优先核对：
+
+1. `experiment_result.json.counterfactual_controls.cross_scenario_audit.status` 为 `passed`；
+2. 四个场景的 `shared_input_sha256` 完全一致、`scenario_input_sha256` 各不相同，状态目录彼此独立；
+3. 通告投入后的 `incremental_comment_history.jsonl` 使用 `generation_mode=scenario_reactive_public`，并携带当前场景 `scenario_id`；不得出现旧式 `shared_exogenous_context`；
+4. 抽查回应场景评论，不得在通告已经公开后无依据地声称“尚无任何官方信息”；
+5. `state_evidence_diagnostics` 同时出现 `exogenous_state_evidence_count` 与 `endogenous_state_evidence_count`，后者会包含Agent表达和场景反应；
+6. 网络快照同时包含原始与归一化影响力，传播记录同时包含两类传播权重；
+7. `strategy_state_diagnostics` 能看到官方态度记忆的新增与跨轮恢复，但没有新证据时不应出现态度变化；
+8. 评论目标和证据角色有缺失时可以由兼容层补齐，但新生成批次不应大量依赖 `public_discourse/opinion` 默认值。
+
+本轮只完成离线语法、契约和单元回归，不等同于完成新的DeepSeek全量实验。正式比较方案前仍需新建批次运行，旧批次不会被新机制重写。

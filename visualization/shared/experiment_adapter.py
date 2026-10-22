@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
+from visualization.shared.artifact_io import load_json_object
 from visualization.shared.experiment_catalog import (
     HISTORICAL_MODE,
     STRATEGY_MODE,
@@ -23,13 +23,6 @@ STRATEGY_NAMES = {
 }
 
 
-def _load_json(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError(f"JSON 文件不是对象：{path}")
-    return data
-
-
 class ExperimentAdapter:
     """对两种实验目录暴露统一的场景、轮次和传播文件接口。"""
 
@@ -43,7 +36,7 @@ class ExperimentAdapter:
             else "experiment_result.json"
         )
         self.result_path = self.experiment_dir / result_name
-        self.result = _load_json(self.result_path)
+        self.result = load_json_object(self.result_path)
 
     @property
     def experiment_id(self) -> str:

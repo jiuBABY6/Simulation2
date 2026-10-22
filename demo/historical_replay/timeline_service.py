@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-from runtime_paths import DEMO_DIR  # noqa: F401，导入时完成现有 Demo 模块路径初始化。
+if __package__:
+    from .runtime_paths import DEMO_DIR  # noqa: F401
+else:  # pragma: no cover - 保留直接脚本启动方式
+    from runtime_paths import DEMO_DIR  # noqa: F401
 
 from infrastructure.json_storage import load_json
 

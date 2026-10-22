@@ -21,6 +21,7 @@ from comments.generation_service import (
     load_generation_profiles,
     summarize_profile_faction_combinations,
 )
+from domain.comment_semantics import normalize_comment_semantics
 from comments.angle_planner import (
     build_incremental_angle_tasks,
     format_comment_tasks,
@@ -29,7 +30,10 @@ from comments.angle_planner import (
 )
 from comments.repository import load_comment_pool
 from simulation.event_context import load_event_context
-from simulation.options import uses_evidence_based_emotions
+from simulation.options import (
+    uses_evidence_based_emotions,
+    uses_strategy_participation_gate,
+)
 from simulation.event_state_updater import load_event_state_history
 from infrastructure.json_storage import append_jsonl, read_jsonl
 from project_config import (
@@ -553,6 +557,8 @@ def select_fallback_comments(
         }
         fallback_comment["text"] = str(fallback_comment["text"]).strip()
         fallback_comment["source_type"] = "repost_fallback"
+        fallback_comment["provenance_type"] = "repost_fallback"
+        fallback_comment["information_origin"] = "exogenous"
         fallback_comment["source_comment_id"] = source_comment["comment_id"]
         if required_emotion is not None:
             fallback_comment["fallback_required_emotion"] = required_emotion
@@ -622,6 +628,11 @@ def build_emergency_fallback_comments(
                 "positive": "support",
             }.get(emotion, "neutral"),
             "source_type": "local_emergency_fallback",
+            "provenance_type": "local_emergency_fallback",
+            "information_source_type": "public",
+            "information_origin": "exogenous",
+            "reaction_target": "public_discourse",
+            "evidence_role": "opinion",
             "fallback_reason": "insufficient_valid_comments",
         }
         if required_emotion is not None:
@@ -764,6 +775,10 @@ def build_incremental_prompt(
     allow_task_alternatives=False,
 ):
     """构造后续轮次增量评论生成提示词。"""
+    scenario_reactive_public = (
+        uses_strategy_participation_gate(event_context)
+        and not uses_evidence_based_emotions(event_context)
+    )
     if compact_profiles:
         profile_text = "\n".join(
             f"- profile_id={profile['profile_id']}，"
@@ -832,8 +847,18 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 {json.dumps(previous_incremental_summary or {}, ensure_ascii=False, indent=2)}
 """.strip()
 
+    official_statement_text = current_state.get("official_statement", "")
+    official_status_text = current_state.get(
+        "official_statement_status", "none"
+    )
+    generator_role = (
+        "请根据本场景已经公开的官方信息、共同客观事实和上一轮实际讨论，"
+        "生成本场景本轮新出现的公众反应。不得假装未看到已经公开的信息。"
+        if scenario_reactive_public
+        else "请根据当前事件状态和上一轮真实讨论，生成本轮新出现的社会评论。"
+    )
     return f"""
-你是社会舆情模拟系统的增量评论生成器。请根据当前事件状态和上一轮真实讨论，生成本轮新出现的社会评论。
+你是社会舆情模拟系统的增量评论生成器。{generator_role}
 
 【事件内容】
 {event_context.get('event_content', '')}
@@ -845,10 +870,10 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 {current_state.get('step')}
 
 【当前官方声明】
-{current_state.get('official_statement', '')}
+{official_statement_text}
 
 【官方声明类型】
-{current_state.get('official_statement_status', 'none')}
+{official_status_text}
 
 【本轮生成原因】
 {generation_trigger}
@@ -869,7 +894,7 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 
 【生成要求】
 1. 生成 {comment_count} 条新的中文微博评论。
-2. 评论应体现对当前官方声明或上一轮讨论的继续反应，不得复制上面的近期文本，也不要只替换少量词语进行复述。
+2. 评论应体现当前阶段已经出现的外部事件和公共背景，并可回应本场景当前官方声明与上一轮讨论；不得声称已经公开的信息仍未发布。不得复制近期文本，也不要只替换少量词语复述。
 3. 同一批次尽量从事实进展、信息可信度、处理态度、社会影响和公众感受等不同角度表达，避免重复同一个论点。
 4. 尽量覆盖不同人物类型、五种评论派系、三种情绪和三种信息取向。
 5. 不得编造事件中没有提供的姓名、数字、时间和调查结论。
@@ -882,6 +907,8 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
 12. 提供角度任务时，task_id 必须来自本批次角度任务，不得自行创建；是否允许同一任务提供备选表达以本批次任务说明为准。
 13. negative 事件中的 positive 只能表示对搜寻、互助、事实澄清、公开回应或社会改进的希望、宽慰或认可，不能表示赞同伤害或悲剧后果。
 14. 正面任务必须依据任务中的 positive_evidence 表达；没有正面证据时不得为了凑齐三类情绪而编造正面内容。
+15. reaction_target 表示评论实际评价对象，只能从 event_harm、official_claim、investigation_process、accountability、victim_support、public_discourse、social_action 中选择。
+16. evidence_role 表示评论在证据链中的作用，只能从 support、contradict、question、opinion、background、clarify 中选择；普通个人立场应使用 opinion 或 question，不能伪装成已核实事实。
 
 【输出格式】
 只能返回一个 JSON 对象，不要返回 Markdown 或额外解释：
@@ -894,7 +921,10 @@ expression_instruction 指定的表达方式。人物类型和评论派系由你
       "topic": "事件主题",
       "emotion": "negative",
       "orientation": "questioning",
-      "stance": "questioning"
+      "stance": "questioning",
+      "reaction_target": "investigation_process",
+      "evidence_role": "question",
+      "claim_id": null
     }}
   ]
 }}
@@ -1144,10 +1174,19 @@ def generate_incremental_comments(
     selected_comment_ids = {
         str(comment_id) for comment_id in (selected_comment_ids or ())
     }
+    scenario_reactive_public = (
+        uses_strategy_participation_gate(event_context)
+        and not uses_evidence_based_emotions(event_context)
+    )
+    # 2026/10/20，修改功能：公众反应属于场景干预后的结果，必须读取
+    # 当前场景的通告和上一轮Agent表达。共同对照只固化客观事实，不再
+    # 通过清空上下文制造一套与所有回应方案相同的公众评论。
+    context_previous_comments = previous_comments
+    context_previous_incremental_summary = previous_incremental_summary
     # 2026/08/26 第十一次联调问题修复，修改功能：首次请求同时覆盖近期评论和较早历史样本。
     previous_comment_texts = [
         str(comment.get("text", "")).strip()
-        for comment in previous_comments
+        for comment in context_previous_comments
         if isinstance(comment, dict) and str(comment.get("text", "")).strip()
     ]
     history_avoid_texts = list(
@@ -1164,15 +1203,16 @@ def generate_incremental_comments(
     # 2026/09/04 增量评论生成架构优化，修改功能：首轮并行批次独立收集反馈，合并后统一用于一次补齐。
     round_rejected_duplicate_texts = []
     # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：为本轮全部增量评论预先分配活跃角度。
+    task_state = event_context["current_state"]
     comment_tasks = (
         build_incremental_angle_tasks(
             angle_plan,
-            event_context["current_state"],
+            task_state,
             comment_count,
             # 2026/10/9，修改功能：条件化回放根据本轮证据为三类情绪
             # 保留最低任务覆盖，防止增量评论池也发生单一情绪坍缩。
             evidence_based=uses_evidence_based_emotions(event_context),
-            previous_comments=previous_comments,
+            previous_comments=context_previous_comments,
         )
         if angle_plan is not None
         else None
@@ -1193,12 +1233,14 @@ def generate_incremental_comments(
         batch_specs.append(
             {
                 "event_context": event_context,
-                "previous_comments": previous_comments,
+                "previous_comments": context_previous_comments,
                 "profiles": profiles,
                 "used_texts": used_texts,
                 "batch_size": batch_size,
                 "generation_trigger": generation_trigger,
-                "previous_incremental_summary": previous_incremental_summary,
+                "previous_incremental_summary": (
+                    context_previous_incremental_summary
+                ),
                 "avoid_texts": history_avoid_texts,
                 "comment_tasks": batch_tasks,
             }
@@ -1246,11 +1288,11 @@ def generate_incremental_comments(
         )
         refill_prompt = build_incremental_prompt(
             event_context,
-            previous_comments,
+            context_previous_comments,
             profiles,
             refill_request_count,
             generation_trigger,
-            previous_incremental_summary,
+            context_previous_incremental_summary,
             refill_avoid_texts,
             missing_tasks,
             include_discussion_context=False,
@@ -1368,16 +1410,42 @@ def generate_incremental_comments(
         generation_stats["emotion_coverage"] = emotion_coverage
 
     next_number = get_next_comment_number(existing_comments)
+    current_state = event_context["current_state"]
+    scenario_id = current_state.get("scenario_id")
+    shared_input_sha256 = current_state.get("shared_input_sha256")
     result = []
     for offset, comment in enumerate(generated_comments):
-        result.append(
+        normalized_comment = normalize_comment_semantics(
             {
                 "comment_id": f"comment_{next_number + offset:03d}",
                 **comment,
                 "introduced_step": current_step,
                 "generation_trigger": generation_trigger,
-            }
+                "source_type": comment.get("source_type", "llm_generated"),
+                "provenance_type": comment.get(
+                    "provenance_type", "llm_incremental_public"
+                ),
+                "information_source_type": comment.get(
+                    "information_source_type", "public"
+                ),
+                # 2026/10/20，修改功能：策略实验通告投入后的公众评论会
+                # 受到本场景通告和Agent讨论影响，因此属于场景内生反应；
+                # 历史复现及其他非策略入口仍保持外生公共语境语义。
+                "information_origin": (
+                    "endogenous" if scenario_reactive_public else "exogenous"
+                ),
+                "scenario_id": scenario_id,
+                "shared_input_sha256": shared_input_sha256,
+                "causal_origin": (
+                    "scenario_reactive_public"
+                    if scenario_reactive_public
+                    else "external_public_context"
+                ),
+            },
+            default_information_source="public",
+            default_provenance="llm_incremental_public",
         )
+        result.append(normalized_comment)
     return result
 
 
@@ -1407,11 +1475,9 @@ def determine_comment_quality(history_fallback_count, emergency_fallback_count):
     return "normal"
 
 
-# 2026/08/24 增量评论兜底机制，修改功能：加载排除项并保存每轮实际兜底数量。
-# 2026/08/24 增量评论稳定补齐，修改功能：保存模型生成、两级兜底、过滤原因和数据质量状态。
-# 2026/08/26，事件角度+派系+人物类型，解决评论兜底，修改功能：复用初始角度计划并保存角度任务诊断。
-def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
-    """读取本轮所需数据，生成增量评论并追加保存。"""
+def _prepare_incremental_generation_inputs():
+    """集中读取一轮增量生成所需的数据，不生成评论。"""
+
     ensure_runtime_directories()
     event_context = load_event_context(EVENT_FILE, EVENT_STATE_FILE)
     event_id = event_context["event_id"]
@@ -1421,13 +1487,15 @@ def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
 
     incremental_history = load_incremental_history(INCREMENTAL_COMMENT_FILE)
     if any(
-        record.get("event_id") == event_id and record.get("step") == current_step
+        record.get("event_id") == event_id
+        and record.get("step") == current_step
         for record in incremental_history
     ):
-        raise ValueError(f"事件 {event_id} 的第 {current_step} 轮增量评论已经存在。")
+        raise ValueError(
+            f"事件 {event_id} 的第 {current_step} 轮增量评论已经存在。"
+        )
 
     comment_pool = load_comment_pool(COMMENT_POOL_FILE)
-    # 2026/08/26，事件角度+派系+人物类型，解决评论兜底，新增功能：优先复用初始评论池中的事件角度计划。
     raw_angle_plan = comment_pool.get("angle_plan")
     angle_plan = (
         validate_event_angle_plan(raw_angle_plan, event_context)
@@ -1439,40 +1507,44 @@ def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
         incremental_history,
         event_id,
     )
-    previous_comments = load_previous_round_comments(
-        event_id,
-        current_step,
-        existing_comments,
-        DECISION_HISTORY_FILE,
-    )
-    # 2026/08/25 第六次联调问题修复，新增功能：向生成器提供上一轮完整增量评论的分布摘要。
-    previous_incremental_summary = summarize_previous_incremental_comments(
-        existing_comments,
-        current_step,
-    )
-    state_history = load_event_state_history(EVENT_STATE_FILE, event_id)
-    generation_trigger = determine_generation_trigger(event_context, state_history)
-    profiles = load_generation_profiles(COMMENT_PROFILE_FILE)
-    # 2026/08/24 增量评论兜底机制，新增功能：兜底抽取前排除已经被 Agent 选择的历史评论。
-    selected_comment_ids = load_selected_comment_ids(
-        event_id,
-        current_step,
-        DECISION_HISTORY_FILE,
-    )
+    return {
+        "event_context": event_context,
+        "event_id": event_id,
+        "current_step": current_step,
+        "existing_comments": existing_comments,
+        "previous_comments": load_previous_round_comments(
+            event_id,
+            current_step,
+            existing_comments,
+            DECISION_HISTORY_FILE,
+        ),
+        "previous_incremental_summary": (
+            summarize_previous_incremental_comments(
+                existing_comments,
+                current_step,
+            )
+        ),
+        "generation_trigger": determine_generation_trigger(
+            event_context,
+            load_event_state_history(EVENT_STATE_FILE, event_id),
+        ),
+        "profiles": load_generation_profiles(COMMENT_PROFILE_FILE),
+        "selected_comment_ids": load_selected_comment_ids(
+            event_id,
+            current_step,
+            DECISION_HISTORY_FILE,
+        ),
+        "angle_plan": angle_plan,
+    }
 
-    generation_stats = {}
-    comments = generate_incremental_comments(
-        event_context=event_context,
-        previous_comments=previous_comments,
-        profiles=profiles,
-        existing_comments=existing_comments,
-        comment_count=comment_count,
-        generation_trigger=generation_trigger,
-        selected_comment_ids=selected_comment_ids,
-        generation_stats=generation_stats,
-        previous_incremental_summary=previous_incremental_summary,
-        angle_plan=angle_plan,
-    )
+
+def _build_incremental_record(
+    inputs,
+    comments,
+    generation_stats,
+):
+    """把评论和生成诊断组合为原有 JSONL 记录格式。"""
+
     history_fallback_count = sum(
         comment.get("source_type") == "repost_fallback"
         for comment in comments
@@ -1481,75 +1553,163 @@ def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
         comment.get("source_type") == "local_emergency_fallback"
         for comment in comments
     )
-    fallback_count = history_fallback_count + emergency_fallback_count
     quality_status = determine_comment_quality(
         history_fallback_count,
         emergency_fallback_count,
     )
-    record = {
-        "event_id": event_id,
-        "step": current_step,
-        "generation_trigger": generation_trigger,
+    event_context = inputs["event_context"]
+    current_state = event_context["current_state"]
+    scenario_reactive_public = (
+        uses_strategy_participation_gate(event_context)
+        and not uses_evidence_based_emotions(event_context)
+    )
+    return {
+        "event_id": inputs["event_id"],
+        "step": inputs["current_step"],
+        # 2026/10/20，新增功能：每批公众反应携带场景和共同输入指纹，
+        # 运行结束后可直接检查是否误复制了其他方案的数据。
+        "scenario_id": current_state.get("scenario_id"),
+        "shared_input_sha256": current_state.get("shared_input_sha256"),
+        "generation_mode": (
+            "scenario_reactive_public"
+            if scenario_reactive_public
+            else "llm_incremental"
+        ),
+        "generation_trigger": inputs["generation_trigger"],
         "comment_count": len(comments),
         "llm_comment_count": generation_stats.get("llm_comment_count", 0),
         "history_fallback_count": history_fallback_count,
         "emergency_fallback_count": emergency_fallback_count,
-        "fallback_count": fallback_count,
+        "fallback_count": history_fallback_count + emergency_fallback_count,
         "quality_status": quality_status,
         "generation_attempts": generation_stats.get("generation_attempts", 0),
-        # 2026/09/04 增量评论生成架构优化，新增功能：保存业务层首轮、补齐和波次请求数量。
         "initial_request_count": generation_stats.get(
-            "initial_request_count",
-            0,
+            "initial_request_count", 0
         ),
-        "refill_request_count": generation_stats.get(
-            "refill_request_count",
-            0,
-        ),
-        # 2026/09/04 评论质量与耗时平衡，新增功能：保存自适应质量门槛和救援请求数量。
-        "rescue_request_count": generation_stats.get(
-            "rescue_request_count",
-            0,
-        ),
-        "generation_wave_count": generation_stats.get(
-            "generation_wave_count",
-            0,
-        ),
-        "quality_target_count": generation_stats.get(
-            "quality_target_count",
-            0,
-        ),
+        "refill_request_count": generation_stats.get("refill_request_count", 0),
+        "rescue_request_count": generation_stats.get("rescue_request_count", 0),
+        "generation_wave_count": generation_stats.get("generation_wave_count", 0),
+        "quality_target_count": generation_stats.get("quality_target_count", 0),
         "model_returned_comment_count": generation_stats.get(
-            "model_returned_comment_count",
-            0,
+            "model_returned_comment_count", 0
         ),
         "rejection_counts": generation_stats.get("rejection_counts", {}),
         "validation_errors": generation_stats.get("validation_errors", []),
         "angle_task_count": generation_stats.get("angle_task_count", 0),
         "completed_angle_task_count": generation_stats.get(
-            "completed_angle_task_count",
-            0,
+            "completed_angle_task_count", 0
         ),
         "angle_counts": summarize_angle_task_counts(comments),
         "profile_faction_combinations": summarize_profile_faction_combinations(
             comments
         ),
         "emotion_coverage": generation_stats.get(
-            "emotion_coverage",
-            {"status": "not_required"},
+            "emotion_coverage", {"status": "not_required"}
         ),
         "comments": comments,
     }
+
+
+# 2026/08/24 增量评论兜底机制，修改功能：加载排除项并保存每轮实际兜底数量。
+# 2026/08/24 增量评论稳定补齐，修改功能：保存模型生成、两级兜底、过滤原因和数据质量状态。
+# 2026/08/26，事件角度+派系+人物类型，解决评论兜底，修改功能：复用初始角度计划并保存角度任务诊断。
+def run_incremental_generation(comment_count=INCREMENTAL_COMMENT_COUNT):
+    """生成并保存一轮增量评论。
+
+    2026/10/15，重构功能：输入读取、评论生成和记录装配分开，原有
+    生成规则、兜底顺序、统计字段及文件格式保持不变。
+    """
+    inputs = _prepare_incremental_generation_inputs()
+
+    generation_stats = {}
+    comments = generate_incremental_comments(
+        event_context=inputs["event_context"],
+        previous_comments=inputs["previous_comments"],
+        profiles=inputs["profiles"],
+        existing_comments=inputs["existing_comments"],
+        comment_count=comment_count,
+        generation_trigger=inputs["generation_trigger"],
+        selected_comment_ids=inputs["selected_comment_ids"],
+        generation_stats=generation_stats,
+        previous_incremental_summary=inputs["previous_incremental_summary"],
+        angle_plan=inputs["angle_plan"],
+    )
+    record = _build_incremental_record(inputs, comments, generation_stats)
     append_incremental_record(record, INCREMENTAL_COMMENT_FILE)
 
     print(
-        f"事件 {event_id} 第 {current_step} 轮增量评论生成完成，"
+        f"事件 {inputs['event_id']} 第 {inputs['current_step']} 轮增量评论生成完成，"
         f"新增 {len(comments)} 条，其中模型生成 "
         f"{record['llm_comment_count']} 条、历史兜底 "
-        f"{history_fallback_count} 条、本地应急 "
-        f"{emergency_fallback_count} 条；质量状态 {quality_status}。"
+        f"{record['history_fallback_count']} 条、本地应急 "
+        f"{record['emergency_fallback_count']} 条；"
+        f"质量状态 {record['quality_status']}。"
     )
     print(f"输出文件：{INCREMENTAL_COMMENT_FILE}")
+    return record
+
+
+# 2026/10/18，新增功能：为“冻结公共语境”消融条件保存合法的空批次。
+def run_frozen_incremental_generation():
+    """记录本轮未生成外部评论，保证断点续跑不会重复尝试生成。
+
+    该函数只用于显式消融配置。初始评论池和Agent邻居表达仍然可见；
+    空记录与正常增量记录共享同一JSONL契约，并用 ``generation_mode``
+    标明这是实验干预而不是模型故障或评论生成失败。
+    """
+
+    ensure_runtime_directories()
+    event_context = load_event_context(EVENT_FILE, EVENT_STATE_FILE)
+    event_id = event_context["event_id"]
+    current_step = event_context["current_state"]["step"]
+    if current_step < 2:
+        raise ValueError("当前还是第 1 轮，不需要记录冻结增量评论。")
+
+    history = load_incremental_history(INCREMENTAL_COMMENT_FILE)
+    if any(
+        record.get("event_id") == event_id
+        and record.get("step") == current_step
+        for record in history
+    ):
+        raise ValueError(
+            f"事件 {event_id} 的第 {current_step} 轮增量评论已经存在。"
+        )
+
+    record = {
+        "event_id": event_id,
+        "step": current_step,
+        "scenario_id": event_context["current_state"].get("scenario_id"),
+        "shared_input_sha256": event_context["current_state"].get(
+            "shared_input_sha256"
+        ),
+        "generation_trigger": "ablation_frozen_public_context",
+        "generation_mode": "disabled_by_ablation",
+        "comment_count": 0,
+        "llm_comment_count": 0,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "quality_status": "normal",
+        "generation_attempts": 0,
+        "initial_request_count": 0,
+        "refill_request_count": 0,
+        "rescue_request_count": 0,
+        "generation_wave_count": 0,
+        "quality_target_count": 0,
+        "model_returned_comment_count": 0,
+        "rejection_counts": {},
+        "validation_errors": [],
+        "angle_task_count": 0,
+        "completed_angle_task_count": 0,
+        "angle_counts": {},
+        "profile_faction_combinations": [],
+        "emotion_coverage": {"status": "not_required"},
+        "comments": [],
+    }
+    append_incremental_record(record, INCREMENTAL_COMMENT_FILE)
+    print(
+        f"事件 {event_id} 第 {current_step} 轮已按消融配置冻结外部增量评论。"
+    )
     return record
 
 

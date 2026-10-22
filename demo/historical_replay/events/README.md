@@ -39,3 +39,10 @@ python visualization\historical\real_data_processor.py --event-id <event_id>
 ```
 
 第一条命令创建新的历史回放批次；第二条只在存在人工 Excel 时生成运行后的真实趋势对照。完整说明见 [`../../docs/HISTORICAL_REPLAY.md`](../../docs/HISTORICAL_REPLAY.md)。
+
+## 当前事件与兼容边界
+
+- 北国先天下当前可运行事件为`event_beiguo_xiantianxia_crash_20260920_002`，使用新数据的三阶段输入；
+- 旧`event_beiguo_xiantianxia_crash_20260920_001`事件源已经退出运行入口；
+- `visualization/data/real_trends`中的旧`001`趋势JSON以及引用它的旧实验批次继续只读保留，以保证历史结果仍可查看；
+- 新运行、新测试和新文档不得再把`001`当作现行事件源。

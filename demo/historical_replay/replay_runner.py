@@ -2,28 +2,75 @@
 
 from pathlib import Path
 
-from runtime_paths import DEMO_DIR  # noqa: F401
+if __package__:
+    from .runtime_paths import DEMO_DIR  # noqa: F401
+    from .public_context import (
+        get_public_context_for_step,
+        load_public_context_timeline,
+    )
+    from .run_manifest import save_historical_run_manifest
+    from .timeline_service import (
+        get_official_state_for_step,
+        get_step_period,
+        load_official_response_timeline,
+    )
+else:  # pragma: no cover - 保留直接脚本启动方式
+    from runtime_paths import DEMO_DIR  # noqa: F401
+    from public_context import (
+        get_public_context_for_step,
+        load_public_context_timeline,
+    )
+    from run_manifest import save_historical_run_manifest
+    from timeline_service import (
+        get_official_state_for_step,
+        get_step_period,
+        load_official_response_timeline,
+    )
 
-from simulation.event_state_updater import append_event_state_record
-from experiment_runner import (
+from application.round_results import (
     calculate_scenario_propagation_summary,
     load_round_result,
-    prepare_scenario_state,
-    run_simulation_step,
     summarize_comment_quality,
 )
+from application.runtime_config import DEFAULT_SIMULATION_RUNTIME
+from application.scenario_state import prepare_scenario_state
+from application.step_executor import (
+    SimulationStepRequest,
+    SubprocessSimulationStepExecutor,
+)
 from infrastructure.json_storage import load_json, save_json
-from public_context import (
-    get_public_context_for_step,
-    load_public_context_timeline,
-)
-from run_manifest import save_historical_run_manifest
+from simulation.event_state_updater import append_event_state_record
 from simulation.options import normalize_simulation_options
-from timeline_service import (
-    get_official_state_for_step,
-    get_step_period,
-    load_official_response_timeline,
-)
+
+
+# 历史复现只负责历史时间线编排；单轮执行协议由共享应用层提供。
+_STEP_EXECUTOR = SubprocessSimulationStepExecutor()
+
+
+def _run_simulation_step(
+    state_dir,
+    event_file,
+    comment_pool_file,
+    incremental_comment_count,
+):
+    """使用与五策略实验一致的参数执行一轮，避免依赖其顶层脚本。"""
+
+    return _STEP_EXECUTOR.run(
+        SimulationStepRequest(
+            state_dir=Path(state_dir),
+            event_file=Path(event_file),
+            comment_pool_file=Path(comment_pool_file),
+            social_network_file=None,
+            incremental_comment_count=incremental_comment_count,
+            max_agents=DEFAULT_SIMULATION_RUNTIME.max_agents,
+            max_workers=DEFAULT_SIMULATION_RUNTIME.max_workers,
+            random_seed=DEFAULT_SIMULATION_RUNTIME.random_seed,
+            comment_temperature=(
+                DEFAULT_SIMULATION_RUNTIME.comment_temperature
+            ),
+            demo_dir=DEMO_DIR,
+        )
+    )
 
 
 # 2026/09/02 历史趋势复现，新增功能：在固定轮次更新官方信息并连续运行同一场景。
@@ -105,7 +152,7 @@ def run_historical_replay(
                 _build_official_update_record(timeline, step)
             )
 
-        run_simulation_step(
+        _run_simulation_step(
             state_dir,
             event_file,
             comment_pool_file,

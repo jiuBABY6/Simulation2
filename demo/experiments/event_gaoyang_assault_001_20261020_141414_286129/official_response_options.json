@@ -1,0 +1,26 @@
+{
+  "event_id": "event_gaoyang_assault_001",
+  "entry_strategy": "combined_policy",
+  "stagnation_rounds": 2,
+  "negative_rate_improvement_tolerance": 0.05,
+  "content_strategies": [
+    {
+      "strategy_id": "response_plan_1",
+      "strategy_name": "回应方案一",
+      "official_statement": "近日，我县“某女子被当街殴打撕扯”的视频引发网络关注。现将相关情况通报如下：8月29日中午，霍某某（女，52岁）、张某某(女，53岁)在公共场所对刘某（女，37岁）实施殴打、撕扯衣服行为，引发围观。接警后，我局民警立即到场处置，送伤者就医治疗，将两名涉案人员控制并带回公安机关调查。8月30日，霍某某、张某某被依法刑事拘留，目前，案件正在进一步侦办中。警方提示：网络不是法外之地，请广大网民尊重当事人隐私，不转发扩散相关视频图片，不进行人肉搜索、网络攻击，自觉抵制网络暴力，共同维护清朗网络空间。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "response_plan_2",
+      "strategy_name": "回应方案二",
+      "official_statement": "我们高度关注受害人在公共场所遭受殴打和侮辱的情况，并对其身心受到的伤害表示关切。公安机关接报后已开展调查，依法询问涉事人员，调取现场监控并固定相关视频证据。受害人已接受伤情检查，案件事实和责任正在进一步核查，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "response_plan_3",
+      "strategy_name": "回应方案三",
+      "official_statement": "针对网络上关于涉事人员身份、双方关系和案件处置情况的多种说法，目前可以确认，公安机关已经接报并开展调查，正在依法询问涉事人员、调取现场监控并固定相关视频证据。受害人已接受伤情检查，尚未得到权威确认的信息请勿传播，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "event_id": "event_gaoyang_assault_001",
+  "entry_strategy": "combined_policy",
+  "stagnation_rounds": 2,
+  "negative_rate_improvement_tolerance": 0.05,
+  "content_strategies": [
+    {
+      "strategy_id": "fact_report",
+      "strategy_name": "事实通报",
+      "official_statement": "8月29日中午，高阳县某商场门口发生一起两名女子之间的冲突。公安机关接报后已开展调查，依法询问涉事人员，调取现场监控并固定相关视频证据。受害人已接受伤情检查，案件事实和责任正在进一步核查，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "empathy",
+      "strategy_name": "共情安抚",
+      "official_statement": "我们高度关注受害人在公共场所遭受殴打和侮辱的情况，并对其身心受到的伤害表示关切。公安机关接报后已开展调查，依法询问涉事人员，调取现场监控并固定相关视频证据。受害人已接受伤情检查，案件事实和责任正在进一步核查，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "rumor_clarification",
+      "strategy_name": "辟谣澄清",
+      "official_statement": "针对网络上关于涉事人员身份、双方关系和案件处置情况的多种说法，目前可以确认，公安机关已经接报并开展调查，正在依法询问涉事人员、调取现场监控并固定相关视频证据。受害人已接受伤情检查，尚未得到权威确认的信息请勿传播，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    },
+    {
+      "strategy_id": "handling_progress",
+      "strategy_name": "处置进展",
+      "official_statement": "目前，公安机关已经完成接报警核查、涉事人员询问、现场监控调取和网络视频证据固定等工作，受害人伤情检查及案件责任认定工作正在进行。后续将根据调查结果依法处理有关人员，并及时向社会公布案件处理情况。",
+      "official_statement_status": "clear"
+    }
+  ]
+}

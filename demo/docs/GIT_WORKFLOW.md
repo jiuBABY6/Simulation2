@@ -123,7 +123,7 @@ python -m compileall -q demo
 git diff --check
 ```
 
-如果修改数据库、后端或前端，应继续执行该模块自己的最小测试。只有正式运行完整五策略联调时，才把结果追加到`INTEGRATION_TEST_HISTORY.md`。
+如果修改数据库、后端或前端，应继续执行该模块自己的最小测试。只有正式运行完整的“三个回应方案＋一组不回应基线”联调时，才把结果追加到`INTEGRATION_TEST_HISTORY.md`。
 
 提交前必须确认：
 

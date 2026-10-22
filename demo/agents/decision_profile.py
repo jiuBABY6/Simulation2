@@ -1,12 +1,14 @@
-"""历史复现的 Persona 决策画像与离散迟滞约束。
+"""Persona 决策画像与离散迟滞约束。
 
 本模块不调用 LLM、不读写文件，也不读取真实趋势。它把 Persona 转换为
 稳定的个体门槛，并根据当轮新证据决定 Agent 应保持状态、只允许相邻变化，
 还是可以完整重判。
 
-2026/10/14，修改功能：保留离散情绪迟滞，同时把情绪转移和官方态度的
-最终裁决放在本地个体规则中。LLM负责解释与表达，不再覆盖已经由Persona、
-当前证据和上一轮状态形成的个体裁决。
+2026/10/14，修改功能：保留历史复现的离散情绪迟滞，同时把情绪转移和
+官方态度的最终裁决放在本地个体规则中。LLM负责解释与表达，不再覆盖已经
+由Persona、当前证据和上一轮状态形成的个体裁决。历史复现使用本模块的
+完整本地裁决；2026/10/18起，回应方案只复用稳定Persona画像，不复用
+历史复现的完整证据规则，由独立的策略状态模块约束邻居影响与状态候选。
 """
 
 from __future__ import annotations
@@ -166,21 +168,24 @@ def build_persona_decision_profile(persona, policy, event_context):
 
 
 def _distinct_new_evidence(evidence_items):
-    """同一事实的原文和摘要只保留个人影响更强的一项。"""
+    """同一事实、同一情绪方向只保留个人影响更强的一项。
+
+    2026/10/16，修改功能：一份通告可能同时包含“事实复述”和“新增
+    处置行动”。总影响仍按 evidence_group_id 去重，但效用计算保留
+    不同方向，避免整份通告的第一条片段覆盖真正可推动缓和的行动证据。
+    """
 
     by_group = {}
     for item in evidence_items:
         if not _is_eligible_new_evidence(item):
             continue
         group_id = str(item.get("evidence_group_id", item.get("evidence_id")))
+        group_key = (group_id, item.get("emotion"))
         impact = item.get("personal_impact", {})
-        score = max(
-            float(impact.get("emotion_score", 0.0) or 0.0),
-            float(impact.get("official_attitude_score", 0.0) or 0.0),
-        )
-        previous = by_group.get(group_id)
+        score = float(impact.get("emotion_score", 0.0) or 0.0)
+        previous = by_group.get(group_key)
         if previous is None or score > previous[0]:
-            by_group[group_id] = (score, item)
+            by_group[group_key] = (score, item)
     return [entry[1] for entry in by_group.values()]
 
 
@@ -231,6 +236,12 @@ def _emotion_utilities(profile, previous_emotion, items):
                 item.get("personal_impact", {}).get("emotion_score")
             )
             utilities[emotion] += 0.28 * score / total_weight
+            if emotion == "positive" and previous_emotion == "negative":
+                # 2026/10/16，修改功能：离散状态不允许 negative 直接
+                # 跳到 positive，因此建设性行动先为相邻 neutral 提供
+                # 缓和效用。它不是强制转向，仍须越过个人门槛并具备
+                # neutral方向证据，避免“积极行动反而无法缓和”的断层。
+                utilities["neutral"] += 0.18 * score / total_weight
     if previous_emotion in utilities:
         # 2026/10/14，修改功能：上一轮状态仍提供迟滞，但不再以过高固定
         # 奖励压过已经越过个人门槛的新证据。真正的保持条件由下面的

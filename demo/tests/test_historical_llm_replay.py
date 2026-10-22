@@ -118,6 +118,7 @@ class HistoricalLlmReplayTests(unittest.TestCase):
             {"neighbor_comment_count": 4, "public_comment_count": 11},
         )
         self.assertEqual(options["network"], {"neighbors_per_agent": 5})
+        self.assertEqual(options["incremental_comment_count"], 50)
 
     def test_historical_network_topology_can_be_overridden_per_event(self):
         context = _context()
@@ -685,6 +686,24 @@ class HistoricalLlmReplayTests(unittest.TestCase):
                 "process_accountability",
             },
         )
+        self.assertEqual(
+            [item["unresolved_concern"] for item in units],
+            [True, False, True],
+        )
+
+    def test_completed_fact_is_not_hidden_by_pending_responsibility(self):
+        context = _context()
+        context["current_state"]["official_statement"] = (
+            "受害人已接受伤情检查，案件事实和责任正在进一步核查。"
+            "调查处理结果将及时向社会公布。"
+        )
+
+        units = build_official_statement_evidence_units(
+            context["current_state"]
+        )
+
+        self.assertEqual(units[0]["evidence_target"], "fact_clarification")
+        self.assertTrue(units[0]["unresolved_concern"])
 
     def test_evidence_fields_do_not_leak_into_five_strategy_mode(self):
         """历史复现的证据契约不能改变五策略原有决策输出结构。"""
@@ -1228,7 +1247,7 @@ class HistoricalLlmReplayTests(unittest.TestCase):
         self.assertEqual(validated["current_emotion"], "neutral")
         self.assertEqual(validated["expression"]["emotion"], "negative")
 
-    def test_history_expression_rejects_exact_comment_copy(self):
+    def test_history_expression_allows_exact_comment_copy(self):
         candidate = {
             "comment_id": "visible_1",
             "text": "请继续公布可核实的调查进展。",
@@ -1257,8 +1276,16 @@ class HistoricalLlmReplayTests(unittest.TestCase):
             }
         )
 
-        with self.assertRaisesRegex(ValueError, "不得照抄"):
-            validate_cognition_decision(decision, choices)
+        validated = validate_cognition_decision(decision, choices)
+
+        self.assertEqual(validated["expression"]["text"], candidate["text"])
+        self.assertEqual(
+            validated["expression_similarity_audit"]["match_type"],
+            "exact",
+        )
+        self.assertTrue(
+            validated["expression_similarity_audit"]["accepted"]
+        )
 
     @patch("agents.decision_service.decide_agent_cognition")
     def test_history_service_uses_original_expression_not_pool_text(

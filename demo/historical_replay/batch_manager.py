@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-from runtime_paths import DEMO_DIR, EXPERIMENT_DIR  # noqa: F401
+if __package__:
+    from .runtime_paths import DEMO_DIR, EXPERIMENT_DIR  # noqa: F401
+else:  # pragma: no cover - 保留直接脚本启动方式
+    from runtime_paths import DEMO_DIR, EXPERIMENT_DIR  # noqa: F401
 
 from comments.pool_generator import generate_comment_pool
 from historical_replay.public_context import (

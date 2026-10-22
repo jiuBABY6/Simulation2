@@ -70,6 +70,10 @@ def build_initial_event_state(event_input):
         "objective_event_context",
         "objective_event_timing",
         "simulation_mode",
+        # 2026/10/20，新增功能：策略共同基线及分叉场景携带来源编号和
+        # 共同输入指纹，供公众反应生成与跨场景污染检查使用。
+        "scenario_id",
+        "shared_input_sha256",
     ):
         if field in event_input:
             state[field] = event_input[field]

@@ -18,11 +18,16 @@ STATE_FIELDS = (
     "official_statement_status",
 )
 OPTIONAL_STATE_FIELDS = (
+    "official_evidence_dimensions",
     "public_context",
     "public_context_timing",
     "objective_event_context",
     "objective_event_timing",
     "simulation_mode",
+    # 2026/10/20，新增功能：策略分叉后显式记录所属场景和共同输入
+    # 指纹，供增量评论标记来源及运行后跨场景污染检查使用。
+    "scenario_id",
+    "shared_input_sha256",
 )
 
 
@@ -30,11 +35,14 @@ def append_event_state_record(
     event_input,
     official_statement="",
     official_statement_status="none",
+    official_evidence_dimensions=None,
     public_context=None,
     public_context_timing=None,
     objective_event_context=None,
     objective_event_timing=None,
     simulation_mode=None,
+    scenario_id=None,
+    shared_input_sha256=None,
     state_file=EVENT_STATE_FILE,
 ):
     """追加当前时间步的事件状态记录。
@@ -44,11 +52,15 @@ def append_event_state_record(
         official_statement：本轮人工输入的官方声明，没有声明时传空字符串。
         official_statement_status：本轮人工选择的声明类型，只能是 none、clear、
             incomplete 或 conflict。
+        official_evidence_dimensions：可选的人工通告语义维度布尔映射；用于
+            补充关键词识别，不直接指定Agent结论。
         public_context：条件化历史回放的本轮公众语境。
         public_context_timing：该语境对应的阶段与时间范围。
         objective_event_context：可选的本轮客观事件，只由历史复现入口传入。
         objective_event_timing：可选的客观事件阶段和时间范围。
         simulation_mode：可选运行模式标记。
+        scenario_id：策略分叉后的场景编号。
+        shared_input_sha256：事件、初始评论、网络和客观事实时间线的共同哈希。
         state_file：事件状态历史 JSON 文件路径。
 
     返回：
@@ -75,6 +87,15 @@ def append_event_state_record(
         "official_statement": normalize_text(official_statement),
         "official_statement_status": official_statement_status,
     }
+    if official_evidence_dimensions is not None:
+        if not isinstance(official_evidence_dimensions, dict) or any(
+            not isinstance(value, bool)
+            for value in official_evidence_dimensions.values()
+        ):
+            raise ValueError("official_evidence_dimensions 必须是布尔值对象。")
+        state_record["official_evidence_dimensions"] = dict(
+            official_evidence_dimensions
+        )
     if public_context is not None:
         if not isinstance(public_context, dict):
             raise ValueError("public_context 必须是 JSON 对象。")
@@ -100,6 +121,19 @@ def append_event_state_record(
         if not normalized_mode:
             raise ValueError("simulation_mode 不能为空。")
         state_record["simulation_mode"] = normalized_mode
+    if scenario_id is not None:
+        normalized_scenario_id = str(scenario_id).strip()
+        if not normalized_scenario_id:
+            raise ValueError("scenario_id 不能为空。")
+        state_record["scenario_id"] = normalized_scenario_id
+    if shared_input_sha256 is not None:
+        normalized_fingerprint = str(shared_input_sha256).strip().lower()
+        if len(normalized_fingerprint) != 64 or any(
+            character not in "0123456789abcdef"
+            for character in normalized_fingerprint
+        ):
+            raise ValueError("shared_input_sha256 必须是64位十六进制SHA-256。")
+        state_record["shared_input_sha256"] = normalized_fingerprint
 
     history.append(state_record)
     history.sort(key=lambda item: (item["event_id"], item["step"]))
@@ -167,6 +201,14 @@ def is_valid_state_record(record):
         record["objective_event_context"], dict
     ):
         return False
+    if "official_evidence_dimensions" in record and (
+        not isinstance(record["official_evidence_dimensions"], dict)
+        or any(
+            not isinstance(value, bool)
+            for value in record["official_evidence_dimensions"].values()
+        )
+    ):
+        return False
     if "public_context" in record and not isinstance(
         record["public_context"], dict
     ):
@@ -181,6 +223,14 @@ def is_valid_state_record(record):
         return False
     if "simulation_mode" in record and not str(record["simulation_mode"]).strip():
         return False
+    if "scenario_id" in record and not str(record["scenario_id"]).strip():
+        return False
+    if "shared_input_sha256" in record:
+        fingerprint = str(record["shared_input_sha256"]).strip().lower()
+        if len(fingerprint) != 64 or any(
+            character not in "0123456789abcdef" for character in fingerprint
+        ):
+            return False
     return True
 
 

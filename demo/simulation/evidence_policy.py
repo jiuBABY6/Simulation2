@@ -156,7 +156,12 @@ def build_official_statement_evidence(current_state: dict | None) -> dict | None
         "evidence_type": "official_statement",
         "content": statement,
         "statement_status": status,
-        "evidence_target": "official_response",
+        "evidence_target": _official_clause_target(statement),
+        "reaction_target": _official_clause_target(statement),
+        "evidence_role": "clarify",
+        "information_source_type": "official",
+        "information_origin": "exogenous",
+        "claim_id": f"official_statement_step_{introduced_step}",
         "introduced_step": introduced_step,
         "active_round_count": active_round_count,
         "is_new": is_new,
@@ -165,13 +170,72 @@ def build_official_statement_evidence(current_state: dict | None) -> dict | None
             is_new,
             timing.get("evidence_strength"),
         ),
-        "positive_eligible": is_new,
+        # 2026/10/20，新增功能：人工维护的语义维度只补充可观察内容，
+        # 不直接指定Agent态度或情绪；缺失时仍由文本规则保守识别。
+        "evidence_dimensions": dict(
+            state.get("official_evidence_dimensions", {})
+        )
+        if isinstance(state.get("official_evidence_dimensions"), dict)
+        else {},
+        # 2026/10/19，修改功能：通告存在或内容清晰不等于事件已经产生
+        # 正面结果。只有明确写出修复、风险解除或结果完成，才允许它为
+        # 中性到正面的变化提供候选证据；一般到场、调查和控制主要用于
+        # 支持负面向中性缓和。
+        "positive_eligible": is_new
+        and _official_content_supports_positive_transition(statement),
     }
+
+
+def _official_content_supports_positive_transition(content: str) -> bool:
+    """保守判断通告是否包含已完成的修复或结果性事实。"""
+
+    text = str(content or "")
+    completed_markers = (
+        "整改完成",
+        "赔偿到位",
+        "达成和解",
+        "风险已排除",
+        "恢复正常",
+        "隐患已消除",
+        "已妥善解决",
+        "救援成功",
+        "安全获救",
+    )
+    pending_markers = (
+        "正在整改",
+        "正在协商",
+        "进一步调查",
+        "结果将",
+        "尚未",
+        "有待",
+    )
+    return any(marker in text for marker in completed_markers) and not any(
+        marker in text for marker in pending_markers
+    )
 
 
 def _official_clause_target(content: str) -> str:
     """按通告片段的可观察语义标注作用对象，不推断未写明的结论。"""
 
+    # 2026/10/18，修改功能：已经发生的控制、拘留、到场和送医属于
+    # 通告中的可核查事实，不应因同一句还包含“调查”就全部降为过程
+    # 描述。混合句中也先保留已经完成的事实，不能被“责任正在核查”
+    # 之类的过程词覆盖；纯追责或承诺句仍归入过程问责。
+    if any(
+        word in content
+        for word in (
+            "拘留",
+            "控制",
+            "到场",
+            "送医",
+            "已接报",
+            "已经接报",
+            "已调取",
+            "已固定",
+            "已接受伤情检查",
+        )
+    ):
+        return "fact_clarification"
     if any(word in content for word in ("责任", "追责", "处分", "问责", "道歉")):
         return "process_accountability"
     if any(word in content for word in ("搜寻", "救援", "帮助", "救助")):
@@ -216,6 +280,20 @@ def build_official_statement_evidence_units(
     group_id = parent["evidence_id"]
     units = []
     for index, clause in enumerate(clauses, start=1):
+        unresolved_concern = any(
+            marker in clause
+            for marker in (
+                "正在",
+                "尚未",
+                "有待",
+                "进一步",
+                "将依法",
+                "将继续",
+                "将根据",
+                "将及时",
+                "结果将",
+            )
+        )
         units.append(
             {
                 **parent,
@@ -224,7 +302,24 @@ def build_official_statement_evidence_units(
                 "evidence_group_id": group_id,
                 "content": clause,
                 "evidence_target": _official_clause_target(clause),
+                "reaction_target": _official_clause_target(clause),
+                "evidence_role": (
+                    "question" if unresolved_concern else "clarify"
+                ),
+                "information_source_type": "official",
+                "information_origin": "exogenous",
+                "claim_id": group_id,
                 "statement_part_index": index,
+                # 待调查或待公布语句只是明确说明“仍未完成”，不能和
+                # 已核实结论产生同样的接受信号；高质疑Persona可以据此
+                # 保持观望或提出质疑。
+                "unresolved_concern": unresolved_concern,
+                "positive_eligible": (
+                    parent.get("is_new") is True
+                    and _official_content_supports_positive_transition(
+                        clause
+                    )
+                ),
             }
         )
     return units

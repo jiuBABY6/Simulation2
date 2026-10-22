@@ -5,22 +5,32 @@ import json
 import sys
 import traceback
 
-from runtime_paths import DEMO_DIR  # noqa: F401，导入时注册 demo 模块路径。
-from event_repository import list_events, resolve_event_files
+if __package__:
+    from .runtime_paths import DEMO_DIR  # noqa: F401
+    from .event_repository import list_events, resolve_event_files
+    from .batch_manager import (
+        prepare_historical_batch,
+        prepare_historical_comment_pool,
+    )
+    from .replay_runner import run_historical_replay
+    from .timeline_service import load_official_response_timeline
+else:  # pragma: no cover - 保留既有直接脚本命令
+    from runtime_paths import DEMO_DIR  # noqa: F401
+    from event_repository import list_events, resolve_event_files
+    from batch_manager import (
+        prepare_historical_batch,
+        prepare_historical_comment_pool,
+    )
+    from replay_runner import run_historical_replay
+    from timeline_service import load_official_response_timeline
 from historical_replay.public_context import (
     load_public_context_timeline,
 )
 from historical_replay.initial_opinion import validate_initial_opinion
 
 from simulation.event_context import validate_event_input
-from experiment_runner import summarize_scenario_error
+from application.error_summary import summarize_scenario_error
 from infrastructure.json_storage import load_json, save_json
-from batch_manager import (
-    prepare_historical_batch,
-    prepare_historical_comment_pool,
-)
-from replay_runner import run_historical_replay
-from timeline_service import load_official_response_timeline
 
 
 # 2026/09/02 历史趋势复现，新增功能：独立准备批次并执行固定官方信息时间线。

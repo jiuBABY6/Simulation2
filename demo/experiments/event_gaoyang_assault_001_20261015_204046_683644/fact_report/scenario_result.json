@@ -1,0 +1,1086 @@
+{
+  "strategy": "fact_report",
+  "strategy_name": "事实通报",
+  "entry_strategy": "combined_policy",
+  "status": "success",
+  "entry_triggered": true,
+  "entry_reason": "negative_threshold",
+  "comparison_eligible": true,
+  "official_responses": [
+    {
+      "step": 2,
+      "strategy_id": "fact_report",
+      "strategy_name": "事实通报",
+      "official_statement": "8月29日中午，高阳县某商场门口发生一起两名女子之间的冲突。公安机关接报后已开展调查，依法询问涉事人员，调取现场监控并固定相关视频证据。受害人已接受伤情检查，案件事实和责任正在进一步核查，调查处理结果将及时向社会公布。",
+      "official_statement_status": "clear"
+    }
+  ],
+  "rounds": [
+    {
+      "step": 1,
+      "policy_metrics": {
+        "negative_rate": 0.8,
+        "negative_count": 24,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": null,
+        "accept_rate": null,
+        "official_attitude_applicable_count": 0,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 0,
+        "reached_agent_count": 0,
+        "reach_rate": 0.0,
+        "source_agent_count": 0,
+        "propagated_comment_count": 0,
+        "continued_propagation_count": 0,
+        "continued_agent_count": 0,
+        "continuation_rate": 0.0,
+        "max_propagation_depth": 0,
+        "average_propagation_depth": 0.0,
+        "total_effective_weight": 0
+      }
+    },
+    {
+      "step": 2,
+      "policy_metrics": {
+        "negative_rate": 0.8,
+        "negative_count": 24,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 127,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 21,
+        "continued_propagation_count": 8,
+        "continued_agent_count": 8,
+        "continuation_rate": 0.062992,
+        "max_propagation_depth": 1,
+        "average_propagation_depth": 1.0,
+        "total_effective_weight": 255.344
+      },
+      "comment_generation": {
+        "step": 2,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 2,
+        "initial_request_count": 2,
+        "refill_request_count": 0,
+        "rescue_request_count": 0,
+        "generation_wave_count": 1,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 20,
+        "rejection_counts": {},
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 3,
+      "policy_metrics": {
+        "negative_rate": 0.566667,
+        "negative_count": 17,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 145,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 9,
+        "continued_propagation_count": 18,
+        "continued_agent_count": 18,
+        "continuation_rate": 0.124138,
+        "max_propagation_depth": 2,
+        "average_propagation_depth": 1.275862,
+        "total_effective_weight": 262.0537
+      },
+      "comment_generation": {
+        "step": 3,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 35,
+        "rejection_counts": {
+          "重复文本": 15
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 9,
+            "negative": 10
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 4,
+      "policy_metrics": {
+        "negative_rate": 0.433333,
+        "negative_count": 13,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 141,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 9,
+        "continued_propagation_count": 19,
+        "continued_agent_count": 19,
+        "continuation_rate": 0.134752,
+        "max_propagation_depth": 3,
+        "average_propagation_depth": 1.851064,
+        "total_effective_weight": 217.23065
+      },
+      "comment_generation": {
+        "step": 4,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 19,
+        "history_fallback_count": 1,
+        "emergency_fallback_count": 0,
+        "fallback_count": 1,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 27,
+        "rejection_counts": {
+          "重复文本": 8
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 12,
+            "negative": 8
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 5,
+      "policy_metrics": {
+        "negative_rate": 0.2,
+        "negative_count": 6,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 137,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 15,
+        "continued_propagation_count": 12,
+        "continued_agent_count": 12,
+        "continuation_rate": 0.087591,
+        "max_propagation_depth": 4,
+        "average_propagation_depth": 2.124088,
+        "total_effective_weight": 192.983751
+      },
+      "comment_generation": {
+        "step": 5,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 20,
+        "history_fallback_count": 0,
+        "emergency_fallback_count": 0,
+        "fallback_count": 0,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 27,
+        "rejection_counts": {
+          "重复文本": 7
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 12,
+            "negative": 8
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 6,
+      "policy_metrics": {
+        "negative_rate": 0.1,
+        "negative_count": 3,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 132,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 15,
+        "continued_propagation_count": 20,
+        "continued_agent_count": 20,
+        "continuation_rate": 0.151515,
+        "max_propagation_depth": 5,
+        "average_propagation_depth": 1.515152,
+        "total_effective_weight": 223.557771
+      },
+      "comment_generation": {
+        "step": 6,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 18,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 39,
+        "rejection_counts": {
+          "重复文本": 20,
+          "重复 task_id": 1
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 14,
+            "negative": 6
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 7,
+      "policy_metrics": {
+        "negative_rate": 0.1,
+        "negative_count": 3,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 137,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 14,
+        "continued_propagation_count": 22,
+        "continued_agent_count": 22,
+        "continuation_rate": 0.160584,
+        "max_propagation_depth": 4,
+        "average_propagation_depth": 2.20438,
+        "total_effective_weight": 189.940485
+      },
+      "comment_generation": {
+        "step": 7,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 17,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 42,
+        "rejection_counts": {
+          "重复文本": 23,
+          "重复 task_id": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 8,
+      "policy_metrics": {
+        "negative_rate": 0.0,
+        "negative_count": 0,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 141,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 13,
+        "continued_propagation_count": 17,
+        "continued_agent_count": 17,
+        "continuation_rate": 0.120567,
+        "max_propagation_depth": 5,
+        "average_propagation_depth": 2.914894,
+        "total_effective_weight": 158.038472
+      },
+      "comment_generation": {
+        "step": 8,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 18,
+        "history_fallback_count": 2,
+        "emergency_fallback_count": 0,
+        "fallback_count": 2,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 34,
+        "rejection_counts": {
+          "重复文本": 16
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 9,
+      "policy_metrics": {
+        "negative_rate": 0.0,
+        "negative_count": 0,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "worsening"
+      },
+      "propagation_metrics": {
+        "exposure_count": 135,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 28,
+        "propagated_comment_count": 14,
+        "continued_propagation_count": 21,
+        "continued_agent_count": 21,
+        "continuation_rate": 0.155556,
+        "max_propagation_depth": 6,
+        "average_propagation_depth": 1.881481,
+        "total_effective_weight": 211.882454
+      },
+      "comment_generation": {
+        "step": 9,
+        "quality_status": "degraded",
+        "comment_count": 20,
+        "llm_comment_count": 15,
+        "history_fallback_count": 5,
+        "emergency_fallback_count": 0,
+        "fallback_count": 5,
+        "generation_attempts": 4,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 1,
+        "generation_wave_count": 3,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 45,
+        "rejection_counts": {
+          "重复文本": 28,
+          "重复 task_id": 2
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 0,
+            "neutral": 9,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    },
+    {
+      "step": 10,
+      "policy_metrics": {
+        "negative_rate": 0.0,
+        "negative_count": 0,
+        "negative_denominator": 30,
+        "negative_rate_basis": "agent_internal",
+        "expression_count": 30,
+        "silent_agent_count": 0,
+        "question_rate": 0.0,
+        "accept_rate": 0.033333,
+        "official_attitude_applicable_count": 30,
+        "global_trend": "stable"
+      },
+      "propagation_metrics": {
+        "exposure_count": 145,
+        "reached_agent_count": 30,
+        "reach_rate": 1.0,
+        "source_agent_count": 29,
+        "propagated_comment_count": 12,
+        "continued_propagation_count": 23,
+        "continued_agent_count": 23,
+        "continuation_rate": 0.158621,
+        "max_propagation_depth": 6,
+        "average_propagation_depth": 2.248276,
+        "total_effective_weight": 198.701056
+      },
+      "comment_generation": {
+        "step": 10,
+        "quality_status": "normal",
+        "comment_count": 20,
+        "llm_comment_count": 17,
+        "history_fallback_count": 3,
+        "emergency_fallback_count": 0,
+        "fallback_count": 3,
+        "generation_attempts": 3,
+        "initial_request_count": 2,
+        "refill_request_count": 1,
+        "rescue_request_count": 0,
+        "generation_wave_count": 2,
+        "quality_target_count": 17,
+        "model_returned_comment_count": 30,
+        "rejection_counts": {
+          "重复文本": 13
+        },
+        "validation_errors": [],
+        "emotion_coverage": {
+          "status": "not_required",
+          "required_counts": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0
+          },
+          "actual_counts": {
+            "positive": 1,
+            "neutral": 8,
+            "negative": 11
+          },
+          "required_task_count": 0,
+          "completed_required_task_count": 0,
+          "missing_task_ids": []
+        }
+      }
+    }
+  ],
+  "final_metrics": {
+    "negative_rate": 0.0,
+    "negative_count": 0,
+    "negative_denominator": 30,
+    "negative_rate_basis": "agent_internal",
+    "expression_count": 30,
+    "silent_agent_count": 0,
+    "question_rate": 0.0,
+    "accept_rate": 0.033333,
+    "official_attitude_applicable_count": 30,
+    "global_trend": "stable"
+  },
+  "effect_metrics": {
+    "analysis_start_step": 2,
+    "final_negative_rate": 0.0,
+    "negative_peak_rate": 0.8,
+    "negative_peak_steps": [
+      1,
+      2
+    ],
+    "negative_area": 3.0,
+    "observed_step_count": 10,
+    "control_net_effect": {
+      "final_negative_rate_reduction": 0.833333,
+      "peak_negative_rate_reduction": 0.066667,
+      "negative_area_reduction": 5.266665
+    },
+    "baseline_step": 1,
+    "baseline_negative_agent_count": 24,
+    "recovered_agent_count": 24,
+    "emotion_recovery_rate": 1.0,
+    "effect_baseline_negative_rate": 0.8,
+    "effect_start_step": 3,
+    "effect_end_step": 10,
+    "effect_duration": 8,
+    "rebound_agent_count": 0,
+    "rebound_rate": 0.0
+  },
+  "comment_quality": {
+    "quality_status": "degraded",
+    "llm_comment_count": 164,
+    "history_fallback_count": 16,
+    "emergency_fallback_count": 0,
+    "fallback_count": 16,
+    "generation_attempts": 29,
+    "initial_request_count": 18,
+    "refill_request_count": 8,
+    "rescue_request_count": 3,
+    "warning_steps": [
+      9
+    ],
+    "emotion_coverage_status": "not_required",
+    "emotion_coverage_warning_steps": []
+  },
+  "propagation_summary": {
+    "exposure_count": 1240,
+    "reached_agent_count": 30,
+    "reach_rate": 1.0,
+    "source_agent_count": 29,
+    "propagated_comment_count": 59,
+    "continued_propagation_count": 160,
+    "continued_agent_count": 30,
+    "continuation_rate": 0.129032,
+    "max_propagation_depth": 6,
+    "average_propagation_depth": 1.900806,
+    "total_effective_weight": 1909.732339
+  },
+  "shared_baseline_completed_step": 1,
+  "state_dir": "D:\\Desktop\\社会模拟已有代码\\demo\\experiments\\event_gaoyang_assault_001_20261015_204046_683644\\fact_report\\state",
+  "performance": {
+    "executed_step_count": 9,
+    "stage_duration_seconds": {
+      "incremental_comment_generation": 117.702,
+      "agent_decision": 112.21,
+      "metrics": 10.802
+    },
+    "llm_requests": {
+      "logical_request_count": 311,
+      "http_attempt_count": 311,
+      "retry_count": 0,
+      "failed_request_count": 0,
+      "total_duration_seconds": 694.472,
+      "by_type": {
+        "comment_generation": {
+          "logical_request_count": 29,
+          "http_attempt_count": 29,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 163.376
+        },
+        "agent_decision": {
+          "logical_request_count": 273,
+          "http_attempt_count": 273,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 520.49
+        },
+        "global_trend": {
+          "logical_request_count": 9,
+          "http_attempt_count": 9,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 10.603
+        }
+      }
+    },
+    "steps": [
+      {
+        "step": 2,
+        "total_duration_seconds": 21.294,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 7.099,
+          "agent_decision": 12.758,
+          "metrics": 1.417
+        },
+        "llm_requests": {
+          "logical_request_count": 33,
+          "http_attempt_count": 33,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 75.189,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 2,
+              "http_attempt_count": 2,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 13.423
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 60.365
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.401
+            }
+          }
+        }
+      },
+      {
+        "step": 3,
+        "total_duration_seconds": 26.822,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 13.541,
+          "agent_decision": 12.32,
+          "metrics": 0.937
+        },
+        "llm_requests": {
+          "logical_request_count": 34,
+          "http_attempt_count": 34,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 76.252,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 18.426
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 56.903
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 0.923
+            }
+          }
+        }
+      },
+      {
+        "step": 4,
+        "total_duration_seconds": 24.03,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 10.218,
+          "agent_decision": 12.619,
+          "metrics": 1.165
+        },
+        "llm_requests": {
+          "logical_request_count": 34,
+          "http_attempt_count": 34,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 75.889,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 15.005
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 59.734
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.149
+            }
+          }
+        }
+      },
+      {
+        "step": 5,
+        "total_duration_seconds": 23.496,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 10.145,
+          "agent_decision": 11.946,
+          "metrics": 1.371
+        },
+        "llm_requests": {
+          "logical_request_count": 34,
+          "http_attempt_count": 34,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 73.064,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 14.913
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 56.799
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.351
+            }
+          }
+        }
+      },
+      {
+        "step": 6,
+        "total_duration_seconds": 30.5,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 16.346,
+          "agent_decision": 12.889,
+          "metrics": 1.228
+        },
+        "llm_requests": {
+          "logical_request_count": 36,
+          "http_attempt_count": 36,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 81.094,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 21.208
+            },
+            "agent_decision": {
+              "logical_request_count": 31,
+              "http_attempt_count": 31,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 58.68
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.206
+            }
+          }
+        }
+      },
+      {
+        "step": 7,
+        "total_duration_seconds": 31.356,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 17.71,
+          "agent_decision": 12.138,
+          "metrics": 1.465
+        },
+        "llm_requests": {
+          "logical_request_count": 35,
+          "http_attempt_count": 35,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 80.572,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 22.678
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 56.455
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.44
+            }
+          }
+        }
+      },
+      {
+        "step": 8,
+        "total_duration_seconds": 26.884,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 13.28,
+          "agent_decision": 12.642,
+          "metrics": 0.916
+        },
+        "llm_requests": {
+          "logical_request_count": 35,
+          "http_attempt_count": 35,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 77.447,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 18.514
+            },
+            "agent_decision": {
+              "logical_request_count": 31,
+              "http_attempt_count": 31,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 58.044
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 0.888
+            }
+          }
+        }
+      },
+      {
+        "step": 9,
+        "total_duration_seconds": 31.884,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 17.828,
+          "agent_decision": 13.038,
+          "metrics": 0.967
+        },
+        "llm_requests": {
+          "logical_request_count": 36,
+          "http_attempt_count": 36,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 83.227,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 4,
+              "http_attempt_count": 4,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 22.749
+            },
+            "agent_decision": {
+              "logical_request_count": 31,
+              "http_attempt_count": 31,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 59.538
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 0.939
+            }
+          }
+        }
+      },
+      {
+        "step": 10,
+        "total_duration_seconds": 24.79,
+        "stage_duration_seconds": {
+          "incremental_comment_generation": 11.535,
+          "agent_decision": 11.86,
+          "metrics": 1.336
+        },
+        "llm_requests": {
+          "logical_request_count": 34,
+          "http_attempt_count": 34,
+          "retry_count": 0,
+          "failed_request_count": 0,
+          "total_duration_seconds": 71.738,
+          "by_type": {
+            "comment_generation": {
+              "logical_request_count": 3,
+              "http_attempt_count": 3,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 16.46
+            },
+            "agent_decision": {
+              "logical_request_count": 30,
+              "http_attempt_count": 30,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 53.972
+            },
+            "global_trend": {
+              "logical_request_count": 1,
+              "http_attempt_count": 1,
+              "retry_count": 0,
+              "failed_request_count": 0,
+              "total_duration_seconds": 1.306
+            }
+          }
+        }
+      }
+    ],
+    "duration_seconds": 244.824
+  }
+}

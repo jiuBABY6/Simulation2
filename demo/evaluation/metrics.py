@@ -304,6 +304,48 @@ def calculate_expression_distribution(agent_decisions):
     }
 
 
+# 2026/10/16，新增功能：单独统计沉默、原创和转发，并记录
+# 原创文本的去重率。该指标不改变内部情绪的全Agent分母，也不用
+# 发言人数反推情绪结论。
+def calculate_action_distribution(agent_decisions):
+    """返回Agent行为分布和可观测表达的基础多样性。"""
+
+    decisions = [record.get("decision", {}) for record in agent_decisions]
+    action_types = []
+    original_texts = []
+    for decision in decisions:
+        action_type = decision.get("action_type")
+        if action_type not in {"silent", "original", "reshare"}:
+            action_type = "original" if decision.get("will_comment") else "silent"
+        action_types.append(action_type)
+        if action_type == "original":
+            selected_comment = decision.get("selected_comment", {})
+            text = str(selected_comment.get("text", "")).strip()
+            if text:
+                original_texts.append(text)
+
+    agent_count = len(decisions)
+    distribution = {}
+    for action_type in ("silent", "original", "reshare"):
+        count = action_types.count(action_type)
+        distribution[action_type] = {
+            "count": count,
+            "rate": round(count / agent_count, 6) if agent_count else 0.0,
+        }
+    unique_original_count = len(set(original_texts))
+    return {
+        "agent_count": agent_count,
+        "distribution": distribution,
+        "original_expression_count": len(original_texts),
+        "unique_original_expression_count": unique_original_count,
+        "original_expression_uniqueness_rate": (
+            round(unique_original_count / len(original_texts), 6)
+            if original_texts
+            else None
+        ),
+    }
+
+
 # 2026/08/25 第五次联调问题修复，修改功能：无声明时将官方态度指标标为不适用。
 def calculate_attitude_distribution(agent_decisions, statement_status=None):
     """仅使用存在官方声明时的适用Agent计算官方态度分布。"""
@@ -436,6 +478,379 @@ def calculate_attitude_diagnostics(agent_decisions, statement_status=None):
     }
 
 
+# 2026/10/17，新增功能：聚合个人视图中的有效邻居曝光诊断。
+def calculate_neighbor_exposure_diagnostics(agent_decisions):
+    """统计邻居曝光目标的实际填充率、轮龄和根表达去重情况。"""
+
+    target_total = 0
+    visible_total = 0
+    full_target_count = 0
+    zero_exposure_count = 0
+    root_total = 0
+    age_distribution = {}
+    applicable_count = 0
+    for record in agent_decisions:
+        target = record.get("neighbor_target_count")
+        visible = record.get("neighbor_visible_count")
+        if (
+            isinstance(target, bool)
+            or not isinstance(target, int)
+            or target <= 0
+            or isinstance(visible, bool)
+            or not isinstance(visible, int)
+        ):
+            continue
+        applicable_count += 1
+        target_total += target
+        visible_total += max(0, visible)
+        full_target_count += visible >= target
+        zero_exposure_count += visible == 0
+        root_count = record.get("unique_neighbor_root_count", 0)
+        if isinstance(root_count, int) and not isinstance(root_count, bool):
+            root_total += max(0, root_count)
+        for age, count in record.get(
+            "neighbor_expression_age_distribution", {}
+        ).items():
+            if isinstance(count, int) and not isinstance(count, bool):
+                age_distribution[str(age)] = (
+                    age_distribution.get(str(age), 0) + max(0, count)
+                )
+
+    return {
+        "applicable_agent_count": applicable_count,
+        "target_exposure_count": target_total,
+        "effective_exposure_count": visible_total,
+        "effective_neighbor_exposure_rate": (
+            round(visible_total / target_total, 6)
+            if target_total
+            else None
+        ),
+        "full_target_agent_rate": (
+            round(full_target_count / applicable_count, 6)
+            if applicable_count
+            else None
+        ),
+        "zero_exposure_agent_rate": (
+            round(zero_exposure_count / applicable_count, 6)
+            if applicable_count
+            else None
+        ),
+        "average_unique_root_count": (
+            round(root_total / applicable_count, 6)
+            if applicable_count
+            else None
+        ),
+        "expression_age_distribution": age_distribution,
+        "diagnostic_only": True,
+    }
+
+
+# 2026/10/18，新增功能：汇总Persona状态门槛、方向性证据效用及
+# 邻居/公共证据限流效果。
+# 2026/10/19，修改功能：增加证据生命周期的新增、延续和消费数量，
+# 用于区分“没有新证据”与“权威证据仍在有限吸收期”。
+def calculate_strategy_state_diagnostics(agent_decisions):
+    """统计策略状态变化来源，不把诊断值作为新的群体控制条件。"""
+
+    applicable = []
+    for record in agent_decisions:
+        decision = record.get("decision", {})
+        if isinstance(decision.get("strategy_state_guard"), dict):
+            applicable.append(decision)
+    if not applicable:
+        return {
+            "applicable_agent_count": 0,
+            "diagnostic_only": True,
+        }
+
+    peer_signals = []
+    peer_thresholds = []
+    emotion_changed_count = 0
+    attitude_changed_count = 0
+    peer_allowed_count = 0
+    peer_held_count = 0
+    neighbor_visible_total = 0
+    neighbor_state_total = 0
+    public_visible_total = 0
+    public_state_total = 0
+    exogenous_state_total = 0
+    endogenous_state_total = 0
+    effective_non_peer_total = 0
+    held_non_peer_total = 0
+    directional_group_total = 0
+    lifecycle_new_total = 0
+    lifecycle_restored_total = 0
+    lifecycle_consumed_total = 0
+    assimilation_active_total = 0
+    assimilation_new_total = 0
+    assimilation_restored_total = 0
+    assimilation_expired_total = 0
+    assimilation_consumed_total = 0
+    assimilation_fractions = []
+    attitude_memory_active_total = 0
+    attitude_memory_new_total = 0
+    attitude_memory_restored_total = 0
+    utility_margins = []
+    switch_margins = []
+    directional_support_totals = {
+        "positive": 0.0,
+        "neutral": 0.0,
+        "negative": 0.0,
+    }
+    transition_basis_counts = {}
+    transition_reason_counts = {}
+    attitude_reason_counts = {}
+    for decision in applicable:
+        transition = decision.get("state_transition_diagnostics", {})
+        evidence = decision.get("state_evidence_diagnostics", {})
+        signal = transition.get("peer_signal_strength")
+        threshold = transition.get("peer_change_threshold")
+        if isinstance(signal, (int, float)) and not isinstance(signal, bool):
+            peer_signals.append(float(signal))
+        if isinstance(threshold, (int, float)) and not isinstance(
+            threshold,
+            bool,
+        ):
+            peer_thresholds.append(float(threshold))
+        emotion_changed_count += transition.get("emotion_changed") is True
+        attitude_changed_count += (
+            transition.get("official_attitude_changed") is True
+        )
+        basis = str(transition.get("state_change_basis", "unknown"))
+        transition_basis_counts[basis] = transition_basis_counts.get(
+            basis,
+            0,
+        ) + 1
+        # 新版方向性整合器直接保存邻居信号是否满足个体门槛；保留
+        # 旧basis兼容历史实验记录和离线可视化。
+        peer_eligible = transition.get("peer_influence_eligible")
+        if peer_eligible is True or (
+            basis == "peer_signal_passed_persona_threshold"
+        ):
+            peer_allowed_count += 1
+        elif (
+            int(transition.get("independent_neighbor_root_count", 0) or 0)
+            > 0
+            or basis == "peer_signal_below_persona_threshold"
+        ):
+            peer_held_count += 1
+        transition_reason = str(
+            transition.get("transition_reason", "unknown")
+        )
+        transition_reason_counts[transition_reason] = (
+            transition_reason_counts.get(transition_reason, 0) + 1
+        )
+        reason = str(
+            transition.get("official_transition_reason", "unknown")
+        )
+        attitude_reason_counts[reason] = attitude_reason_counts.get(
+            reason,
+            0,
+        ) + 1
+        neighbor_visible_total += int(
+            evidence.get("neighbor_visible_comment_count", 0) or 0
+        )
+        neighbor_state_total += int(
+            evidence.get("neighbor_state_evidence_count", 0) or 0
+        )
+        public_visible_total += int(
+            evidence.get("public_visible_comment_count", 0) or 0
+        )
+        public_state_total += int(
+            evidence.get("public_state_evidence_count", 0) or 0
+        )
+        exogenous_state_total += int(
+            evidence.get("exogenous_state_evidence_count", 0) or 0
+        )
+        endogenous_state_total += int(
+            evidence.get("endogenous_state_evidence_count", 0) or 0
+        )
+        effective_non_peer_total += int(
+            transition.get("effective_non_peer_evidence_count", 0) or 0
+        )
+        held_non_peer_total += int(
+            transition.get("held_non_peer_evidence_count", 0) or 0
+        )
+        directional_group_total += int(
+            transition.get("directional_evidence_group_count", 0) or 0
+        )
+        lifecycle = transition.get("evidence_lifecycle", {})
+        if isinstance(lifecycle, dict):
+            lifecycle_new_total += int(
+                lifecycle.get("new_group_count", 0) or 0
+            )
+            lifecycle_restored_total += int(
+                lifecycle.get("restored_group_count", 0) or 0
+            )
+            lifecycle_consumed_total += int(
+                lifecycle.get("consumed_group_count", 0) or 0
+            )
+        assimilation = transition.get("evidence_assimilation", {})
+        if isinstance(assimilation, dict):
+            assimilation_active_total += int(
+                assimilation.get("active_group_count", 0) or 0
+            )
+            assimilation_new_total += int(
+                assimilation.get("new_group_count", 0) or 0
+            )
+            assimilation_restored_total += int(
+                assimilation.get("restored_group_count", 0) or 0
+            )
+            assimilation_expired_total += int(
+                assimilation.get("expired_group_count", 0) or 0
+            )
+            assimilation_consumed_total += int(
+                assimilation.get("consumed_group_count", 0) or 0
+            )
+            absorbed_fraction = assimilation.get(
+                "average_absorbed_fraction"
+            )
+            if isinstance(absorbed_fraction, (int, float)) and not isinstance(
+                absorbed_fraction,
+                bool,
+            ):
+                assimilation_fractions.append(float(absorbed_fraction))
+        attitude_lifecycle = transition.get("attitude_lifecycle", {})
+        if isinstance(attitude_lifecycle, dict):
+            attitude_memory_active_total += int(
+                attitude_lifecycle.get("active_count", 0) or 0
+            )
+            attitude_memory_new_total += int(
+                attitude_lifecycle.get("new_count", 0) or 0
+            )
+            attitude_memory_restored_total += int(
+                attitude_lifecycle.get("restored_count", 0) or 0
+            )
+        utility_margin = transition.get("utility_margin")
+        if isinstance(utility_margin, (int, float)) and not isinstance(
+            utility_margin,
+            bool,
+        ):
+            utility_margins.append(float(utility_margin))
+        switch_margin = transition.get("required_switch_margin")
+        if isinstance(switch_margin, (int, float)) and not isinstance(
+            switch_margin,
+            bool,
+        ):
+            switch_margins.append(float(switch_margin))
+        directional_support = transition.get(
+            "aggregated_directional_support",
+            {},
+        )
+        if isinstance(directional_support, dict):
+            for emotion in directional_support_totals:
+                value = directional_support.get(emotion)
+                if isinstance(value, (int, float)) and not isinstance(
+                    value,
+                    bool,
+                ):
+                    directional_support_totals[emotion] += float(value)
+
+    count = len(applicable)
+    return {
+        "applicable_agent_count": count,
+        "emotion_changed_count": emotion_changed_count,
+        "emotion_changed_rate": round(emotion_changed_count / count, 6),
+        "official_attitude_changed_count": attitude_changed_count,
+        "official_attitude_changed_rate": round(
+            attitude_changed_count / count,
+            6,
+        ),
+        "peer_transition_allowed_count": peer_allowed_count,
+        "peer_transition_held_count": peer_held_count,
+        "average_peer_signal_strength": (
+            round(sum(peer_signals) / len(peer_signals), 6)
+            if peer_signals
+            else None
+        ),
+        "average_peer_change_threshold": (
+            round(sum(peer_thresholds) / len(peer_thresholds), 6)
+            if peer_thresholds
+            else None
+        ),
+        "neighbor_visible_comment_count": neighbor_visible_total,
+        "neighbor_state_evidence_count": neighbor_state_total,
+        "neighbor_state_evidence_retention_rate": (
+            round(neighbor_state_total / neighbor_visible_total, 6)
+            if neighbor_visible_total
+            else None
+        ),
+        "public_visible_comment_count": public_visible_total,
+        "public_state_evidence_count": public_state_total,
+        "public_state_evidence_retention_rate": (
+            round(public_state_total / public_visible_total, 6)
+            if public_visible_total
+            else None
+        ),
+        # 2026/10/19，新增功能：分开审计外部语境与Agent内生表达，避免把
+        # 两类信息混成一个“评论池数量”后误判方案效果来源。
+        "exogenous_state_evidence_count": exogenous_state_total,
+        "endogenous_state_evidence_count": endogenous_state_total,
+        "effective_non_peer_evidence_count": effective_non_peer_total,
+        "held_non_peer_evidence_count": held_non_peer_total,
+        "directional_evidence_group_count": directional_group_total,
+        "average_directional_evidence_group_count": round(
+            directional_group_total / count,
+            6,
+        ),
+        "lifecycle_new_evidence_group_count": lifecycle_new_total,
+        "lifecycle_restored_evidence_group_count": (
+            lifecycle_restored_total
+        ),
+        "lifecycle_consumed_evidence_group_count": (
+            lifecycle_consumed_total
+        ),
+        # 2026/10/20，新增功能：渐进吸收诊断只用于解释不同Persona的
+        # 延迟变化，不参与群体配额、进场判断或结果改写。
+        "assimilation_active_evidence_group_count": (
+            assimilation_active_total
+        ),
+        "assimilation_new_evidence_group_count": assimilation_new_total,
+        "assimilation_restored_evidence_group_count": (
+            assimilation_restored_total
+        ),
+        "assimilation_expired_evidence_group_count": (
+            assimilation_expired_total
+        ),
+        "assimilation_consumed_evidence_group_count": (
+            assimilation_consumed_total
+        ),
+        "average_authoritative_absorbed_fraction": (
+            round(
+                sum(assimilation_fractions) / len(assimilation_fractions),
+                6,
+            )
+            if assimilation_fractions
+            else None
+        ),
+        "attitude_memory_active_evidence_count": (
+            attitude_memory_active_total
+        ),
+        "attitude_memory_new_evidence_count": attitude_memory_new_total,
+        "attitude_memory_restored_evidence_count": (
+            attitude_memory_restored_total
+        ),
+        "average_directional_support": {
+            emotion: round(total / count, 6)
+            for emotion, total in directional_support_totals.items()
+        },
+        "average_utility_margin": (
+            round(sum(utility_margins) / len(utility_margins), 6)
+            if utility_margins
+            else None
+        ),
+        "average_required_switch_margin": (
+            round(sum(switch_margins) / len(switch_margins), 6)
+            if switch_margins
+            else None
+        ),
+        "transition_basis_counts": transition_basis_counts,
+        "transition_reason_counts": transition_reason_counts,
+        "official_transition_reason_counts": attitude_reason_counts,
+        "diagnostic_only": True,
+    }
+
+
 # 2026/08/25 第五次联调问题修复，修改功能：保存完整情绪分布并按声明状态计算官方态度。
 def calculate_round_metrics(
     event_context,
@@ -458,6 +873,9 @@ def calculate_round_metrics(
         "agent_expression_distribution": calculate_expression_distribution(
             successful_decisions
         ),
+        "agent_action_distribution": calculate_action_distribution(
+            successful_decisions
+        ),
         "official_attitude_distribution": calculate_attitude_distribution(
             successful_decisions,
             event_context.get("current_state", {}).get(
@@ -471,6 +889,12 @@ def calculate_round_metrics(
                 "official_statement_status",
                 "none",
             ),
+        ),
+        "neighbor_exposure_diagnostics": (
+            calculate_neighbor_exposure_diagnostics(successful_decisions)
+        ),
+        "strategy_state_diagnostics": (
+            calculate_strategy_state_diagnostics(successful_decisions)
         ),
         # 2026/9/5，社交网络传播第二阶段A，新增功能：在单轮指标中保存传播覆盖和深度。
         "propagation_metrics": propagation_metrics

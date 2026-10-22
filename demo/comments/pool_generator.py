@@ -116,6 +116,8 @@ def build_generation_prompt(
 8. orientation 只能是：{ORIENTATIONS}
 9. stance 只能是：{STANCES}
 10. 提供角度任务时，task_id 必须来自本批次角度任务，不得自行创建或重复。
+11. reaction_target 只能从 event_harm、official_claim、investigation_process、accountability、victim_support、public_discourse、social_action 中选择。
+12. evidence_role 只能从 support、contradict、question、opinion、background、clarify 中选择；普通网民的个人判断不能标记成已经核实的事实。
 
 【输出格式】
 只能返回一个 JSON 对象，不要返回 Markdown 或额外解释：
@@ -128,7 +130,10 @@ def build_generation_prompt(
       "topic": "事件主题",
       "emotion": "negative",
       "orientation": "fact",
-      "stance": "questioning"
+      "stance": "questioning",
+      "reaction_target": "event_harm",
+      "evidence_role": "opinion",
+      "claim_id": null
     }}
   ]
 }}
@@ -447,6 +452,20 @@ def generate_comment_pool(
                 "stance": comment["stance"],
                 "introduced_step": current_step,
                 "generation_trigger": "initial_event",
+                # 2026/10/19，新增功能：初始评论属于实验外部公共语境，
+                # 与后续Agent原创/转发形成的内生表达明确分离。
+                "source_type": "llm_generated",
+                "provenance_type": "llm_initial_public",
+                "information_source_type": comment.get(
+                    "information_source_type", "public"
+                ),
+                "information_origin": "exogenous",
+                "reaction_target": comment.get(
+                    "reaction_target", "event_harm"
+                ),
+                "evidence_role": comment.get("evidence_role", "opinion"),
+                "claim_id": comment.get("claim_id"),
+                "root_id": comment.get("root_id", comment["task_id"]),
             }
         )
 

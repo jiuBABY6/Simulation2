@@ -1,10 +1,16 @@
+"""使用现有有效 Persona 原子重建全局策略配置。"""
+
 import json
 import shutil
 from datetime import datetime
 from pathlib import Path
 
-from build_personas import build_global_policy_config
-from emotion import build_emotion_quantiles, EMOTION_FIELDS
+if __package__:
+    from .emotion import build_emotion_quantiles, EMOTION_FIELDS
+    from .policy_builder import build_global_policy_config
+else:  # pragma: no cover - 保留既有直接脚本命令
+    from emotion import build_emotion_quantiles, EMOTION_FIELDS
+    from policy_builder import build_global_policy_config
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent

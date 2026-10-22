@@ -13,7 +13,7 @@ from visualization.historical.comparison_service import compare_negative_trends
 from visualization.historical.real_data_processor import _build_real_trend_from_rows
 
 
-EVENT_ID = "event_beiguo_xiantianxia_crash_20260920_001"
+EVENT_ID = "event_beiguo_xiantianxia_crash_20260920_002"
 
 
 def _two_stage_rows() -> list[dict[str, str]]:

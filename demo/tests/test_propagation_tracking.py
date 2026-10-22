@@ -15,6 +15,10 @@ from simulation.propagation_tracking import (
     attach_expression_lineage,
     build_propagation_events,
 )
+from simulation.propagation import (  # noqa: E402
+    extract_recent_agent_expressions,
+    sample_neighbor_comments,
+)
 
 
 class PropagationTrackingTests(unittest.TestCase):
@@ -185,6 +189,103 @@ class PropagationTrackingTests(unittest.TestCase):
         self.assertEqual(
             events[0]["resulting_expression_id"],
             results[0]["decision"]["expression_id"],
+        )
+
+    def test_recent_expression_window_keeps_three_rounds(self):
+        """策略传播池应保留最近三轮并记录准确轮龄。"""
+
+        records = []
+        for step in (1, 2, 3):
+            records.append(
+                {
+                    "event_id": "event_test",
+                    "step": step,
+                    "status": "success",
+                    "agent_id": "agent_source",
+                    "decision": {
+                        "will_comment": True,
+                        "selected_comment": {
+                            "comment_id": f"comment_{step}",
+                            "text": f"第{step}轮表达",
+                        },
+                    },
+                }
+            )
+
+        result = extract_recent_agent_expressions(
+            records,
+            "event_test",
+            step=4,
+            window_rounds=3,
+        )
+
+        self.assertEqual(
+            [item["expression_age"] for item in result["agent_source"]],
+            [1, 2, 3],
+        )
+
+    def test_neighbor_sampling_prefers_recent_and_deduplicates_root(self):
+        """同一根传播链只曝光一次，且最近表达先占邻居名额。"""
+
+        network = {
+            "nodes": [
+                {"agent_id": "target", "influence_weight": 1.0},
+                {"agent_id": "source_a", "influence_weight": 1.0},
+                {"agent_id": "source_b", "influence_weight": 1.0},
+            ],
+            "edges": [
+                {"source_agent_id": "target", "target_agent_id": "source_a"},
+                {"source_agent_id": "target", "target_agent_id": "source_b"},
+            ],
+            "propagation_decay_factor": 0.7,
+        }
+        expressions = {
+            "source_a": [
+                {
+                    "comment_id": "recent_root_a",
+                    "expression_id": "expression_recent_a",
+                    "root_expression_ids": ["root_a"],
+                    "expression_age": 1,
+                    "propagation_depth": 0,
+                },
+                {
+                    "comment_id": "old_root_b",
+                    "expression_id": "expression_old_b",
+                    "root_expression_ids": ["root_b"],
+                    "expression_age": 3,
+                    "propagation_depth": 0,
+                },
+            ],
+            "source_b": [
+                {
+                    "comment_id": "duplicate_root_a",
+                    "expression_id": "expression_duplicate_a",
+                    "root_expression_ids": ["root_a"],
+                    "expression_age": 2,
+                    "propagation_depth": 0,
+                }
+            ],
+        }
+
+        result = sample_neighbor_comments(
+            network,
+            expressions,
+            "target",
+            "event_test",
+            step=4,
+            sample_count=2,
+            random_seed=2026,
+        )
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["comment_id"], "recent_root_a")
+        self.assertEqual(
+            {item["root_expression_ids"][0] for item in result},
+            {"root_a", "root_b"},
+        )
+        self.assertLess(
+            result[1]["propagation_weight"],
+            result[0]["propagation_weight"],
         )
 
 

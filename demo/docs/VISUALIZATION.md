@@ -1,16 +1,20 @@
 # 结果可视化
 
-`visualization` 是统一的只读展示模块。它自动识别五策略实验和历史复现实验，不修改 `demo/experiments`，也不会调用大模型。
+`visualization` 是统一的只读展示模块。它自动识别回应方案对照实验和历史复现实验，不修改 `demo/experiments`，也不会调用大模型。
 
 ## 三层职责
 
 2026/10/10 重构后，可视化按职责划分为三层：
 
 - `visualization/historical/`：历史复现实验、人工真实趋势、探索性对照和历史页面；
-- `visualization/strategy/`：五策略实验结果整理和五策略专属对比页面；
+- `visualization/strategy/`：回应方案对照结果整理和专属对比页面；
 - `visualization/shared/`：实验目录适配，以及两种模式共用的社交网络、逐轮传播和评论传播链。
 
-`visualization/app.py` 只负责 HTTP 路由和静态资源托管。历史趋势计算不会进入五策略服务，五策略比较也不会进入历史服务；共享网络通过统一实验适配器只读两类实验目录，避免复制两套网络构图代码。
+`visualization/app.py` 只负责 HTTP 传输和静态资源托管，
+`visualization/api_router.py` 负责 API 参数校验与服务分发，
+`visualization/shared/artifact_io.py` 统一只读加载 JSON/JSONL。历史趋势计算
+不会进入回应方案对照服务，回应方案比较也不会进入历史服务；共享网络通过统一实验
+适配器只读两类实验目录，避免复制两套网络构图代码。
 
 ## 启动统一入口
 
@@ -23,7 +27,7 @@ python visualization\app.py
 
 默认打开 `http://127.0.0.1:8765`。首页提供两种模式：
 
-- **五策略推演**：查看五种回应策略、固定关注网络、逐轮传播和单评论传播链；
+- **回应方案对照推演**：新批次查看三个自定义回应方案与一组不回应基线，同时查看固定关注网络、逐轮传播和单评论传播链；
 - **历史数据复现**：查看模拟趋势与人工真实趋势对照，并可进入同批次的社交网络和评论追踪。
 
 不自动打开浏览器：
@@ -36,16 +40,16 @@ python visualization\app.py --no-browser
 
 实验目录接口只索引 `status=completed` 的批次：
 
-- 包含 `experiment_result.json`：识别为五策略实验；
+- 包含 `experiment_result.json`：识别为回应方案对照实验（兼容旧五场景批次）；
 - 包含 `historical_replay_result.json`：识别为历史复现；
 - 失败批次不会作为可用入口展示。
 
-首页还会检查页面所需数据：五策略入口要求网络快照及传播/决策记录完整；历史复现入口要求存在与实验 `event_id` 对应的真实趋势文件。旧历史批次即使没有网络记录，也可以展示趋势；此时页面明确隐藏网络入口，不伪造传播数据。
+首页还会检查页面所需数据：回应方案对照入口要求网络快照及传播/决策记录完整；历史复现入口要求存在与实验 `event_id` 对应的真实趋势文件。旧历史批次即使没有网络记录，也可以展示趋势；此时页面明确隐藏网络入口，不伪造传播数据。
 
 网络与评论追踪会根据实验类型自动选择路径：
 
 ```text
-五策略：<experiment>/<scenario>/state/
+回应方案对照：<experiment>/<scenario>/state/
 历史复现：<experiment>/historical_replay/state/
 ```
 
@@ -84,11 +88,11 @@ python visualization\historical\real_data_processor.py --event-id <event_id>
 
 处理器默认读取 `demo/historical_replay/events/<event_id>/real_trend_source.xlsx`，结果保存在 `visualization/data/real_trends/<event_id>.json`。不同事件不会再互相覆盖；网页按所选实验自动加载对应JSON，不会重复读取Excel。
 
-## 五策略可视化
+## 回应方案对照可视化
 
-首页选择五策略批次后进入 `/strategy/`。该页面只展示五策略业务指标：逐轮负面情绪率、最终趋势、官方投入次数、传播摘要和评论生成质量。点击“社交网络与评论追踪”后进入共享网络页面。
+首页选择回应方案对照批次后进入 `/strategy/`。该页面展示逐轮负面情绪率、最终趋势、官方投入次数、沉默/原创/转发数量、参与率、原创去重率、传播摘要和评论生成质量。2026/10/16新增三张随策略切换的逐轮诊断图：Agent内部情绪以全部Agent为分母，Agent实际表达情绪以本轮真实发言者为分母，官方态度以公告投入后的适用Agent为分母；公告投入前的官方态度显示为空缺而不是0。旧批次若汇总文件缺少这些字段，页面只读加载场景`metrics_history.jsonl`，无需重跑。旧五场景批次仍按文件中的实际场景数动态展示。点击“社交网络与评论追踪”后进入共享网络页面。
 
-五策略页面的数据由 `visualization/strategy/service.py` 提供，不读取人工真实趋势，也不执行历史拟合计算。
+回应方案对照页面的数据由 `visualization/strategy/service.py` 提供，不读取人工真实趋势，也不执行历史拟合计算。
 
 ## 共享社交网络与评论追踪
 
@@ -101,7 +105,7 @@ python visualization\historical\real_data_processor.py --event-id <event_id>
 - 按传播深度排序的评论目录；
 - 单评论传播 DAG 和“看见但未继续”节点。
 
-五策略实验显示场景传播差异；历史复现显示逐阶段传播变化，不把阶段差异解释为策略因果效果。
+回应方案对照实验显示场景传播差异；历史复现显示逐阶段传播变化，不把阶段差异解释为策略因果效果。
 
 2026年9月2日以前的历史批次可能没有 `social_network_snapshot.json` 和 `propagation_history.jsonl`。这些批次仍可查看历史趋势，但不能事后重建真实传播链。
 
@@ -110,7 +114,7 @@ python visualization\historical\real_data_processor.py --event-id <event_id>
 当前只读 API 按职责命名：
 
 - `/api/catalog`：共享实验目录；
-- `/api/strategy/dashboard`：五策略总览；
+- `/api/strategy/dashboard`：回应方案对照总览；
 - `/api/historical/*`：历史结果、真实趋势和探索性比较；
 - `/api/network/*`：两类实验共用的网络、评论目录和传播链。
 
